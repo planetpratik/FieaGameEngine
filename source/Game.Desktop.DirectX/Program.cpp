@@ -3,7 +3,6 @@
 
 #include "pch.h"
 #include "GameException.h"
-#include "Foo.h"
 #include "Monster.h"
 
 using namespace std;
@@ -12,7 +11,6 @@ using namespace gsl;
 using namespace winrt;
 using namespace DirectX;
 using namespace Library;
-using namespace FieaGameEngine;
 
 void InitializeWindow(HINSTANCE instance, const wstring& className, const wstring& windowTitle, int showCommand);
 LRESULT WINAPI WndProc(HWND windowHandle, UINT message, WPARAM wParam, LPARAM lParam);
@@ -44,9 +42,6 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int showCommand)
 	InitializeDirectX();
 
 	MSG message = { 0 };
-
-	Foo f;
-	f;
 
 	Monster m;
 	m;

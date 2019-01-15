@@ -18,6 +18,12 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SList.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SList.inl" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{B5185635-03C8-43DD-82A8-5B20E0F88E8C}</ProjectGuid>

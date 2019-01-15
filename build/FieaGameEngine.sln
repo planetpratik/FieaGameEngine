@@ -13,7 +13,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Game.Desktop.DirectX", "..\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D9A66D90-C6EB-4D48-A0BB-FDC57067E526}"
 	ProjectSection(SolutionItems) = preProject
-		..\source\Game.Desktop.DirectX\Shared.props = ..\source\Game.Desktop.DirectX\Shared.props
+		Shared.props = Shared.props
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Game.Desktop.OpenGL", "..\source\Game.Desktop.OpenGL\Game.Desktop.OpenGL.vcxproj", "{66D035BB-151A-4B7D-8000-C72D5BF6C43D}"

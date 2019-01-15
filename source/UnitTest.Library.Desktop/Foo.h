@@ -6,9 +6,10 @@ namespace FieaGameEngine
 	public:
 		explicit Foo(int data = 0);
 		~Foo() = default;
-		int Data() const;
+		int data() const;
+		bool operator==(const Foo& t_rhs) const;
 	private:
-		int mData;
+		int m_data;
 	};
 }
 

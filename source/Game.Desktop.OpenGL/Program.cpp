@@ -1,16 +1,10 @@
 // Program.cpp : Defines the entry point for the application.
 
 #include "pch.h"
-#include "Foo.h"
 #include "Monster.h"
-
-using namespace FieaGameEngine;
 
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR commandLine, int showCommand)
 {
-	Foo f;
-	f;
-
 	Monster m;
 	m;
 
