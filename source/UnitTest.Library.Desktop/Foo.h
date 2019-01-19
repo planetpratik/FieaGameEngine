@@ -8,6 +8,7 @@ namespace FieaGameEngine
 		~Foo() = default;
 		int data() const;
 		bool operator==(const Foo& t_rhs) const;
+		bool operator!=(const Foo & t_rhs) const;
 	private:
 		int m_data;
 	};

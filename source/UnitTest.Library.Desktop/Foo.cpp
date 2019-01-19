@@ -18,4 +18,9 @@ namespace FieaGameEngine
 		return m_data == t_rhs.m_data;
 	}
 
+	bool Foo::operator!=(const Foo & t_rhs) const
+	{
+		return !(*this == t_rhs);
+	}
+
 }

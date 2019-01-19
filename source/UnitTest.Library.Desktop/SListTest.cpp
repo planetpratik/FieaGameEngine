@@ -71,7 +71,7 @@ namespace UnitTestLibraryDesktop
 			Assert::AreEqual(10, list_of_integers->back());
 			Assert::AreEqual(20, list_of_integers->front());
 			// At this stage, Size of the list should be 2.
-			Assert::AreEqual(2, static_cast<int>(list_of_integers->size()));
+			Assert::AreEqual(2U, list_of_integers->size());
 		}
 
 		// Test method popFront() for list of Integers
@@ -115,7 +115,7 @@ namespace UnitTestLibraryDesktop
 			Assert::AreEqual(10, list_of_integers->front());
 			Assert::AreEqual(20, list_of_integers->back());
 			// At this stage, Size of the list should be 2.
-			Assert::AreEqual(2, static_cast<int>(list_of_integers->size()));
+			Assert::AreEqual(2U, list_of_integers->size());
 		}
 
 		// Test method popBack() for list of Integers
@@ -155,7 +155,7 @@ namespace UnitTestLibraryDesktop
 			list_of_integers->pushFront(30);
 			list_of_integers->clear();
 			// Once list is cleared, size returned should be zero.
-			Assert::AreEqual(0, static_cast<int>(list_of_integers->size()));
+			Assert::AreEqual(0U, list_of_integers->size());
 		}
 
 		// Test method front() for list of Integers
@@ -192,11 +192,11 @@ namespace UnitTestLibraryDesktop
 		TEST_METHOD(SListIntTestSize)
 		{
 			// When initialised, size returned should be zero.
-			Assert::AreEqual(0, static_cast<int>(list_of_integers->size()));
+			Assert::AreEqual(0U, list_of_integers->size());
 			// After inserting 2 elements, size should be 2.
 			list_of_integers->pushFront(10);
 			list_of_integers->pushBack(20);
-			Assert::AreEqual(2, static_cast<int>(list_of_integers->size()));
+			Assert::AreEqual(2U, list_of_integers->size());
 		}
 
 		// Test method isEmpty() for list of Integers
@@ -220,7 +220,7 @@ namespace UnitTestLibraryDesktop
 			// Check that passed list isn't empty.
 			Assert::IsFalse(list_of_integers->isEmpty());
 			// Print size of the list - It should be 3 at this stage.
-			Assert::AreEqual(3, static_cast<int>(temp_list->size()));
+			Assert::AreEqual(3U, temp_list->size());
 			// Remove last element from temp list. Last element in the list should be 20 now.
 			temp_list->popBack();
 			Assert::AreEqual(20, temp_list->back()); 
@@ -241,11 +241,11 @@ namespace UnitTestLibraryDesktop
 			Assert::AreEqual(30, list_of_integers->back());
 			list_of_integers->popBack();
 			// After deleting last element, list size should be 2.
-			Assert::AreEqual(2, static_cast<int>(list_of_integers->size()));
+			Assert::AreEqual(2U, list_of_integers->size());
 			Assert::AreEqual(20, list_of_integers->back());
 			list_of_integers->popBack();
 			// After deleting last element, list size should be 1.
-			Assert::AreEqual(1, static_cast<int>(list_of_integers->size()));
+			Assert::AreEqual(1U, list_of_integers->size());
 			Assert::AreEqual(10, list_of_integers->back());
 		}
 
@@ -273,7 +273,7 @@ namespace UnitTestLibraryDesktop
 			Assert::AreEqual(&a, list_of_integer_pointers->back());
 			Assert::AreEqual(&b, list_of_integer_pointers->front());
 			// At this stage, Size of the list should be 2.
-			Assert::AreEqual(2, static_cast<int>(list_of_integer_pointers->size()));
+			Assert::AreEqual(2U, list_of_integer_pointers->size());
 		}
 
 		// Test method popFront() for list of Integer pointers
@@ -321,7 +321,7 @@ namespace UnitTestLibraryDesktop
 			Assert::AreEqual(&a, list_of_integer_pointers->front());
 			Assert::AreEqual(&b, list_of_integer_pointers->back());
 			// At this stage, Size of the list should be 2.
-			Assert::AreEqual(2, static_cast<int>(list_of_integer_pointers->size()));
+			Assert::AreEqual(2U, list_of_integer_pointers->size());
 		}
 
 		// Test method popBack() for list of Integer pointers
@@ -366,7 +366,7 @@ namespace UnitTestLibraryDesktop
 			list_of_integer_pointers->pushFront(&c);
 			list_of_integer_pointers->clear();
 			// Once list is cleared, size returned should be zero.
-			Assert::AreEqual(0, static_cast<int>(list_of_integer_pointers->size()));
+			Assert::AreEqual(0U, list_of_integer_pointers->size());
 		}
 
 		// Test method front() for list of Integer pointers
@@ -409,11 +409,11 @@ namespace UnitTestLibraryDesktop
 			int a = 10;
 			int b = 20;
 			// When initialised, size returned should be zero.
-			Assert::AreEqual(0, static_cast<int>(list_of_integer_pointers->size()));
+			Assert::AreEqual(0U, list_of_integer_pointers->size());
 			// After inserting 2 elements, size should be 2.
 			list_of_integer_pointers->pushFront(&a);
 			list_of_integer_pointers->pushBack(&b);
-			Assert::AreEqual(2, static_cast<int>(list_of_integer_pointers->size()));
+			Assert::AreEqual(2U, list_of_integer_pointers->size());
 		}
 
 		// Test method isEmpty() for list of Integer pointers
@@ -441,7 +441,7 @@ namespace UnitTestLibraryDesktop
 			// Check that passed list isn't empty.
 			Assert::IsFalse(list_of_integer_pointers->isEmpty());
 			// Print size of the list - It should be 3 at this stage.
-			Assert::AreEqual(3, static_cast<int>(temp_list.size()));
+			Assert::AreEqual(3U, temp_list.size());
 			// Remove last element from temp list. Last element in the list should be 20 now.
 			temp_list.popBack();
 			Assert::AreEqual(&b, temp_list.back());
@@ -465,11 +465,11 @@ namespace UnitTestLibraryDesktop
 			Assert::AreEqual(&c, list_of_integer_pointers->back());
 			list_of_integer_pointers->popBack();
 			// After deleting last element, list size should be 2.
-			Assert::AreEqual(2, static_cast<int>(list_of_integer_pointers->size()));
+			Assert::AreEqual(2U, list_of_integer_pointers->size());
 			Assert::AreEqual(&b, list_of_integer_pointers->back());
 			list_of_integer_pointers->popBack();
 			// After deleting last element, list size should be 1.
-			Assert::AreEqual(1, static_cast<int>(list_of_integer_pointers->size()));
+			Assert::AreEqual(1U, list_of_integer_pointers->size());
 			Assert::AreEqual(&a, list_of_integer_pointers->back());
 		}
 
@@ -496,7 +496,7 @@ namespace UnitTestLibraryDesktop
 			Assert::AreEqual(a, list_of_foos->back());
 			Assert::AreEqual(b, list_of_foos->front());
 			// At this stage, Size of the list should be 2.
-			Assert::AreEqual(2, static_cast<int>(list_of_foos->size()));
+			Assert::AreEqual(2U, list_of_foos->size());
 		}
 
 		// Test method popFront() for list of Foos
@@ -544,7 +544,7 @@ namespace UnitTestLibraryDesktop
 			Assert::AreEqual(a, list_of_foos->front());
 			Assert::AreEqual(b, list_of_foos->back());
 			// At this stage, Size of the list should be 2.
-			Assert::AreEqual(2, static_cast<int>(list_of_foos->size()));
+			Assert::AreEqual(2U, list_of_foos->size());
 		}
 
 		// Test method popBack() for list of Foos
@@ -589,7 +589,7 @@ namespace UnitTestLibraryDesktop
 			list_of_foos ->pushFront(c);
 			list_of_foos->clear();
 			// Once list is cleared, size returned should be zero.
-			Assert::AreEqual(0, static_cast<int>(list_of_foos->size()));
+			Assert::AreEqual(0U, list_of_foos->size());
 		}
 
 		// Test method front() for list of Foos
@@ -633,11 +633,11 @@ namespace UnitTestLibraryDesktop
 			Foo a(10);
 			Foo b(20);
 			// When initialised, size returned should be zero.
-			Assert::AreEqual(0, static_cast<int>(list_of_foos->size()));
+			Assert::AreEqual(0U, list_of_foos->size());
 			// After inserting 2 elements, size should be 2.
 			list_of_foos->pushFront(a);
 			list_of_foos->pushBack(b);
-			Assert::AreEqual(2, static_cast<int>(list_of_foos->size()));
+			Assert::AreEqual(2U, list_of_foos->size());
 		}
 
 		// Test method isEmpty() for list of Foos
@@ -665,7 +665,7 @@ namespace UnitTestLibraryDesktop
 			// Check that passed list isn't empty.
 			Assert::IsFalse(list_of_foos->isEmpty());
 			// Print size of the list - It should be 3 at this stage.
-			Assert::AreEqual(3, static_cast<int>(temp_list->size()));
+			Assert::AreEqual(3U, temp_list->size());
 			// Remove last element from temp list. Last element in the list should be 20 now.
 			temp_list->popBack();
 			Assert::AreEqual(b, temp_list->back());
@@ -689,12 +689,509 @@ namespace UnitTestLibraryDesktop
 			Assert::AreEqual(c, list_of_foos->back());
 			list_of_foos->popBack();
 			// After deleting last element, list size should be 2.
-			Assert::AreEqual(2, static_cast<int>(list_of_foos->size()));
+			Assert::AreEqual(2U, list_of_foos->size());
 			Assert::AreEqual(b, list_of_foos->back());
 			list_of_foos->popBack();
 			// After deleting last element, list size should be 1.
-			Assert::AreEqual(1, static_cast<int>(list_of_foos->size()));
+			Assert::AreEqual(1U, list_of_foos->size());
 			Assert::AreEqual(a, list_of_foos->back());
+		}
+
+		// Unit test for Iterator Implementation
+
+		TEST_METHOD(IteratorTestConstructor)
+		{
+			{
+				SList<int>::Iterator it;
+				// Iterator doesn't belong to any list. Exception should be thrown.
+				auto expression = [&] { int a = *it; };
+				Assert::ExpectException<std::exception>(expression);
+			}
+			{
+				SList<int*>::Iterator it;
+				// Iterator doesn't belong to any list. Exception should be thrown.
+				auto expression = [&] { int* a = *it; };
+				Assert::ExpectException<std::exception>(expression);
+			}
+			{
+				SList<Foo>::Iterator it;
+				// Iterator doesn't belong to any list. Exception should be thrown.
+				auto expression = [&] { Foo a = *it; };
+				Assert::ExpectException<std::exception>(expression);
+			}
+		}
+
+		TEST_METHOD(IteratorTestCopyConstructor)
+		{
+			{
+				list_of_integers->pushFront(10);
+				SList<int>::Iterator it = list_of_integers->begin();
+				SList<int>::Iterator it2(it);
+				Assert::IsTrue(it == it2);
+			}
+			{
+				int a = 10;
+				list_of_integer_pointers->pushFront(&a);
+				SList<int*>::Iterator it = list_of_integer_pointers->begin();
+				SList<int*>::Iterator it2(it);
+				Assert::IsTrue(it == it2);
+			}
+			{
+				Foo a(10);
+				list_of_foos->pushFront(a);
+				SList<Foo>::Iterator it = list_of_foos->begin();
+				SList<Foo>::Iterator it2(it);
+				Assert::IsTrue(it == it2);
+			}
+		}
+
+		TEST_METHOD(IteratorTestAssignmentOperator)
+		{
+			{
+				list_of_integers->pushFront(10);
+				SList<int>::Iterator it = list_of_integers->begin();
+				SList<int>::Iterator it2;
+				it2 = it;
+				Assert::IsTrue(it == it2);
+			}
+			{
+				int a = 10;
+				list_of_integer_pointers->pushFront(&a);
+				SList<int*>::Iterator it = list_of_integer_pointers->begin();
+				SList<int*>::Iterator it2;
+				it2 = it;
+				Assert::IsTrue(it == it2);
+			}
+			{
+				Foo a(10);
+				list_of_foos->pushFront(a);
+				SList<Foo>::Iterator it = list_of_foos->begin();
+				SList<Foo>::Iterator it2;
+				it2 = it;
+				Assert::IsTrue(it == it2);
+			}
+		}
+
+		TEST_METHOD(IteratorTestComparisonOperator)
+		{
+			{
+				list_of_integers->pushBack(10);
+				list_of_integers->pushBack(20);
+				SList<int>::Iterator it = list_of_integers->begin();
+				SList<int>::Iterator it2 = list_of_integers->begin();
+				Assert::IsTrue(it == it2);
+				SList<int>::Iterator it3;
+				SList<int>::Iterator it4;
+				Assert::IsFalse(it == it3);
+				Assert::IsFalse(it4 == it);
+				it2++;
+				Assert::IsFalse(it2 == it);
+			}
+			{
+				int a = 10;
+				int b = 20;
+				list_of_integer_pointers->pushBack(&a);
+				list_of_integer_pointers->pushBack(&b);
+				SList<int*>::Iterator it = list_of_integer_pointers->begin();
+				SList<int*>::Iterator it2 = list_of_integer_pointers->begin();
+				Assert::IsTrue(it == it2);
+				SList<int*>::Iterator it3;
+				SList<int*>::Iterator it4;
+				Assert::IsFalse(it == it3);
+				Assert::IsFalse(it4 == it);
+				it2++;
+				Assert::IsFalse(it2 == it);
+			}
+			{
+				Foo a(10);
+				Foo b(20);
+				list_of_foos->pushBack(a);
+				list_of_foos->pushBack(b);
+				SList<Foo>::Iterator it = list_of_foos->begin();
+				SList<Foo>::Iterator it2 = list_of_foos->begin();
+				Assert::IsTrue(it == it2);
+				SList<Foo>::Iterator it3;
+				SList<Foo>::Iterator it4;
+				Assert::IsFalse(it == it3);
+				Assert::IsFalse(it4 == it);
+				++it2;
+				Assert::IsFalse(it2 == it);
+			}
+		}
+
+		TEST_METHOD(IteratorTestNotEqualsOperator)
+		{
+			{
+				list_of_integers->pushBack(10);
+				SList<int> temp_list;
+				temp_list.pushBack(30);
+				SList<int>::Iterator it = list_of_integers->begin();
+				SList<int>::Iterator it2 = temp_list.begin();
+				Assert::IsTrue(it != it2);
+			}
+			{
+				int a = 10;
+				int b = 30;
+				list_of_integer_pointers->pushBack(&a);
+				SList<int*> temp_list;
+				temp_list.pushBack(&b);
+				SList<int*>::Iterator it = list_of_integer_pointers->begin();
+				SList<int*>::Iterator it2 = temp_list.begin();
+				Assert::IsTrue(it != it2);
+			}
+			{
+				Foo a(10);
+				Foo b(20);
+				list_of_foos->pushBack(a);
+				SList<Foo> temp_list;
+				temp_list.pushBack(b);
+				SList<Foo>::Iterator it = list_of_foos->begin();
+				SList<Foo>::Iterator it2 = temp_list.begin();
+				Assert::IsTrue(it != it2);
+			}
+		}
+
+		TEST_METHOD(IteratorTestPreIncrementOperator)
+		{
+			{
+				SList<int>::Iterator it;
+				// Iterator doesn't belong to any list. Exception should be thrown.
+				auto expression = [&] { int a = *it; };
+				Assert::ExpectException<std::exception>(expression);
+				it = list_of_integers->end();
+				// As iterator points to the end of the list, due to nullptr reference, exception should be thrown
+				auto expression_two = [&] { int b = *it; };
+				Assert::ExpectException<std::exception>(expression_two);
+				list_of_integers->pushBack(20);
+				list_of_integers->pushFront(10);
+				it = list_of_integers->begin();
+				++it;
+				Assert::AreEqual(20, *it);
+			}
+			{
+				SList<int*>::Iterator it;
+				int c = 10;
+				int d = 20;
+				// Iterator doesn't belong to any list. Exception should be thrown.
+				auto expression = [&] { int* a = *it; };
+				Assert::ExpectException<std::exception>(expression);
+				it = list_of_integer_pointers->end();
+				// As iterator points to the end of the list, due to nullptr reference, exception should be thrown
+				auto expression_two = [&] { int* b = *it; };
+				Assert::ExpectException<std::exception>(expression_two);
+				list_of_integer_pointers->pushBack(&d);
+				list_of_integer_pointers->pushFront(&c);
+				it = list_of_integer_pointers->begin();
+				++it;
+				Assert::AreEqual(&d, *it);
+			}
+			{
+				SList<Foo>::Iterator it;
+				Foo c(10);
+				Foo d(20);
+				// Iterator doesn't belong to any list. Exception should be thrown.
+				auto expression = [&] { Foo a = *it; };
+				Assert::ExpectException<std::exception>(expression);
+				it = list_of_foos->end();
+				// As iterator points to the end of the list, due to nullptr reference, exception should be thrown
+				auto expression_two = [&] { Foo b = *it; };
+				Assert::ExpectException<std::exception>(expression_two);
+				list_of_foos->pushBack(d);
+				list_of_foos->pushFront(c);
+				it = list_of_foos->begin();
+				++it;
+				Assert::AreEqual(d, *it);
+			}
+		}
+
+		TEST_METHOD(IteratorTestPostIncrementOperator)
+		{
+			{
+				SList<int>::Iterator it;
+				// Iterator doesn't belong to any list. Exception should be thrown.
+				auto expression = [&] { int a = *it; };
+				Assert::ExpectException<std::exception>(expression);
+				it = list_of_integers->end();
+				// As iterator points to the end of the list, due to nullptr reference, exception should be thrown
+				auto expression_two = [&] { int b = *it; };
+				Assert::ExpectException<std::exception>(expression_two);
+				list_of_integers->pushBack(20);
+				list_of_integers->pushFront(10);
+				it = list_of_integers->begin();
+				it++;
+				Assert::AreEqual(20, *it);
+			}
+			{
+				SList<int*>::Iterator it;
+				int c = 10;
+				int d = 20;
+				// Iterator doesn't belong to any list. Exception should be thrown.
+				auto expression = [&] { int* a = *it; };
+				Assert::ExpectException<std::exception>(expression);
+				it = list_of_integer_pointers->end();
+				// As iterator points to the end of the list, due to nullptr reference, exception should be thrown
+				auto expression_two = [&] { int* b = *it; };
+				Assert::ExpectException<std::exception>(expression_two);
+				list_of_integer_pointers->pushBack(&d);
+				list_of_integer_pointers->pushFront(&c);
+				it = list_of_integer_pointers->begin();
+				it++;
+				Assert::AreEqual(&d, *it);
+			}
+			{
+				SList<Foo>::Iterator it;
+				Foo c(10);
+				Foo d(20);
+				// Iterator doesn't belong to any list. Exception should be thrown.
+				auto expression = [&] { Foo a = *it; };
+				Assert::ExpectException<std::exception>(expression);
+				it = list_of_foos->end();
+				// As iterator points to the end of the list, due to nullptr reference, exception should be thrown
+				auto expression_two = [&] { Foo b = *it; };
+				Assert::ExpectException<std::exception>(expression_two);
+				list_of_foos->pushBack(d);
+				list_of_foos->pushFront(c);
+				it = list_of_foos->begin();
+				it++;
+				Assert::AreEqual(d, *it);
+			}
+		}
+
+		TEST_METHOD(IteratorTestBegin)
+		{
+			{
+				list_of_integers->pushBack(10);
+				SList<int>::Iterator it = list_of_integers->begin();
+				Assert::AreEqual(10, *it);
+			}
+			{
+				int a = 10;
+				list_of_integer_pointers->pushBack(&a);
+				SList<int*>::Iterator it = list_of_integer_pointers->begin();
+				Assert::AreEqual(&a, *it);
+			}
+			{
+				Foo a(10);
+				list_of_foos->pushBack(a);
+				SList<Foo>::Iterator it = list_of_foos->begin();
+				Assert::AreEqual(a, *it);
+			}
+		}
+
+		TEST_METHOD(IteratorTestEnd)
+		{
+			{
+				list_of_integers->pushBack(10);
+				list_of_integers->pushBack(20);
+				SList<int>::Iterator it = list_of_integers->end();
+				// As end of the list refer to nullptr, exception should be thrown.
+				auto expression = [&] { int a = *it; };
+				Assert::ExpectException<std::exception>(expression);
+			}
+			{
+				int a = 10;
+				int b = 20;
+				list_of_integer_pointers->pushBack(&a);
+				list_of_integer_pointers->pushBack(&b);
+				SList<int*>::Iterator it = list_of_integer_pointers->end();
+				// As end of the list refer to nullptr, exception should be thrown.
+				auto expression = [&] { int* a = *it; };
+				Assert::ExpectException<std::exception>(expression);
+			}
+			{
+				Foo a(10);
+				Foo b(20);
+				list_of_foos->pushBack(a);
+				list_of_foos->pushBack(b);
+				SList<Foo>::Iterator it = list_of_foos->end();
+				// As end of the list refer to nullptr, exception should be thrown.
+				auto expression = [&] { Foo a = *it; };
+				Assert::ExpectException<std::exception>(expression);
+			}
+		}
+
+		TEST_METHOD(IteratorTestInsertAfter)
+		{
+			{
+				SList<int> test_list;
+				list_of_integers->pushBack(10);
+				list_of_integers->pushBack(20);
+				{
+					SList<int>::Iterator it = test_list.begin();
+					// As we've given iterator belonging to some other list, exception will be thrown
+					auto expression = [&] {list_of_integers->insertAfter(10, it); };
+					Assert::ExpectException<std::exception>(expression);
+				}
+				{
+					SList<int>::Iterator it = test_list.begin();
+					// If the list is empty or we've reached to the end of the list, insert at the end.
+					test_list.insertAfter(10, test_list.begin());
+					Assert::AreEqual(10, test_list.back());
+				}
+				
+				SList<int>::Iterator it = list_of_integers->end();
+				//Else item will be inserted after the node iterator points
+				list_of_integers->insertAfter(10, it);
+				it = list_of_integers->begin();
+				Assert::AreEqual(10, *it); 
+			}
+			{
+				SList<int*> test_list;
+				int a = 10;
+				int b = 20;
+				list_of_integer_pointers->pushBack(&a);
+				list_of_integer_pointers->pushBack(&b);
+				{
+					SList<int*>::Iterator it = test_list.begin();
+					// As we've given iterator belonging to some other list, exception will be thrown
+					auto expression = [&] {list_of_integer_pointers->insertAfter(&a, it); };
+					Assert::ExpectException<std::exception>(expression);
+				}
+				{
+					SList<int*>::Iterator it = test_list.begin();
+					// If the list is empty or we've reached to the end of the list, insert at the end.
+					test_list.insertAfter(&a, test_list.begin());
+					Assert::AreEqual(&a, test_list.back());
+				}
+
+				SList<int*>::Iterator it = list_of_integer_pointers->end();
+				//Else item will be inserted after the node iterator points
+				list_of_integer_pointers->insertAfter(&a, it);
+				it = list_of_integer_pointers->begin();
+				Assert::AreEqual(&a, *it);
+			}
+			{
+				SList<Foo> test_list;
+				Foo a(10);
+				Foo b(20);
+				Foo c(30);
+				list_of_foos->pushBack(a);
+				list_of_foos->pushBack(b);
+				list_of_foos->pushBack(c);
+				{
+					SList<Foo>::Iterator it = test_list.begin();
+					// As we've given iterator belonging to some other list, exception will be thrown
+					auto expression = [&] {list_of_foos->insertAfter(a, it); };
+					Assert::ExpectException<std::exception>(expression);
+				}
+				{
+					SList<Foo>::Iterator it = test_list.begin();
+					// If the list is empty or we've reached to the end of the list, insert at the end.
+					test_list.insertAfter(a, test_list.begin());
+					Assert::AreEqual(a, test_list.back());
+				}
+
+				SList<Foo>::Iterator it = list_of_foos->begin();
+				it++;
+				//Else item will be inserted after the node iterator points
+				list_of_foos->insertAfter(a, it);
+				it = list_of_foos->begin();
+				it++;
+				it++;
+				Assert::AreEqual(a, *it);
+			}
+		}
+
+		TEST_METHOD(IteratorTestRemove)
+		{
+			{
+				list_of_integers->pushBack(10);
+				list_of_integers->pushBack(20);
+				list_of_integers->pushBack(30);
+				//Remove last element
+				list_of_integers->remove(30);
+				Assert::AreEqual(20, list_of_integers->back());
+				//Remove First element
+				list_of_integers->remove(10);
+				Assert::AreEqual(20, list_of_integers->front());
+				//Try to remove element which isn't in the list.
+				list_of_integers->remove(50);
+				Assert::AreEqual(20, list_of_integers->front());
+				//Remove remaining element from the list
+				list_of_integers->remove(20);
+				Assert::IsTrue(list_of_integers->isEmpty());
+			}
+			{
+				int a = 10;
+				int b = 20;
+				int c = 30;
+				int d = 50;
+				list_of_integer_pointers->pushBack(&a);
+				list_of_integer_pointers->pushBack(&b);
+				list_of_integer_pointers->pushBack(&c);
+				//Remove last element
+				list_of_integer_pointers->remove(&c);
+				Assert::AreEqual(&b, list_of_integer_pointers->back());
+				//Remove First element
+				list_of_integer_pointers->remove(&a);
+				Assert::AreEqual(&b, list_of_integer_pointers->front());
+				//Try to remove element which isn't in the list.
+				list_of_integer_pointers->remove(&d);
+				Assert::AreEqual(&b, list_of_integer_pointers->front());
+				//Remove remaining element from the list
+				list_of_integer_pointers->remove(&b);
+				Assert::IsTrue(list_of_integer_pointers->isEmpty());
+			}
+			{
+				Foo a(10);
+				Foo b(20);
+				Foo c(30);
+				Foo d(50);
+				list_of_foos->pushBack(a);
+				list_of_foos->pushBack(b);
+				list_of_foos->pushBack(c);
+				//Remove last element
+				list_of_foos->remove(c);
+				Assert::AreEqual(b, list_of_foos->back());
+				//Remove First element
+				list_of_foos->remove(a);
+				Assert::AreEqual(b, list_of_foos->front());
+				//Try to remove element which isn't in the list.
+				list_of_foos->remove(d);
+				Assert::AreEqual(b, list_of_foos->front());
+				//Remove remaining element from the list
+				list_of_foos->remove(b);
+				Assert::IsTrue(list_of_foos->isEmpty());
+			}
+		}
+			
+		TEST_METHOD(IteratorTestFind)
+		{
+			{
+				list_of_integers->pushBack(10);
+				list_of_integers->pushBack(20);
+				list_of_integers->pushBack(30);
+				SList<int>::Iterator it = list_of_integers->find(20);
+				Assert::IsTrue(20 == *it);
+				it = list_of_integers->find(40);
+				Assert::IsTrue(it == list_of_integers->end());
+			}
+			{
+				int a = 10;
+				int b = 20;
+				int c = 30;
+				int d = 40;
+				list_of_integer_pointers->pushBack(&a);
+				list_of_integer_pointers->pushBack(&b);
+				list_of_integer_pointers->pushBack(&c);
+				SList<int*>::Iterator it = list_of_integer_pointers->find(&b);
+				Assert::IsTrue(&b == *it);
+				it = list_of_integer_pointers->find(&d);
+				Assert::IsTrue(it == list_of_integer_pointers->end());
+			}
+			{
+				Foo a(10);
+				Foo b(20);
+				Foo c(30);
+				Foo d(40);
+				list_of_foos->pushBack(a);
+				list_of_foos->pushBack(b);
+				list_of_foos->pushBack(c);
+				SList<Foo>::Iterator it = list_of_foos->find(b);
+				Assert::IsTrue(b == *it);
+				it = list_of_foos->find(d);
+				Assert::IsTrue(it == list_of_foos->end());
+			}
 		}
 
 	private:

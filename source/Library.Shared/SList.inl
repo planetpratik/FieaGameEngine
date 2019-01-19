@@ -1,124 +1,64 @@
-#include "pch.h"
 #include "SList.h"
 
 namespace FieaGameEngine
 {
-	// Default constructor implementation
 	template <typename T>
-	SList<T>::SList() :
+	inline SList<T>::SList() :
 		m_front(nullptr), m_back(nullptr),
 		m_size(0)
 	{
 	}
 
-	// Copy Constructor Implementation - Create Deep copy of list given as argument
 	template <typename T>
 	SList<T>::SList(const SList<T>& t_rhs) :
 		m_front(nullptr), m_back(nullptr),
 		m_size(0)
 	{
-		// Check if passed list is not empty
-		if (t_rhs.isEmpty() != true)
-		{
-			// Get first item in list
-			Node* current_node = t_rhs.m_front;
-			// Loop till we reach end of the list
-			while (current_node != nullptr)
-			{
-				// Create new node and copy data from current node into it.
-				Node* new_node = new Node(current_node->getData());
-				// If first element, assign m_front and m_back to point to it.
-				if (m_size == 0)
-				{
-					m_front = new_node;
-					m_back = new_node;
-				}
-				else
-				{
-					// Update next pointer of last item to point to new node.
-					m_back->next = new_node;
-					// Update m_back node to point to last item in list.
-					m_back = m_back->next;
-				}
-				// Update current node to next node
-				current_node = current_node->next;
-				// Increment list size counter
-				m_size++;
-			}
-		}
+		operator=(t_rhs);
 	}
 
-	// Assignment Operator Overload Implementation
 	template <typename T>
 	SList<T>& SList<T>::operator=(const SList<T>& t_rhs)
 	{
-		// If "this" object and passed object aren't same, then only proceed else skip.
 		if (this != &t_rhs)
 		{
 			// Clear list associated to "this" before assigning passed list.
 			clear();
 			// Deep copy passed list into this list.
-			if (t_rhs.isEmpty() != true)
+			SList<T>::Iterator it = t_rhs.begin();
+			for (it; it != t_rhs.end(); ++it)
 			{
-				Node* current_node = t_rhs.m_front;
-				while (current_node != nullptr)
-				{
-					Node* new_node = new Node(current_node->getData());
-					if (m_size == 0)
-					{
-						m_front = new_node;
-						m_back = new_node;
-					}
-					else
-					{
-						m_back->next = new_node;
-						m_back = m_back->next;
-					}
-					current_node = current_node->next;
-					m_size++;
-				}
+				pushBack(*it);
 			}
 		}
 		return *this;
 	}
 
-	// Implementation of pushFront() method.
 	template<typename T>
-	void SList<T>::pushFront(const T & t_item)
+	inline void SList<T>::pushFront(const T & t_item)
 	{
-		// Check if list is empty.
-		if (m_front == nullptr)
+		m_front = new Node(t_item, m_front);
+		// If list is empty
+		if (isEmpty())
 		{
-			m_front = new Node(t_item);
 			m_back = m_front;
-		}
-		// Else add item to the front of list and update front pointer.
-		else
-		{
-			Node* temp = new Node(t_item);
-			temp->next = m_front;
-			m_front = temp;
 		}
 		m_size++;
 	}
 
-	// Implementation of popFront() method
 	template<typename T>
-	void SList<T>::popFront()
+	inline void SList<T>::popFront()
 	{
-		// Check if the pop operation is being performed on empty list. if yes, throw exception.
 		if (isEmpty())
 		{
 			throw std::exception("Error: Invalid Operation. List is Empty.");
 		}
-		// Else remove first element of list and make m_front point to second element in the list.
 		else
 		{
 			Node* temp = m_front->next;
 			delete m_front;
 			m_front = temp;
 			m_size--;
-			// Check if list is empty, if yes, set front and back pointers to null pointers.
 			if (m_size == 0)
 			{
 				m_front = nullptr;
@@ -127,13 +67,12 @@ namespace FieaGameEngine
 		}
 	}
 
-	// Implementation of pushBack() method
 	template<typename T>
-	void SList<T>::pushBack(const T & t_item)
+	inline void SList<T>::pushBack(const T & t_item)
 	{
 		Node* temp = new Node(t_item);
 		// Check if list is empty.
-		if (m_back == nullptr)
+		if (isEmpty())
 		{
 			m_back = temp;
 			m_front = m_back;
@@ -142,14 +81,13 @@ namespace FieaGameEngine
 		else
 		{
 			m_back->next = temp;
-			m_back = m_back->next;
+			m_back = temp;
 		}
 		m_size++;
 	}
 
-	// Implementation of popBack() method
 	template<typename T>
-	void SList<T>::popBack()
+	inline void SList<T>::popBack()
 	{
 		// Check if the pop operation is being performed on empty list. if yes, throw exception.
 		if (isEmpty())
@@ -184,73 +122,237 @@ namespace FieaGameEngine
 		}
 	}
 
-	// Implementation of clear() method
 	template<typename T>
-	void SList<T>::clear()
+	inline void SList<T>::clear()
 	{
 		while (!isEmpty())
 		{
 			popFront();
 		}
-		m_front = nullptr;
-		m_back = nullptr;
 	}
 
-	// isEmpty() implementation.
 	template <typename T>
-	bool SList<T>::isEmpty() const
+	inline bool SList<T>::isEmpty() const
 	{
-		return (m_size == 0) ? true : false;
+		return (m_size == 0);
 	}
 
-	// front() implementation
 	template <typename T>
-	const T & SList<T>::front() const
+	inline const T& SList<T>::front() const
 	{
 		if (m_front == nullptr)
 		{
 			throw std::exception("Error: Invalid Operation. List is Empty.");
 		}
-		return m_front->getData();
+		return m_front->m_data;
 	}
 
-	// back() implementation
 	template <typename T>
-	const T & SList<T>::back() const
+	inline T& SList<T>::front()
+	{
+		if (m_front == nullptr)
+		{
+			throw std::exception("Error: Invalid Operation. List is Empty.");
+		}
+		return m_front->m_data;
+	}
+
+	template <typename T>
+	inline const T & SList<T>::back() const
 	{
 		if (m_back == nullptr)
 		{
 			throw std::exception("Error: Invalid Operation. List is Empty.");
 		}
-		return m_back->getData();
+		return m_back->m_data;
 	}
 
-	// size() implementation
+	template <typename T>
+	inline T & SList<T>::back()
+	{
+		if (m_back == nullptr)
+		{
+			throw std::exception("Error: Invalid Operation. List is Empty.");
+		}
+		return m_back->m_data;
+	}
+
 	template <typename T>
 	uint32_t SList<T>::size() const
 	{
 		return m_size;
 	}
 
-	// Destructor implementation
 	template <typename T>
-	SList<T>::~SList()
+	inline SList<T>::~SList()
 	{
 		clear();
 	}
 
-	// Node constructor
 	template <typename T>
-	SList<T>::Node::Node(const T & t_data) :
-		next(nullptr),
-		m_data(t_data)
+	inline SList<T>::Node::Node(const T& t_data, Node* t_next_node) :
+		m_data(t_data), next(t_next_node)
 	{
 	}
 
-	// Node getData() implementation
 	template <typename T>
-	const T & SList<T>::Node::getData() const
+	SList<T>::Iterator::Iterator(Node* t_node, const SList<T>* t_owner_List) :
+		m_node(t_node), m_owner_list(t_owner_List)
 	{
-		return m_data;
+
+	}
+
+	template <typename T>
+	SList<T>::Iterator::Iterator(const Iterator& t_rhs) :
+		m_node(t_rhs.m_node), m_owner_list(t_rhs.m_owner_list)
+	{
+
+	}
+
+	template <typename T>
+	typename SList<T>::Iterator& SList<T>::Iterator::operator=(const Iterator& t_rhs)
+	{
+		if (this != &t_rhs)
+		{
+			m_node = t_rhs.m_node;
+			m_owner_list = t_rhs.m_owner_list;
+		}
+		return *this;
+	}
+
+	template <typename T>
+	inline typename SList<T>::Iterator SList<T>::begin() const
+	{
+		return Iterator(m_front, this);
+	}
+
+	template <typename T>
+	inline typename SList<T>::Iterator SList<T>::end() const
+	{
+		return Iterator(nullptr, this);
+	}
+
+	template <typename T>
+	typename void SList<T>::insertAfter(const T& t_value, const Iterator& t_it)
+	{
+		if (t_it.m_owner_list != this)
+		{
+			throw std::exception("Passed Iterator's owner is not this SList.");
+		}
+		if (t_it.m_node == nullptr)
+		{
+			pushBack(t_value);
+		}
+		else
+		{
+			Node* node_to_insert = new Node(t_value);
+			node_to_insert->next = t_it.m_node->next;
+			t_it.m_node->next = node_to_insert;
+			m_size++;
+		}
+	}
+
+	template <typename T>
+	typename SList<T>::Iterator SList<T>::find(const T& t_value) const
+	{
+		SList<T>::Iterator it = begin();
+		for (it ; it != end(); ++it)
+		{
+			if (*it == t_value)
+			{
+				break;
+			}
+		}
+		return it;
+	}
+
+	template <typename T>
+	inline typename SList<T>::Iterator& SList<T>::Iterator::operator++()
+	{
+		if (m_owner_list == nullptr)
+		{
+			throw std::exception("Iterator doesn't belong to any SList");
+		}
+		if (m_node == nullptr)
+		{
+			throw std::exception("Invalid Operation! Iterator points to end of list.");
+		}
+		m_node = m_node->next;
+		return *this;
+	}
+
+	template <typename T>
+	inline typename SList<T>::Iterator SList<T>::Iterator::operator++(int)
+	{
+		return (*this).operator++();
+	}
+
+	template <typename T>
+	inline bool SList<T>::Iterator::operator!=(const Iterator& t_rhs) const
+	{
+		return !(*this == t_rhs);
+	}
+
+	template <typename T>
+	bool SList<T>::Iterator::operator==(const Iterator& t_rhs) const
+	{
+		if (m_owner_list == nullptr || t_rhs.m_owner_list == nullptr)
+		{
+			return false;
+		}
+		else if (m_node != t_rhs.m_node)
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+	template <typename T>
+	T& SList<T>::Iterator::operator*() const
+	{
+		if (m_owner_list == nullptr)
+		{
+			throw std::exception("Iterator doesn't belong to any SList");
+		}
+		if (m_node == nullptr)
+		{
+			throw std::exception("Invalid Operation! Iterator points to end of list.");
+		}
+		return m_node->m_data;
+	}
+
+	template <typename T>
+	void SList<T>::remove(const T& t_value)
+	{
+		SList<T>::Iterator it = begin();
+		if (!isEmpty())
+		{
+			// If there is only one node in the list do pop_front()
+			if (*it == t_value)
+			{
+				popFront();
+			}
+			else
+			{
+				++it;
+				for (SList<T>::Iterator previous_it = begin(); it != end(); ++it, ++previous_it)
+				{
+					if (*it == t_value)
+					{
+						(previous_it.m_node)->next = (it.m_node)->next;
+						if (it.m_node == m_back)
+						{
+							m_back = previous_it.m_node;
+						}
+						m_size--;
+						delete it.m_node;
+						break;
+					}
+				}
+			}
+		}
 	}
 }
