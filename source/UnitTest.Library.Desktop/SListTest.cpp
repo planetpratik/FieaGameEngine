@@ -59,6 +59,11 @@ namespace UnitTestLibraryDesktop
 			Assert::IsTrue(list_of_integers->isEmpty());
 		}
 
+		TEST_METHOD(SListIntTestInitializerList)
+		{
+			SList<int> integers({ 1,2,3 });
+		}
+
 		// Test method pushFront() for list of Integers
 		TEST_METHOD(SListIntTestPushFront)
 		{
@@ -171,6 +176,17 @@ namespace UnitTestLibraryDesktop
 			list_of_integers->pushFront(10);
 			list_of_integers->pushFront(20);
 			Assert::AreEqual(20, list_of_integers->front());
+
+			// Test for Const front() method
+
+			const SList<int> const_list = {};
+			auto expression_two = [const_list]
+			{
+				const_list.front();
+			};
+			Assert::ExpectException<std::exception>(expression_two);
+			const SList<int> another_const_list = { 1,2,3 };
+			Assert::AreEqual(1, another_const_list.front());
 		}
 
 		// Test method back() for list of Integers
@@ -186,6 +202,17 @@ namespace UnitTestLibraryDesktop
 			list_of_integers->pushBack(10);
 			list_of_integers->pushBack(20);
 			Assert::AreEqual(20, list_of_integers->back());
+
+			// Test for Const back() method
+
+			const SList<int> const_list = {};
+			auto expression_two = [const_list]
+			{
+				const_list.back();
+			};
+			Assert::ExpectException<std::exception>(expression_two);
+			const SList<int> another_const_list = { 1,2,3 };
+			Assert::AreEqual(3, another_const_list.back());
 		}
 
 		// Test method size() for list of Integers
@@ -858,6 +885,10 @@ namespace UnitTestLibraryDesktop
 				// Iterator doesn't belong to any list. Exception should be thrown.
 				auto expression = [&] { int a = *it; };
 				Assert::ExpectException<std::exception>(expression);
+
+				auto error_expression = [&] { ++it; };
+				Assert::ExpectException<std::exception>(error_expression);
+
 				it = list_of_integers->end();
 				// As iterator points to the end of the list, due to nullptr reference, exception should be thrown
 				auto expression_two = [&] { int b = *it; };
@@ -1110,6 +1141,13 @@ namespace UnitTestLibraryDesktop
 				//Remove remaining element from the list
 				list_of_integers->remove(20);
 				Assert::IsTrue(list_of_integers->isEmpty());
+
+				list_of_integers->pushBack(50);
+				SList<int> another_integer_list = { 1,2,3 };
+				SList<int>::Iterator it = another_integer_list.begin();
+				auto expression = [&] { list_of_integers->remove(it); };
+				Assert::ExpectException<std::exception>(expression);
+
 			}
 			{
 				int a = 10;
