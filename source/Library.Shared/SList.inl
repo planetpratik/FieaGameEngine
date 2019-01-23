@@ -10,7 +10,7 @@ namespace FieaGameEngine
 	}
 
 	template <typename T>
-	SList<T>::SList(const SList<T>& t_rhs) :
+	SList<T>::SList(const SList& t_rhs) :
 		m_front(nullptr), m_back(nullptr),
 		m_size(0)
 	{
@@ -18,32 +18,41 @@ namespace FieaGameEngine
 	}
 
 	template <typename T>
-	SList<T>& SList<T>::operator=(const SList<T>& t_rhs)
+	SList<T>::SList(std::initializer_list<T> t_list)
+	{
+		for (const auto& value : t_list)
+		{
+			pushBack(value);
+		}
+	}
+
+	template <typename T>
+	SList<T>& SList<T>::operator=(const SList& t_rhs)
 	{
 		if (this != &t_rhs)
 		{
 			// Clear list associated to "this" before assigning passed list.
 			clear();
 			// Deep copy passed list into this list.
-			SList<T>::Iterator it = t_rhs.begin();
-			for (it; it != t_rhs.end(); ++it)
+			for (const auto& value : t_rhs)
 			{
-				pushBack(*it);
+				pushBack(value);
 			}
 		}
 		return *this;
 	}
 
 	template<typename T>
-	inline void SList<T>::pushFront(const T & t_item)
+	typename SList<T>::Iterator SList<T>::pushFront(const T& t_item)
 	{
 		m_front = new Node(t_item, m_front);
 		// If list is empty
-		if (isEmpty())
+		if (m_back ==  nullptr)
 		{
 			m_back = m_front;
 		}
-		m_size++;
+		++m_size;
+		return Iterator(m_front, *this);
 	}
 
 	template<typename T>
@@ -68,22 +77,22 @@ namespace FieaGameEngine
 	}
 
 	template<typename T>
-	inline void SList<T>::pushBack(const T & t_item)
+	typename SList<T>::Iterator SList<T>::pushBack(const T & t_item)
 	{
 		Node* temp = new Node(t_item);
 		// Check if list is empty.
 		if (isEmpty())
 		{
-			m_back = temp;
-			m_front = m_back;
+			m_front = temp;
 		}
 		// Else add item to the end of list and update back pointer.
 		else
 		{
 			m_back->next = temp;
-			m_back = temp;
 		}
+		m_back = temp;
 		m_size++;
+		return Iterator(m_back, *this);
 	}
 
 	template<typename T>
@@ -196,67 +205,49 @@ namespace FieaGameEngine
 	}
 
 	template <typename T>
-	SList<T>::Iterator::Iterator(Node* t_node, const SList<T>* t_owner_List) :
-		m_node(t_node), m_owner_list(t_owner_List)
+	SList<T>::Iterator::Iterator(Node* t_node, const SList<T>& t_owner_List) :
+		m_node(t_node), m_owner_list(&t_owner_List)
 	{
 
-	}
-
-	template <typename T>
-	SList<T>::Iterator::Iterator(const Iterator& t_rhs) :
-		m_node(t_rhs.m_node), m_owner_list(t_rhs.m_owner_list)
-	{
-
-	}
-
-	template <typename T>
-	typename SList<T>::Iterator& SList<T>::Iterator::operator=(const Iterator& t_rhs)
-	{
-		if (this != &t_rhs)
-		{
-			m_node = t_rhs.m_node;
-			m_owner_list = t_rhs.m_owner_list;
-		}
-		return *this;
 	}
 
 	template <typename T>
 	inline typename SList<T>::Iterator SList<T>::begin() const
 	{
-		return Iterator(m_front, this);
+		return Iterator(m_front, *this);
 	}
 
 	template <typename T>
 	inline typename SList<T>::Iterator SList<T>::end() const
 	{
-		return Iterator(nullptr, this);
+		return Iterator(nullptr, *this);
 	}
 
 	template <typename T>
-	typename void SList<T>::insertAfter(const T& t_value, const Iterator& t_it)
+	typename SList<T>::Iterator SList<T>::insertAfter(const T& t_value, const Iterator& t_it)
 	{
 		if (t_it.m_owner_list != this)
 		{
 			throw std::exception("Passed Iterator's owner is not this SList.");
 		}
-		if (t_it.m_node == nullptr)
+		if ((t_it == end()) || (m_back == t_it.m_node))
 		{
-			pushBack(t_value);
+			return pushBack(t_value);
 		}
 		else
 		{
-			Node* node_to_insert = new Node(t_value);
-			node_to_insert->next = t_it.m_node->next;
-			t_it.m_node->next = node_to_insert;
-			m_size++;
+			Node* node = new Node(t_value, t_it.m_node->next);
+			t_it.m_node->next = node;
+			++m_size;
+			return Iterator(node, *this);
 		}
 	}
 
 	template <typename T>
 	typename SList<T>::Iterator SList<T>::find(const T& t_value) const
 	{
-		SList<T>::Iterator it = begin();
-		for (it ; it != end(); ++it)
+		Iterator it = begin();
+		for ( ; it != end(); ++it)
 		{
 			if (*it == t_value)
 			{
@@ -284,7 +275,9 @@ namespace FieaGameEngine
 	template <typename T>
 	inline typename SList<T>::Iterator SList<T>::Iterator::operator++(int)
 	{
-		return (*this).operator++();
+		Iterator temp = *this;
+		operator++();
+		return temp;
 	}
 
 	template <typename T>
@@ -325,34 +318,40 @@ namespace FieaGameEngine
 	}
 
 	template <typename T>
-	void SList<T>::remove(const T& t_value)
+	bool SList<T>::remove(const T& t_value)
 	{
-		SList<T>::Iterator it = begin();
-		if (!isEmpty())
+		return remove(find(t_value));
+	}
+
+	template <typename T>
+	bool SList<T>::remove(const Iterator& t_it)
+	{
+		if (t_it.m_owner_list != this)
 		{
-			// If there is only one node in the list do pop_front()
-			if (*it == t_value)
+			throw std::exception("Invalid Iterator ! Iterator is owned by different container.");
+		}
+		bool found = false;
+		if (t_it != end())
+		{
+			if (t_it.m_node == m_back)
 			{
-				popFront();
+				popBack();
 			}
 			else
 			{
-				++it;
-				for (SList<T>::Iterator previous_it = begin(); it != end(); ++it, ++previous_it)
+				Node* node = t_it.m_node->next;
+				t_it.m_node->m_data = std::move(node->m_data);
+				t_it.m_node->next = node->next;
+				delete node;
+
+				if (t_it.m_node->next == nullptr)
 				{
-					if (*it == t_value)
-					{
-						(previous_it.m_node)->next = (it.m_node)->next;
-						if (it.m_node == m_back)
-						{
-							m_back = previous_it.m_node;
-						}
-						m_size--;
-						delete it.m_node;
-						break;
-					}
+					m_back = t_it.m_node;
 				}
+				--m_size;
 			}
+			found = true;
 		}
+		return found;
 	}
 }

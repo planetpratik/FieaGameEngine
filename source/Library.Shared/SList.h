@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <exception>
+#include <initializer_list>
 
 namespace FieaGameEngine
 {
@@ -12,29 +13,32 @@ namespace FieaGameEngine
 		/// <summary>Auxiliary Helper class "Node" is used to represents individual elements of List</summary>
 		struct Node final
 		{
-			Node(const T& t_data, Node* t_next_node = nullptr);
+			explicit Node(const T& t_data, Node* t_next_node = nullptr);
 			Node(const Node& t_rhs) = delete;
 			Node& operator=(const Node& t_rhs) = delete;
 			T m_data;
 			Node* next;
+			~Node() = default;
 		};
 
 	public:
 		/// <summary>Embedded Iterator class for SList to iterate over it's items.</summary>
-		class Iterator
+		class Iterator final
 		{
+			friend SList;
+
 		public:
 			/// <summary>Default Constructor for Iterator.</summary>
 			Iterator() = default;
 	
 			/// <summary>Copy Constructor for Iterator.</summary>
 			/// <param name="t_rhs">Const reference to passed Iterator</param>
-			Iterator(const Iterator& t_rhs);
+			Iterator(const Iterator&) = default;
 
 			/// <summary>Assignment Operator Overload</summary>
 			/// <param name="t_rhs">Const reference to passed Iterator</param>
 			/// <returns>Reference to Iterator</returns>
-			Iterator& operator=(const Iterator& t_rhs);
+			Iterator& operator=(const Iterator& t_rhs) = default;
 
 			/// <summary>Compare two iterators based on their owner container and current node.</summary>
 			/// <param name="t_rhs">Const reference to passed Iterator.</param>
@@ -59,18 +63,24 @@ namespace FieaGameEngine
 			/// <returns>Element stored in the list at current position of the iterator</returns>
 			T& operator*() const;
 
-			friend class SList<T>;
+			/// <summary>Destructor for Iterator</summary>
+			~Iterator() = default;
+
 		private:
 			/// <summary>Constructor for Iterator</summary>
 			/// <param name="t_node">Current node which this iterator will point to</param>
-			/// <param name="t_owner_List">Owner Container List for this iterator</param>
-			Iterator(Node* t_node, const SList<T>* t_owner_List);
+			/// <param name="t_owner_List">Const reference to Owner Container List for this iterator</param>
+			Iterator(Node* t_node, const SList<T>& t_owner_List);
 			Node* m_node = nullptr;
 			const SList<T>* m_owner_list = nullptr;
 		};
 
 		/// <summary>Default Constructor for SList.</summary>
 		SList();
+
+		/// <summary>Support for Initializer list syntax ( C++11 ).</summary>
+		/// <param name="t_list"> Initializer arguments list of Type T.</param>
+		SList(std::initializer_list<T> t_list);
 
 		/// <summary>Copy Constructor for SList.</summary>
 		/// <param name="t_rhs">Const reference to passed List of Type T.</param>
@@ -86,14 +96,24 @@ namespace FieaGameEngine
 
 		/// <summary>Pushes element on front of the List. </summary>
 		/// <param name="t_item">Const reference to passed element of Type T.</param>
-		void pushFront(const T& t_item);
+		//void pushFront(const T& t_item);
+
+		/// <summary>Pushes element on front of the List. </summary>
+		/// <param name="t_item">Const reference to passed element of Type T.</param>
+		/// <returns>Returns Iterator to front element in List</returns>
+		Iterator pushFront(const T& t_item);
 		
 		/// <summary>Removes foremost element from the List.</summary>
 		void popFront();
 
 		/// <summary>Pushes element on the back of the List.</summary>
 		/// <param name="t_item">Const reference to passed element of Type T.</param>
-		void pushBack(const T& t_item);
+		//void pushBack(const T& t_item);
+
+		/// <summary>Pushes element on the back of the List.</summary>
+		/// <param name="t_item">Const reference to passed element of Type T.</param>
+		/// <returns>Return Iterator to last element in the List.</returns>
+		Iterator pushBack(const T& t_item);
 
 		/// <summary>Removes Last element from the list</summary>
 		void popBack();
@@ -136,7 +156,13 @@ namespace FieaGameEngine
 		/// <summary>Insert passed value after the element pointed by Iterator.</summary>
 		/// <param name="t_value">Value to Insert.</param>
 		/// <param name="t_it">Position at which value to be inserted.</param>
-		void insertAfter(const T& t_value, const Iterator& t_it);
+		//void insertAfter(const T& t_value, const Iterator& t_it);
+
+		/// <summary>Insert passed value after the element pointed by Iterator.</summary>
+		/// <param name="t_value">Value to Insert.</param>
+		/// <param name="t_it">Position at which value to be inserted.</param>
+		/// <returns>Returns Iterator to newly inserted item in the List.</returns>
+		Iterator insertAfter(const T& t_value, const Iterator& t_it);
 
 		/// <summary>Finds the given value in the list.</summary>
 		/// <param name="t_value">Value to find in list</param>
@@ -145,7 +171,17 @@ namespace FieaGameEngine
 
 		/// <summary>Removes first instance of given value in the list.</summary>
 		/// <param name="t_value">Value to remove from list</param>
-		void remove(const T& t_value);
+		//void remove(const T& t_value);
+
+		/// <summary>Removes first instance of given value in the list.</summary>
+		/// <param name="t_value">Const reference to the Value to remove from list</param>
+		/// <returns>Returns if node corresponding to given value is deleted from the list or not.</returns>
+		bool remove(const T& t_value);
+
+		/// <summary>Removes first instance of given value in the list.</summary>
+		/// <param name="t_it">Const reference to the Iterator corresponding to the value to remove from list</param>
+		/// <returns>Returns if node corresponding to given Iterator is deleted from the list or not.</returns>
+		bool remove(const Iterator& t_it);
 
 	private:
 		Node* m_front;
