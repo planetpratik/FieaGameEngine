@@ -7,6 +7,7 @@ namespace FieaGameEngine
 		explicit Foo(int data = 0);
 		~Foo() = default;
 		int data() const;
+		void SetData(int data);
 		bool operator==(const Foo& t_rhs) const;
 		bool operator!=(const Foo & t_rhs) const;
 	private:
