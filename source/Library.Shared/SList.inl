@@ -289,18 +289,6 @@ namespace FieaGameEngine
 	template <typename T>
 	bool SList<T>::Iterator::operator==(const Iterator& t_rhs) const
 	{
-		/*if (m_owner_list == nullptr || t_rhs.m_owner_list == nullptr)
-		{
-			return false;
-		}
-		else if (m_node != t_rhs.m_node)
-		{
-			return false;
-		}
-		else
-		{
-			return true;
-		}*/
 		return (m_owner_list == t_rhs.m_owner_list) && (m_node == t_rhs.m_node);
 	}
 
