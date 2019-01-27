@@ -64,7 +64,7 @@ namespace FieaGameEngine
 		}
 		else
 		{
-			Node* temp = m_front->next;
+			Node* temp = m_front->m_next;
 			delete m_front;
 			m_front = temp;
 			m_size--;
@@ -88,7 +88,7 @@ namespace FieaGameEngine
 		// Else add item to the end of list and update back pointer.
 		else
 		{
-			m_back->next = temp;
+			m_back->m_next = temp;
 		}
 		m_back = temp;
 		m_size++;
@@ -104,7 +104,7 @@ namespace FieaGameEngine
 			throw std::exception("Error: Invalid Operation. List is Empty.");
 		}
 		// Check if there is only one element in the list
-		else if (m_front->next == nullptr)
+		else if (m_front->m_next == nullptr)
 		{
 			Node* temp = m_front;
 			delete temp;
@@ -116,13 +116,13 @@ namespace FieaGameEngine
 		else
 		{
 			Node* current_node = m_front;
-			Node* next_node = m_front->next;
-			while (next_node->next != nullptr)
+			Node* next_node = m_front->m_next;
+			while (next_node->m_next != nullptr)
 			{
-				next_node = next_node->next;
-				current_node = current_node->next;
+				next_node = next_node->m_next;
+				current_node = current_node->m_next;
 			}
-			current_node->next = nullptr;
+			current_node->m_next = nullptr;
 			// Make back pointer point to second last node and delete last node.
 			m_back = current_node;
 			//delete current_node;
@@ -200,12 +200,12 @@ namespace FieaGameEngine
 
 	template <typename T>
 	inline SList<T>::Node::Node(const T& t_data, Node* t_next_node) :
-		m_data(t_data), next(t_next_node)
+		m_data(t_data), m_next(t_next_node)
 	{
 	}
 
 	template <typename T>
-	SList<T>::Iterator::Iterator(Node* t_node, const SList<T>& t_owner_List) :
+	SList<T>::Iterator::Iterator(Node* t_node, const SList& t_owner_List) :
 		m_node(t_node), m_owner_list(&t_owner_List)
 	{
 
@@ -236,8 +236,8 @@ namespace FieaGameEngine
 		}
 		else
 		{
-			Node* node = new Node(t_value, t_it.m_node->next);
-			t_it.m_node->next = node;
+			Node* node = new Node(t_value, t_it.m_node->m_next);
+			t_it.m_node->m_next = node;
 			++m_size;
 			return Iterator(node, *this);
 		}
@@ -268,7 +268,7 @@ namespace FieaGameEngine
 		{
 			throw std::exception("Invalid Operation! Iterator points to end of list.");
 		}
-		m_node = m_node->next;
+		m_node = m_node->m_next;
 		return *this;
 	}
 
@@ -289,7 +289,7 @@ namespace FieaGameEngine
 	template <typename T>
 	bool SList<T>::Iterator::operator==(const Iterator& t_rhs) const
 	{
-		if (m_owner_list == nullptr || t_rhs.m_owner_list == nullptr)
+		/*if (m_owner_list == nullptr || t_rhs.m_owner_list == nullptr)
 		{
 			return false;
 		}
@@ -300,7 +300,8 @@ namespace FieaGameEngine
 		else
 		{
 			return true;
-		}
+		}*/
+		return (m_owner_list == t_rhs.m_owner_list) && (m_node == t_rhs.m_node);
 	}
 
 	template <typename T>
@@ -339,12 +340,12 @@ namespace FieaGameEngine
 			}
 			else
 			{
-				Node* node = t_it.m_node->next;
+				Node* node = t_it.m_node->m_next;
 				t_it.m_node->m_data = std::move(node->m_data);
-				t_it.m_node->next = node->next;
+				t_it.m_node->m_next = node->m_next;
 				delete node;
 
-				if (t_it.m_node->next == nullptr)
+				if (t_it.m_node->m_next == nullptr)
 				{
 					m_back = t_it.m_node;
 				}

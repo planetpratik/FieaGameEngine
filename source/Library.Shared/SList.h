@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <cstring>
 #include <exception>
 #include <initializer_list>
 
@@ -17,7 +18,7 @@ namespace FieaGameEngine
 			Node(const Node& t_rhs) = delete;
 			Node& operator=(const Node& t_rhs) = delete;
 			T m_data;
-			Node* next;
+			Node* m_next;
 			~Node() = default;
 		};
 
@@ -70,7 +71,7 @@ namespace FieaGameEngine
 			/// <summary>Constructor for Iterator</summary>
 			/// <param name="t_node">Current node which this iterator will point to</param>
 			/// <param name="t_owner_List">Const reference to Owner Container List for this iterator</param>
-			Iterator(Node* t_node, const SList<T>& t_owner_List);
+			Iterator(Node* t_node, const SList& t_owner_List);
 			Node* m_node = nullptr;
 			const SList<T>* m_owner_list = nullptr;
 		};
@@ -84,12 +85,12 @@ namespace FieaGameEngine
 
 		/// <summary>Copy Constructor for SList.</summary>
 		/// <param name="t_rhs">Const reference to passed List of Type T.</param>
-		SList(const SList<T> &t_rhs);
+		SList(const SList &t_rhs);
 
 		/// <summary>Assignment Operator Overload.</summary>
 		/// <param name="t_rhs">Const reference to passed List of Type T.</param>
 		/// <returns>Returns Mutable Reference to "This" list.</returns>
-		SList<T>& operator= (const SList<T> &t_rhs);
+		SList<T>& operator= (const SList &t_rhs);
 
 		/// <summary>Destructor for SList.</summary>
 		~SList();
@@ -122,7 +123,7 @@ namespace FieaGameEngine
 		/// <returns>Returns True if List is empty else returns false.</returns>
 		bool isEmpty() const;
 
-		/// <summary>Gets First element in the list. Doesn't remove element from list.</summary>
+		/// <summary>Gets First element of the List. Doesn't remove element from list.</summary>
 		/// <returns>Returns Const reference to First element of Type T from the List.</returns>
 		const T& front() const;
 

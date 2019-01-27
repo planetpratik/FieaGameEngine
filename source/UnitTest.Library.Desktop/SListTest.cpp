@@ -11,6 +11,12 @@ namespace Microsoft::VisualStudio::CppUnitTestFramework
 	{
 		RETURN_WIDE_STRING(t_rhs.data());
 	}
+
+	template<> inline
+		std::wstring ToString<SList<Foo>::Iterator>(const SList<Foo>::Iterator& t_rhs)
+	{
+		RETURN_WIDE_STRING((*t_rhs).data());
+	}
 }
 
 namespace UnitTestLibraryDesktop
@@ -880,58 +886,31 @@ namespace UnitTestLibraryDesktop
 
 		TEST_METHOD(IteratorTestPreIncrementOperator)
 		{
-			{
-				SList<int>::Iterator it;
-				// Iterator doesn't belong to any list. Exception should be thrown.
-				auto expression = [&] { int a = *it; };
+			Foo a(10);
+			Foo b(10);
+			Foo c(10);
+			SList<Foo> list;
+			SList<Foo>::Iterator it;
+			list.pushBack(a);
+			list.pushBack(b);
+			list.pushBack(c);
+			{ 
+				auto expression = [] { SList<Foo>::Iterator it; ++it; };
 				Assert::ExpectException<std::exception>(expression);
-
-				auto error_expression = [&] { ++it; };
-				Assert::ExpectException<std::exception>(error_expression);
-
-				it = list_of_integers->end();
-				// As iterator points to the end of the list, due to nullptr reference, exception should be thrown
-				auto expression_two = [&] { int b = *it; };
-				Assert::ExpectException<std::exception>(expression_two);
-				list_of_integers->pushBack(20);
-				list_of_integers->pushFront(10);
-				it = list_of_integers->begin();
-				++it;
-				Assert::AreEqual(20, *it);
 			}
 			{
-				SList<int*>::Iterator it;
-				int c = 10;
-				int d = 20;
-				// Iterator doesn't belong to any list. Exception should be thrown.
-				auto expression = [&] { int* a = *it; };
+				auto expression = [&list] { SList<Foo>::Iterator it = list.end(); ++it; };
 				Assert::ExpectException<std::exception>(expression);
-				it = list_of_integer_pointers->end();
-				// As iterator points to the end of the list, due to nullptr reference, exception should be thrown
-				auto expression_two = [&] { int* b = *it; };
-				Assert::ExpectException<std::exception>(expression_two);
-				list_of_integer_pointers->pushBack(&d);
-				list_of_integer_pointers->pushFront(&c);
-				it = list_of_integer_pointers->begin();
-				++it;
-				Assert::AreEqual(&d, *it);
 			}
+			it = list.begin();
+			Assert::AreEqual(a, *it);
+			++it;
+			Assert::AreEqual(b, *it);
+			++it;
+			Assert::AreEqual(c, *it);
 			{
-				SList<Foo>::Iterator it;
-				Foo c(10);
-				Foo d(20);
-				// Iterator doesn't belong to any list. Exception should be thrown.
-				auto expression = [&] { Foo a = *it; };
+				auto expression = [&it] { ++it; ++it; };
 				Assert::ExpectException<std::exception>(expression);
-				it = list_of_foos->end();
-				// As iterator points to the end of the list, due to nullptr reference, exception should be thrown
-				auto expression_two = [&] { Foo b = *it; };
-				Assert::ExpectException<std::exception>(expression_two);
-				list_of_foos->pushBack(d);
-				list_of_foos->pushFront(c);
-				it = list_of_foos->begin();
-				++it;
-				Assert::AreEqual(d, *it);
 			}
 		}
 
