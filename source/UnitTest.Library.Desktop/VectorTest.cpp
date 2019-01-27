@@ -68,6 +68,9 @@ namespace UnitTestLibraryDesktop
 			Assert::AreEqual(10U, vector_of_foos.capacity());
 			Assert::IsTrue(a == vector_of_foos[0]);
 			Assert::IsTrue(b == vector_of_foos[1]);
+			Vector<Foo> another_vector_of_foos{ a };
+			auto expression = [&] { another_vector_of_foos.reserve(1); };
+			Assert::ExpectException<std::exception>(expression);
 		}
 
 		TEST_METHOD(VectorTestCopyConstructor)
@@ -100,7 +103,8 @@ namespace UnitTestLibraryDesktop
 			Foo b(20);
 			Vector<Foo> vector_of_foos{a, b};
 			Assert::IsTrue(b == vector_of_foos[1]);
-			auto expression = [vector_of_foos] { Foo c(vector_of_foos[3U]); };
+			Foo c;
+			auto expression = [&] { c = vector_of_foos[4]; };
 			Assert::ExpectException<std::exception>(expression);
 		}
 
@@ -254,7 +258,7 @@ namespace UnitTestLibraryDesktop
 			Assert::AreEqual(c, b);
 			Foo d = vector_of_foos.at(0);
 			Assert::AreEqual(d, a);
-			auto expression = [vector_of_foos] {Foo e = vector_of_foos.at(2); };
+			auto expression = [&] {Foo e = vector_of_foos.at(2); };
 			Assert::ExpectException<std::exception>(expression);
 		}
 

@@ -28,7 +28,7 @@ namespace FieaGameEngine
 	template <typename T>
 	void Vector<T>::reserve(const uint32_t t_new_capacity)
 	{
-		if (t_new_capacity < m_capacity && t_new_capacity <= 0)
+		if (t_new_capacity < m_capacity || t_new_capacity <= 0)
 		{
 			throw std::exception("Invalid Operation! New Capacity must be greater than current capacity");
 		}
@@ -72,7 +72,7 @@ namespace FieaGameEngine
 	{
 		if (t_index >= m_size)
 		{
-			throw std::exception("Array out of bouds Exception !");
+			throw std::exception("Array out of bounds Exception !");
 		}
 		return m_data_array[t_index];
 	}
@@ -359,10 +359,6 @@ namespace FieaGameEngine
 		{
 			throw std::exception("Invalid Operation! Vector doesn't have any elements. Iterator can't be incremented");
 		}
-		if (m_current_index > m_owner_vector->size())
-		{
-			throw std::exception("Invalid Operation! Vector Index out of Bounds");
-		}
 		return m_owner_vector->m_data_array[m_current_index];
 	}
 
@@ -432,10 +428,6 @@ namespace FieaGameEngine
 		if (0 == (m_owner_vector->size()))
 		{
 			throw std::exception("Invalid Operation! Vector doesn't have any elements. Iterator can't be incremented");
-		}
-		if (m_current_index > m_owner_vector->size())
-		{
-			throw std::exception("Invalid Operation! Vector Index out of Bounds");
 		}
 		return m_owner_vector->m_data_array[m_current_index];
 	}
