@@ -99,8 +99,10 @@ namespace FieaGameEngine
 		// If array needs to exceed, reallocate array to new location using new capacity and then add new object to the end
 		if (m_size == m_capacity)
 		{
-			ReserveStrategy rs;
-			uint32_t new_capacity = rs.operator()(m_size, m_capacity);
+			// Calls Overloaded operator() method in User's CustomReserveStrategy class.
+			// If implementation not found, calls default ReserveStrategy declared in base class present in Vector.h
+			typename FieaGameEngine::CustomReserveStrategy crs;
+			uint32_t new_capacity = crs.operator()(m_size, m_capacity);
 			if (new_capacity < m_capacity)
 			{
 				throw std::exception("Error: Bad Reserve Strategy! New capacity must be greater than current capacity.");

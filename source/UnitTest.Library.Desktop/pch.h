@@ -7,6 +7,7 @@
 #include "Foo.h"
 #include "SList.h"
 #include "Vector.h"
+#include "CustomReserveStrategy.h"
 #pragma warning(disable: 4189)
 // TODO: reference additional headers your program requires here
 #if defined(DEBUG) || defined(_DEBUG)
