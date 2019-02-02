@@ -299,6 +299,9 @@ namespace UnitTestLibraryDesktop
 			const HashMap<Foo, int> hashmap_two(hashmap);
 			HashMap<Foo, int>::ConstIterator it = hashmap_two.begin();
 			Assert::AreEqual((*it).first, a);
+			const HashMap<Foo, int> hashmap_three(3);
+			it = hashmap_three.begin();
+			Assert::IsTrue(hashmap_three.end() == it);
 		}
 		
 		TEST_METHOD(HashMapTestCBegin)
