@@ -6,9 +6,12 @@
     <ClCompile Include="SListTest.cpp" />
     <ClCompile Include="Foo.cpp" />
     <ClCompile Include="VectorTest.cpp" />
+    <ClCompile Include="HashMapTest.cpp" />
+    <ClCompile Include="Bar.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
     <ClInclude Include="Foo.h" />
+    <ClInclude Include="Bar.h" />
   </ItemGroup>
 </Project>

@@ -19,14 +19,14 @@ namespace FieaGameEngine
 #pragma region Vector
 
 	template <typename T>
-	inline Vector<T>::Vector(const uint32_t& t_default_capacity) :
+	inline Vector<T>::Vector(const uint32_t& t_default_capacity, bool t_fixed_size) :
 		m_capacity(0), m_size(0), m_data_array(nullptr)
 	{
-		reserve(t_default_capacity);
+		reserve(t_default_capacity, t_fixed_size);
 	}
 
 	template <typename T>
-	void Vector<T>::reserve(const uint32_t t_new_capacity)
+	void Vector<T>::reserve(const uint32_t t_new_capacity, bool t_fixed_size)
 	{
 		if (t_new_capacity < m_capacity || t_new_capacity <= 0)
 		{
@@ -34,6 +34,14 @@ namespace FieaGameEngine
 		}
 		m_data_array = static_cast<T*>(realloc(m_data_array, t_new_capacity * sizeof(T)));
 		m_capacity = t_new_capacity;
+		if (t_fixed_size)
+		{
+			for (uint32_t i = m_size; i < t_new_capacity; i++)
+			{
+				new (m_data_array + i)T();
+			}
+			m_size = t_new_capacity;
+		}
 	}
 
 	template <typename T>
