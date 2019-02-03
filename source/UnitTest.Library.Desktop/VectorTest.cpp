@@ -68,9 +68,6 @@ namespace UnitTestLibraryDesktop
 			Assert::AreEqual(10U, vector_of_foos.capacity());
 			Assert::IsTrue(a == vector_of_foos[0]);
 			Assert::IsTrue(b == vector_of_foos[1]);
-			Vector<Foo> another_vector_of_foos{ a };
-			auto expression = [&] { another_vector_of_foos.reserve(1); };
-			Assert::ExpectException<std::exception>(expression);
 		}
 
 		TEST_METHOD(VectorTestCopyConstructor)
@@ -232,8 +229,13 @@ namespace UnitTestLibraryDesktop
 			Vector<Foo>::ConstIterator c_it;
 			Vector<Foo> vector_of_foos{a, b, c};
 			Assert::AreEqual(b, vector_of_foos[1]);
-			c_it = vector_of_foos.cend();
-			Assert::AreNotEqual(c, *c_it);
+			c_it = vector_of_foos.begin();
+			c_it++;
+			c_it++;
+			c_it++;
+			//c_it = vector_of_foos.cend();
+			//Assert::AreNotEqual(c, *c_it);
+			Assert::IsTrue(vector_of_foos.cend() == c_it);
 		}
 
 		TEST_METHOD(VectorTestIsEmpty)
@@ -285,7 +287,7 @@ namespace UnitTestLibraryDesktop
 			it = vector_of_foos.find(c);
 			Assert::AreEqual(c, *it);
 			Vector<Foo>::Iterator another_it = vector_of_foos.find(d);
-			Assert::AreEqual(vector_of_foos.end(), another_it);
+			Assert::IsTrue(vector_of_foos.end() == another_it);
 		}
 
 		TEST_METHOD(VectorTestRemove)
@@ -449,8 +451,6 @@ namespace UnitTestLibraryDesktop
 			auto expression_one = [&] { Foo c = *(it); };
 			Assert::ExpectException<std::exception>(expression_one);
 			it = vector_of_foos.begin();
-			auto expression_two = [&] { Foo c = *(it); };
-			Assert::ExpectException<std::exception>(expression_two);
 			vector_of_foos.pushBack(a);
 			vector_of_foos.pushBack(b);
 			it = vector_of_foos.begin();
@@ -458,7 +458,8 @@ namespace UnitTestLibraryDesktop
 			++it;
 			Assert::IsTrue(b == *it);
 			++it;
-			Assert::AreEqual(it, vector_of_foos.end());
+			auto expression = [&] {Foo e = *it; };
+			Assert::ExpectException<std::exception>(expression);
 		}
 #pragma endregion
 
@@ -592,7 +593,8 @@ namespace UnitTestLibraryDesktop
 			++it;
 			Assert::IsTrue(b == *it);
 			++it;
-			Assert::AreEqual(it, vector_of_foos.cend());
+			auto expression = [&] {Foo e = *it; };
+			Assert::ExpectException<std::exception>(expression);
 		}
 #pragma endregion
 

@@ -28,10 +28,6 @@ namespace FieaGameEngine
 	template <typename T>
 	void Vector<T>::reserve(const uint32_t t_new_capacity, bool t_fixed_size)
 	{
-		if (t_new_capacity < m_capacity || t_new_capacity <= 0)
-		{
-			throw std::exception("Invalid Operation! New Capacity must be greater than current capacity");
-		}
 		m_data_array = static_cast<T*>(realloc(m_data_array, t_new_capacity * sizeof(T)));
 		m_capacity = t_new_capacity;
 		if (t_fixed_size)
@@ -48,6 +44,7 @@ namespace FieaGameEngine
 	Vector<T>::Vector(std::initializer_list<T> t_list):
 		m_capacity(0), m_size(0), m_data_array(nullptr)
 	{
+		//reserve(static_cast<uint32_t>(t_list.size()), true);
 		for (const auto& value : t_list)
 		{
 			pushBack(value);
@@ -67,6 +64,7 @@ namespace FieaGameEngine
 		if (this != &t_rhs)
 		{
 			clear();
+			//reserve(static_cast<uint32_t>(t_list.size()), true);
 			for (const auto& value : t_rhs)
 			{
 				pushBack(value);
@@ -107,10 +105,8 @@ namespace FieaGameEngine
 		// If array needs to exceed, reallocate array to new location using new capacity and then add new object to the end
 		if (m_size == m_capacity)
 		{
-			// Calls Overloaded operator() method in User's CustomReserveStrategy class.
-			// If implementation not found, calls default ReserveStrategy declared in base class present in Vector.h
-			typename FieaGameEngine::CustomReserveStrategy crs;
-			uint32_t new_capacity = crs.operator()(m_size, m_capacity);
+			ReserveStrategy rs;
+			uint32_t new_capacity = rs.operator()(m_size, m_capacity);
 			if (new_capacity < m_capacity)
 			{
 				throw std::exception("Error: Bad Reserve Strategy! New capacity must be greater than current capacity.");
@@ -279,7 +275,7 @@ namespace FieaGameEngine
 		if (t_it != end())
 		{
 			(*t_it).~T();
-			std::memmove(m_data_array + t_it.m_current_index, m_data_array + t_it.m_current_index + 1, sizeof(T)*(m_size - t_it.m_current_index));
+			std::memmove(m_data_array + t_it.m_current_index, m_data_array + t_it.m_current_index + 1, sizeof(T)*(m_size - t_it.m_current_index - 1));
 			--m_size;
 			found = true;
 		}
@@ -303,7 +299,7 @@ namespace FieaGameEngine
 		{
 			(*it).~T();
 		}
-		std::memmove(m_data_array + t_begin.m_current_index, m_data_array + t_end.m_current_index + 1, sizeof(T)*(m_size - t_end.m_current_index + 1));
+		std::memmove(m_data_array + t_begin.m_current_index, m_data_array + t_end.m_current_index + 1, sizeof(T)*(m_size - t_end.m_current_index -1));
 		m_size = m_size - (t_end.m_current_index - t_begin.m_current_index + 1);
 		success = true;
 		return success;
@@ -365,9 +361,9 @@ namespace FieaGameEngine
 		{
 			throw std::exception("Iterator doesn't belong to any Vector");
 		}
-		if (0 == (m_owner_vector->size()))
+		if (m_current_index == m_owner_vector->size())
 		{
-			throw std::exception("Invalid Operation! Vector doesn't have any elements. Iterator can't be incremented");
+			throw std::exception("Invalid Operation. Vector index out of bounds.");
 		}
 		return m_owner_vector->m_data_array[m_current_index];
 	}
@@ -435,9 +431,9 @@ namespace FieaGameEngine
 		{
 			throw std::exception("Iterator doesn't belong to any Vector");
 		}
-		if (0 == (m_owner_vector->size()))
+		if (m_current_index == m_owner_vector->size())
 		{
-			throw std::exception("Invalid Operation! Vector doesn't have any elements. Iterator can't be incremented");
+			throw std::exception("Invalid Operation. Vector index out of bounds.");
 		}
 		return m_owner_vector->m_data_array[m_current_index];
 	}

@@ -10,7 +10,7 @@ namespace FieaGameEngine
 	/// For custom reserve strategy, user may override method "operator()" in CustomReserveStrategy class. 
 	/// If user hasn't implemented own reserve strategy, default reserve strategy declared here will be used.
 	/// </summary>
-	class ReserveStrategy
+	class ReserveStrategy final
 	{
 	public:
 		/// <summary>Functor ( Function Object ) to supply default increment strategy for Vector.</summary>
@@ -272,4 +272,3 @@ namespace FieaGameEngine
 }
 
 #include "Vector.inl"
-#include "CustomReserveStrategy.h"

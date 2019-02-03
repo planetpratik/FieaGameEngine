@@ -8,7 +8,6 @@
 #include "Bar.h"
 #include "SList.h"
 #include "Vector.h"
-#include "CustomReserveStrategy.h"
 #include "DefaultHash.h"
 #include "HashMap.h"
 
