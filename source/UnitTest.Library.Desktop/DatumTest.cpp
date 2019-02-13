@@ -374,9 +374,9 @@ namespace UnitTestLibraryDesktop
 			Datum another_int_datum;
 			another_int_datum.setType(Datum::DatumType::INTEGER);
 			another_int_datum.pushBack(10);
-			another_int_datum.pushBack(20);
 			another_int_datum.pushBack(30);
-			Assert::IsTrue(int_datum == another_int_datum);
+			another_int_datum.pushBack(30);
+			Assert::IsFalse(int_datum == another_int_datum);
 
 			Datum float_datum;
 			float_datum.setType(Datum::DatumType::FLOAT);
@@ -386,9 +386,9 @@ namespace UnitTestLibraryDesktop
 			Datum another_float_datum;
 			another_float_datum.setType(Datum::DatumType::FLOAT);
 			another_float_datum.pushBack(10.2f);
-			another_float_datum.pushBack(20.4f);
 			another_float_datum.pushBack(30.1f);
-			Assert::IsTrue(float_datum == another_float_datum);
+			another_float_datum.pushBack(30.1f);
+			Assert::IsFalse(float_datum == another_float_datum);
 
 			Datum string_datum;
 			string_datum.setType(Datum::DatumType::STRING);
@@ -398,9 +398,9 @@ namespace UnitTestLibraryDesktop
 			Datum another_string_datum;
 			another_string_datum.setType(Datum::DatumType::STRING);
 			another_string_datum.pushBack("Pratik"s);
-			another_string_datum.pushBack("Paul"s);
 			another_string_datum.pushBack("Ron"s);
-			Assert::IsTrue(string_datum == another_string_datum);
+			another_string_datum.pushBack("Ron"s);
+			Assert::IsFalse(string_datum == another_string_datum);
 
 			Datum vector_datum;
 			glm::vec4 a(10);
@@ -414,8 +414,8 @@ namespace UnitTestLibraryDesktop
 			another_vector_datum.setType(Datum::DatumType::VECTOR4);
 			another_vector_datum.pushBack(a);
 			another_vector_datum.pushBack(b);
-			another_vector_datum.pushBack(c);
-			Assert::IsTrue(vector_datum == another_vector_datum);
+			another_vector_datum.pushBack(b);
+			Assert::IsFalse(vector_datum == another_vector_datum);
 
 			Datum mat_datum;
 			glm::mat4x4 d(10);
@@ -428,9 +428,9 @@ namespace UnitTestLibraryDesktop
 			Datum another_mat_datum;
 			another_mat_datum.setType(Datum::DatumType::MATRIX4X4);
 			another_mat_datum.pushBack(d);
-			another_mat_datum.pushBack(e);
 			another_mat_datum.pushBack(f);
-			Assert::IsTrue(mat_datum == another_mat_datum);
+			another_mat_datum.pushBack(f);
+			Assert::IsFalse(mat_datum == another_mat_datum);
 
 			Datum rtti_datum;
 			Foo x(10);
@@ -443,9 +443,9 @@ namespace UnitTestLibraryDesktop
 			Datum another_rtti_datum;
 			another_rtti_datum.setType(Datum::DatumType::POINTER);
 			another_rtti_datum.pushBack(&x);
-			another_rtti_datum.pushBack(&y);
+			another_rtti_datum.pushBack(&x);
 			another_rtti_datum.pushBack(&z);
-			Assert::IsTrue(rtti_datum == another_rtti_datum);
+			Assert::IsFalse(rtti_datum == another_rtti_datum);
 		}
 
 		TEST_METHOD(DatumTestComparisonOperator)
