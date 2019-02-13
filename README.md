@@ -1,2 +1,2 @@
 # FieaGameEngine
-Fiea Game Engine developed as a part of Programming-II ( Spring 2019 )
+Cross-Platform Data Driven Game Engine developed as a part of Programming-II Curriculum ( FIEA, UCF - Spring 2019 ) 
