@@ -1,8 +1,10 @@
 #pragma once
+#include "RTTI.h"
 namespace FieaGameEngine
 {
-	class Foo
+	class Foo : public RTTI
 	{
+		RTTI_DECLARATIONS(Foo, RTTI);
 	public:
 		explicit Foo(int data = 0);
 		~Foo() = default;

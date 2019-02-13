@@ -4,6 +4,8 @@
 
 namespace FieaGameEngine
 {
+	RTTI_DEFINITIONS(Bar);
+
 	Bar::Bar(int data) : m_data(data)
 	{
 	}

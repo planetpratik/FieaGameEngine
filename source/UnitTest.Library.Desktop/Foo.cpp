@@ -4,6 +4,8 @@
 
 namespace FieaGameEngine
 {
+	RTTI_DEFINITIONS(Foo);
+
 	Foo::Foo(int data): m_data(data)
 	{
 	}
