@@ -363,6 +363,90 @@ namespace UnitTestLibraryDesktop
 #pragma endregion
 
 #pragma region DatumComparisonOperatorTests
+		
+		TEST_METHOD(DatumTestDatumComparison)
+		{
+			Datum int_datum;
+			int_datum.setType(Datum::DatumType::INTEGER);
+			int_datum.pushBack(10);
+			int_datum.pushBack(20);
+			int_datum.pushBack(30);
+			Datum another_int_datum;
+			another_int_datum.setType(Datum::DatumType::INTEGER);
+			another_int_datum.pushBack(10);
+			another_int_datum.pushBack(20);
+			another_int_datum.pushBack(30);
+			Assert::IsTrue(int_datum == another_int_datum);
+
+			Datum float_datum;
+			float_datum.setType(Datum::DatumType::FLOAT);
+			float_datum.pushBack(10.2f);
+			float_datum.pushBack(20.4f);
+			float_datum.pushBack(30.1f);
+			Datum another_float_datum;
+			another_float_datum.setType(Datum::DatumType::FLOAT);
+			another_float_datum.pushBack(10.2f);
+			another_float_datum.pushBack(20.4f);
+			another_float_datum.pushBack(30.1f);
+			Assert::IsTrue(float_datum == another_float_datum);
+
+			Datum string_datum;
+			string_datum.setType(Datum::DatumType::STRING);
+			string_datum.pushBack("Pratik"s);
+			string_datum.pushBack("Paul"s);
+			string_datum.pushBack("Ron"s);
+			Datum another_string_datum;
+			another_string_datum.setType(Datum::DatumType::STRING);
+			another_string_datum.pushBack("Pratik"s);
+			another_string_datum.pushBack("Paul"s);
+			another_string_datum.pushBack("Ron"s);
+			Assert::IsTrue(string_datum == another_string_datum);
+
+			Datum vector_datum;
+			glm::vec4 a(10);
+			glm::vec4 b(20);
+			glm::vec4 c(30);
+			vector_datum.setType(Datum::DatumType::VECTOR4);
+			vector_datum.pushBack(a);
+			vector_datum.pushBack(b);
+			vector_datum.pushBack(c);
+			Datum another_vector_datum;
+			another_vector_datum.setType(Datum::DatumType::VECTOR4);
+			another_vector_datum.pushBack(a);
+			another_vector_datum.pushBack(b);
+			another_vector_datum.pushBack(c);
+			Assert::IsTrue(vector_datum == another_vector_datum);
+
+			Datum mat_datum;
+			glm::mat4x4 d(10);
+			glm::mat4x4 e(20);
+			glm::mat4x4 f(30);
+			mat_datum.setType(Datum::DatumType::MATRIX4X4);
+			mat_datum.pushBack(d);
+			mat_datum.pushBack(e);
+			mat_datum.pushBack(f);
+			Datum another_mat_datum;
+			another_mat_datum.setType(Datum::DatumType::MATRIX4X4);
+			another_mat_datum.pushBack(d);
+			another_mat_datum.pushBack(e);
+			another_mat_datum.pushBack(f);
+			Assert::IsTrue(mat_datum == another_mat_datum);
+
+			Datum rtti_datum;
+			Foo x(10);
+			Foo y(20);
+			Foo z(30);
+			rtti_datum.setType(Datum::DatumType::POINTER);
+			rtti_datum.pushBack(&x);
+			rtti_datum.pushBack(&y);
+			rtti_datum.pushBack(&z);
+			Datum another_rtti_datum;
+			another_rtti_datum.setType(Datum::DatumType::POINTER);
+			another_rtti_datum.pushBack(&x);
+			another_rtti_datum.pushBack(&y);
+			another_rtti_datum.pushBack(&z);
+			Assert::IsTrue(rtti_datum == another_rtti_datum);
+		}
 
 		TEST_METHOD(DatumTestComparisonOperator)
 		{
@@ -837,7 +921,8 @@ namespace UnitTestLibraryDesktop
 				Assert::ExpectException<std::exception>(expression);
 				Foo a(10);
 				rtti_datum = &a;
-				Assert::IsTrue(rtti_datum.get<RTTI*>()->Equals(reinterpret_cast<RTTI*>(&a)));
+				//Assert::IsTrue(rtti_datum.get<RTTI*>()->Equals(reinterpret_cast<RTTI*>(&a)));
+				Assert::IsTrue(rtti_datum.front<RTTI*>()->Equals(reinterpret_cast<RTTI*>(&a)));
 			}
 		}
 
@@ -896,7 +981,8 @@ namespace UnitTestLibraryDesktop
 				Foo a(10);
 				temp_datum = &a;
 				const Datum another_rtti_datum = temp_datum;
-				Assert::IsTrue(another_rtti_datum.get<RTTI*>()->Equals(reinterpret_cast<RTTI*>(&a)));
+				//Assert::IsTrue(another_rtti_datum.get<RTTI*>()->Equals(reinterpret_cast<RTTI*>(&a)));
+				Assert::IsTrue(another_rtti_datum.front<RTTI*>()->Equals(reinterpret_cast<RTTI*>(&a)));
 			}
 		}
 
@@ -1067,6 +1153,15 @@ namespace UnitTestLibraryDesktop
 			Assert::AreEqual(2U, int_datum.size());
 			Assert::AreEqual(3U, int_datum.capacity());
 
+			Datum temp_float_datum;
+			auto expression_three = [&] { temp_float_datum.remove(3.2f); };
+			Assert::ExpectException<std::exception>(expression_three);
+			temp_float_datum = 10.4f;
+			float_t float_arr[] = { 10.4f,20.3f,31.1f };
+			temp_float_datum.setStorage(float_arr, 3);
+			auto expression_four = [&] { temp_float_datum.remove(10.4f); };
+			Assert::ExpectException<std::exception>(expression_four);
+
 			Datum float_datum;
 			float_datum.setType(Datum::DatumType::FLOAT);
 			float_datum.pushBack(10.2f);
@@ -1082,6 +1177,15 @@ namespace UnitTestLibraryDesktop
 			glm::vec4 a(10);
 			glm::vec4 b(20);
 			glm::vec4 c(30);
+			Datum temp_vector_datum;
+			auto expression_five = [&] { temp_vector_datum.remove(a); };
+			Assert::ExpectException<std::exception>(expression_five);
+			temp_vector_datum = a;
+			glm::vec4 vec_arr[] = { a,b,c };
+			temp_vector_datum.setStorage(vec_arr, 3);
+			auto expression_six = [&] { temp_vector_datum.remove(a); };
+			Assert::ExpectException<std::exception>(expression_six);
+			
 			vector_datum.setType(Datum::DatumType::VECTOR4);
 			vector_datum.pushBack(a);
 			vector_datum.pushBack(b);
@@ -1096,6 +1200,16 @@ namespace UnitTestLibraryDesktop
 			glm::mat4x4 d(10);
 			glm::mat4x4 e(20);
 			glm::mat4x4 f(30);
+
+			Datum temp_mat_datum;
+			auto expression_seven = [&] { temp_mat_datum.remove(d); };
+			Assert::ExpectException<std::exception>(expression_seven);
+			temp_mat_datum = d;
+			glm::mat4x4 mat_arr[] = { d,e,f };
+			temp_mat_datum.setStorage(mat_arr, 3);
+			auto expression_eight = [&] { temp_mat_datum.remove(d); };
+			Assert::ExpectException<std::exception>(expression_eight);
+
 			mat_datum.setType(Datum::DatumType::MATRIX4X4);
 			mat_datum.pushBack(d);
 			mat_datum.pushBack(e);
@@ -1106,14 +1220,23 @@ namespace UnitTestLibraryDesktop
 			Assert::AreEqual(2U, mat_datum.size());
 			Assert::AreEqual(3U, mat_datum.capacity());
 
+			Datum temp_string_datum;
+			auto expression_nine = [&] { temp_string_datum.remove("Pratik"); };
+			Assert::ExpectException<std::exception>(expression_nine);
+			temp_string_datum = "Pratik"s;
+			std::string string_arr[] = { "Pratik"s,"Paul"s,"Ron"s };
+			temp_string_datum.setStorage(string_arr, 3);
+			auto expression_ten = [&] { temp_string_datum.remove("Pratik"s); };
+			Assert::ExpectException<std::exception>(expression_ten);
+
 			Datum string_datum;
 			string_datum.setType(Datum::DatumType::STRING);
 			string_datum.pushBack("Pratik"s);
 			string_datum.pushBack("Paul"s);
 			string_datum.pushBack("Tom"s);
-			string_datum.remove("Tom"s);
+			string_datum.remove("Paul"s);
 			Assert::IsTrue("Pratik"s == string_datum.get<std::string>());
-			Assert::IsTrue("Paul"s == string_datum.get<std::string>(1));
+			Assert::IsTrue("Tom"s == string_datum.get<std::string>(1));
 			Assert::AreEqual(2U, string_datum.size());
 			Assert::AreEqual(3U, string_datum.capacity());
 
@@ -1122,12 +1245,22 @@ namespace UnitTestLibraryDesktop
 			Foo x(10);
 			Foo y(20);
 			Foo z(30);
+
+			Datum temp_rtti_datum;
+			auto expression_eleven = [&] { temp_rtti_datum.remove(x); };
+			Assert::ExpectException<std::exception>(expression_eleven);
+			temp_rtti_datum = &x;
+			RTTI* rtti_arr[] = { &x,&y,&z };
+			temp_rtti_datum.setStorage(rtti_arr, 3);
+			auto expression_twelve = [&] { temp_rtti_datum.remove(x); };
+			Assert::ExpectException<std::exception>(expression_twelve);
+
 			rtti_datum.pushBack(&x);
 			rtti_datum.pushBack(&y);
 			rtti_datum.pushBack(&z);
-			rtti_datum.remove(z);
+			rtti_datum.remove(y);
 			Assert::IsTrue(&x == rtti_datum.get<RTTI*>());
-			Assert::IsTrue(&y == rtti_datum.get<RTTI*>(1));
+			Assert::IsTrue(&z == rtti_datum.get<RTTI*>(1));
 			Assert::AreEqual(2U, rtti_datum.size());
 			Assert::AreEqual(3U, rtti_datum.capacity());
 		}
@@ -1198,9 +1331,9 @@ namespace UnitTestLibraryDesktop
 			string_datum.pushBack("Pratik"s);
 			string_datum.pushBack("Paul"s);
 			string_datum.pushBack("Tom"s);
-			string_datum.removeAt(2);
+			string_datum.removeAt(1);
 			Assert::IsTrue("Pratik"s == string_datum.get<std::string>());
-			Assert::IsTrue("Paul"s == string_datum.get<std::string>(1));
+			Assert::IsTrue("Tom"s == string_datum.get<std::string>(1));
 			Assert::AreEqual(2U, string_datum.size());
 			Assert::AreEqual(3U, string_datum.capacity());
 
@@ -1212,9 +1345,9 @@ namespace UnitTestLibraryDesktop
 			rtti_datum.pushBack(&x);
 			rtti_datum.pushBack(&y);
 			rtti_datum.pushBack(&z);
-			rtti_datum.removeAt(2);
+			rtti_datum.removeAt(1);
 			Assert::IsTrue(&x == rtti_datum.get<RTTI*>());
-			Assert::IsTrue(&y == rtti_datum.get<RTTI*>(1));
+			Assert::IsTrue(&z == rtti_datum.get<RTTI*>(1));
 			Assert::AreEqual(2U, rtti_datum.size());
 			Assert::AreEqual(3U, rtti_datum.capacity());
 		}
@@ -1350,7 +1483,7 @@ namespace UnitTestLibraryDesktop
 				auto expression_one = [&] { int_datum.find(10); };
 				Assert::ExpectException<std::exception>(expression_one);
 				datum_two.setType(Datum::DatumType::POINTER);
-				const Datum another_temp_datum = temp_datum;
+				const Datum another_temp_datum = datum_two;
 				auto expression_two = [&] { another_temp_datum.find(15); };
 				Assert::ExpectException<std::exception>(expression_two);
 				datum_one.setType(Datum::DatumType::INTEGER);
