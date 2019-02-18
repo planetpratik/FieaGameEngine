@@ -241,6 +241,11 @@ namespace FieaGameEngine
 		return static_cast<float_t>(no_of_buckets_in_use) / m_buckets.size();
 	}
 
+	template <typename TKey, typename TData, typename HashFunctor>
+	uint32_t HashMap<TKey, TData, HashFunctor>::noOfBuckets() const
+	{
+		return m_buckets.size();
+	}
 #pragma endregion
 
 #pragma region Iterator

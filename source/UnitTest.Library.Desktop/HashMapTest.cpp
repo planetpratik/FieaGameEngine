@@ -186,12 +186,14 @@ namespace UnitTestLibraryDesktop
 			HashMap<Foo, int>::Iterator it_two = second_hashmap.insert(HashMap<Foo, int>::PairType(a, 10), result);
 			Assert::AreEqual(10, (*it_two).second);
 			Assert::IsTrue(result);
+
 			it_two = second_hashmap.insert(HashMap<Foo, int>::PairType(b, 50), result);
 			Assert::AreEqual(50, (*it_two).second);
 			Assert::IsTrue(result);
 			it_two = second_hashmap.insert(HashMap<Foo, int>::PairType(a, 40), result);
 			Assert::AreEqual(10, (*it_two).second);
-			Assert::IsFalse(result);
+			Assert::IsFalse(result); 
+
 		}
 
 		TEST_METHOD(HashMapTestIndexOperator)

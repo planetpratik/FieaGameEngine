@@ -1,5 +1,6 @@
 #include "pch.h"
 #include <string>
+#include <tuple>
 #include "CppUnitTest.h"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace FieaGameEngine;
@@ -1369,10 +1370,14 @@ namespace UnitTestLibraryDesktop
 				int_datum.setType(Datum::DatumType::INTEGER);
 				int32_t int_arr[] = { 1,2,3 };
 				int_datum.setStorage(int_arr, 3);
-				Assert::IsTrue(0 == int_datum.find(1));
-				Assert::IsTrue(1 == int_datum.find(2));
-				Assert::IsTrue(2 == int_datum.find(3));
-				Assert::IsTrue(3 == int_datum.find(10));
+				auto[result, index] = int_datum.find(1);
+				Assert::IsTrue(0 == index);
+				auto[result2, index2] = int_datum.find(2);
+				Assert::IsTrue(1 == index2);
+				auto[result3, index3] = int_datum.find(3);
+				Assert::IsTrue(2 == index3);
+				auto[result4, index4] = int_datum.find(5);
+				Assert::IsTrue(3 == index4);
 			}
 			{
 				Datum float_datum;
@@ -1385,10 +1390,14 @@ namespace UnitTestLibraryDesktop
 				float_datum.setType(Datum::DatumType::FLOAT);
 				float_t float_arr[] = { 10.2f,15.5f,31.1f };
 				float_datum.setStorage(float_arr, 3);
-				Assert::IsTrue(0 == float_datum.find(10.2f));
-				Assert::IsTrue(1 == float_datum.find(15.5f));
-				Assert::IsTrue(2 == float_datum.find(31.1f));
-				Assert::IsTrue(3 == float_datum.find(104.2f));
+				auto[result, index] = float_datum.find(10.2f);
+				Assert::IsTrue(0 == index);
+				auto[result2, index2] = float_datum.find(15.5f);
+				Assert::IsTrue(1 == index2);
+				auto[result3, index3] = float_datum.find(31.1f);
+				Assert::IsTrue(2 == index3);
+				auto[result4, index4] = float_datum.find(103.2f);
+				Assert::IsTrue(3 == index4);
 			}
 			{
 				Datum vector_datum;
@@ -1405,10 +1414,14 @@ namespace UnitTestLibraryDesktop
 				vector_datum.setType(Datum::DatumType::VECTOR4);
 				glm::vec4 vector_arr[] = { a,b,c };
 				vector_datum.setStorage(vector_arr, 3);
-				Assert::IsTrue(0 == vector_datum.find(a));
-				Assert::IsTrue(1 == vector_datum.find(b));
-				Assert::IsTrue(2 == vector_datum.find(c));
-				Assert::IsTrue(3 == vector_datum.find(d));
+				auto[result, index] = vector_datum.find(a);
+				Assert::IsTrue(0 == index);
+				auto[result2, index2] = vector_datum.find(b);
+				Assert::IsTrue(1 == index2);
+				auto[result3, index3] = vector_datum.find(c);
+				Assert::IsTrue(2 == index3);
+				auto[result4, index4] = vector_datum.find(d);
+				Assert::IsTrue(3 == index4);
 			}
 			{
 				Datum mat_datum;
@@ -1425,10 +1438,14 @@ namespace UnitTestLibraryDesktop
 				mat_datum.setType(Datum::DatumType::MATRIX4X4);
 				glm::mat4x4 mat_arr[] = { a,b,c };
 				mat_datum.setStorage(mat_arr, 3);
-				Assert::IsTrue(0 == mat_datum.find(a));
-				Assert::IsTrue(1 == mat_datum.find(b));
-				Assert::IsTrue(2 == mat_datum.find(c));
-				Assert::IsTrue(3 == mat_datum.find(d));
+				auto[result, index] = mat_datum.find(a);
+				Assert::IsTrue(0 == index);
+				auto[result2, index2] = mat_datum.find(b);
+				Assert::IsTrue(1 == index2);
+				auto[result3, index3] = mat_datum.find(c);
+				Assert::IsTrue(2 == index3);
+				auto[result4, index4] = mat_datum.find(d);
+				Assert::IsTrue(3 == index4);
 			}
 			{
 				Datum string_datum;
@@ -1441,10 +1458,14 @@ namespace UnitTestLibraryDesktop
 				string_datum.setType(Datum::DatumType::STRING);
 				std::string string_arr[] = { "Pratik"s, "Paul"s, "Ron"s };
 				string_datum.setStorage(string_arr, 3);
-				Assert::IsTrue(0 == string_datum.find("Pratik"s));
-				Assert::IsTrue(1 == string_datum.find("Paul"s));
-				Assert::IsTrue(2 == string_datum.find("Ron"s));
-				Assert::IsTrue(3 == string_datum.find("Rick"s));
+				auto[result, index] = string_datum.find("Pratik"s);
+				Assert::IsTrue(0 == index);
+				auto[result2, index2] = string_datum.find("Paul"s);
+				Assert::IsTrue(1 == index2);
+				auto[result3, index3] = string_datum.find("Ron"s);
+				Assert::IsTrue(2 == index3);
+				auto[result4, index4] = string_datum.find("Rick"s);
+				Assert::IsTrue(3 == index4);
 			}
 			{
 				Datum rtti_datum;
@@ -1464,10 +1485,14 @@ namespace UnitTestLibraryDesktop
 				foos[1] = &b;
 				foos[2] = &c;
 				rtti_datum.setStorage(reinterpret_cast<RTTI**>(foos), 3);
-				Assert::IsTrue(0 == rtti_datum.find(a));
-				Assert::IsTrue(1 == rtti_datum.find(b));
-				Assert::IsTrue(2 == rtti_datum.find(c));
-				Assert::IsTrue(3 == rtti_datum.find(d));
+				auto[result, index] = rtti_datum.find(a);
+				Assert::IsTrue(0 == index);
+				auto[result2, index2] = rtti_datum.find(b);
+				Assert::IsTrue(1 == index2);
+				auto[result3, index3] = rtti_datum.find(c);
+				Assert::IsTrue(2 == index3);
+				auto[result4, index4] = rtti_datum.find(d);
+				Assert::IsTrue(3 == index4);
 				delete[] foos;
 			}
 		}
@@ -1475,7 +1500,6 @@ namespace UnitTestLibraryDesktop
 		TEST_METHOD(DatumTestFindConst)
 		{
 			{
-
 				Datum datum_one;
 				const Datum int_datum = datum_one;
 				Datum datum_two;
@@ -1490,10 +1514,14 @@ namespace UnitTestLibraryDesktop
 				int32_t int_arr[] = { 1,2,3 };
 				datum_one.setStorage(int_arr, 3);
 				const Datum another_int_datum = datum_one;
-				Assert::IsTrue(0 == another_int_datum.find(1));
-				Assert::IsTrue(1 == another_int_datum.find(2));
-				Assert::IsTrue(2 == another_int_datum.find(3));
-				Assert::IsTrue(3 == another_int_datum.find(10));
+				auto[result, index] = another_int_datum.find(1);
+				Assert::IsTrue(0 == index);
+				auto[result2, index2] = another_int_datum.find(2);
+				Assert::IsTrue(1 == index2);
+				auto[result3, index3] = another_int_datum.find(3);
+				Assert::IsTrue(2 == index3);
+				auto[result4, index4] = another_int_datum.find(10);
+				Assert::IsTrue(3 == index4);
 			}
 			{
 				Datum datum_one;
@@ -1510,10 +1538,14 @@ namespace UnitTestLibraryDesktop
 				float_t float_arr[] = { 10.2f,15.5f,31.1f };
 				datum_one.setStorage(float_arr, 3);
 				const Datum another_float_datum = datum_one;
-				Assert::IsTrue(0 == another_float_datum.find(10.2f));
-				Assert::IsTrue(1 == another_float_datum.find(15.5f));
-				Assert::IsTrue(2 == another_float_datum.find(31.1f));
-				Assert::IsTrue(3 == another_float_datum.find(104.4f));
+				auto[result, index] = another_float_datum.find(10.2f);
+				Assert::IsTrue(0 == index);
+				auto[result2, index2] = another_float_datum.find(15.5f);
+				Assert::IsTrue(1 == index2);
+				auto[result3, index3] = another_float_datum.find(31.1f);
+				Assert::IsTrue(2 == index3);
+				auto[result4, index4] = another_float_datum.find(104.4f);
+				Assert::IsTrue(3 == index4);
 			}
 			{
 				Datum datum_one;
@@ -1534,10 +1566,14 @@ namespace UnitTestLibraryDesktop
 				glm::vec4 vector_arr[] = { a,b,c };
 				datum_one.setStorage(vector_arr, 3);
 				const Datum another_vector_datum = datum_one;
-				Assert::IsTrue(0 == another_vector_datum.find(a));
-				Assert::IsTrue(1 == another_vector_datum.find(b));
-				Assert::IsTrue(2 == another_vector_datum.find(c));
-				Assert::IsTrue(3 == another_vector_datum.find(d));
+				auto[result, index] = another_vector_datum.find(a);
+				Assert::IsTrue(0 == index);
+				auto[result2, index2] = another_vector_datum.find(b);
+				Assert::IsTrue(1 == index2);
+				auto[result3, index3] = another_vector_datum.find(c);
+				Assert::IsTrue(2 == index3);
+				auto[result4, index4] = another_vector_datum.find(d);
+				Assert::IsTrue(3 == index4);
 			}
 			{
 				Datum datum_one;
@@ -1558,10 +1594,14 @@ namespace UnitTestLibraryDesktop
 				glm::mat4x4 mat_arr[] = { a,b,c };
 				datum_one.setStorage(mat_arr, 3);
 				const Datum another_mat_datum = datum_one;
-				Assert::IsTrue(0 == another_mat_datum.find(a));
-				Assert::IsTrue(1 == another_mat_datum.find(b));
-				Assert::IsTrue(2 == another_mat_datum.find(c));
-				Assert::IsTrue(3 == another_mat_datum.find(d));
+				auto[result, index] = another_mat_datum.find(a);
+				Assert::IsTrue(0 == index);
+				auto[result2, index2] = another_mat_datum.find(b);
+				Assert::IsTrue(1 == index2);
+				auto[result3, index3] = another_mat_datum.find(c);
+				Assert::IsTrue(2 == index3);
+				auto[result4, index4] = another_mat_datum.find(d);
+				Assert::IsTrue(3 == index4);
 			}
 			{
 				Datum datum_one;
@@ -1578,10 +1618,14 @@ namespace UnitTestLibraryDesktop
 				std::string string_arr[] = { "Pratik"s, "Paul"s, "Ron"s };
 				datum_one.setStorage(string_arr, 3);
 				const Datum another_string_datum = datum_one;
-				Assert::IsTrue(0 == another_string_datum.find("Pratik"s));
-				Assert::IsTrue(1 == another_string_datum.find("Paul"s));
-				Assert::IsTrue(2 == another_string_datum.find("Ron"s));
-				Assert::IsTrue(3 == another_string_datum.find("Rick"s));
+				auto[result, index] = another_string_datum.find("Pratik"s);
+				Assert::IsTrue(0 == index);
+				auto[result2, index2] = another_string_datum.find("Paul"s);
+				Assert::IsTrue(1 == index2);
+				auto[result3, index3] = another_string_datum.find("Ron"s);
+				Assert::IsTrue(2 == index3);
+				auto[result4, index4] = another_string_datum.find("Rick"s);
+				Assert::IsTrue(3 == index4);
 			}
 			{
 				Datum datum_one;
@@ -1605,10 +1649,14 @@ namespace UnitTestLibraryDesktop
 				foos[2] = &c;
 				datum_one.setStorage(reinterpret_cast<RTTI**>(foos), 3);
 				const Datum another_rtti_datum = datum_one;
-				Assert::IsTrue(0 == another_rtti_datum.find(a));
-				Assert::IsTrue(1 == another_rtti_datum.find(b));
-				Assert::IsTrue(2 == another_rtti_datum.find(c));
-				Assert::IsTrue(3 == another_rtti_datum.find(d));
+				auto[result, index] = another_rtti_datum.find(a);
+				Assert::IsTrue(0 == index);
+				auto[result2, index2] = another_rtti_datum.find(b);
+				Assert::IsTrue(1 == index2);
+				auto[result3, index3] = another_rtti_datum.find(c);
+				Assert::IsTrue(2 == index3);
+				auto[result4, index4] = another_rtti_datum.find(d);
+				Assert::IsTrue(3 == index4);
 				delete[] foos;
 			}
 		}

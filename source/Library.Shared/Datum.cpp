@@ -1,10 +1,11 @@
 #include "pch.h"
+#include "Scope.h"
 #include "Datum.h"
 
 namespace FieaGameEngine
 {
-	Datum::Datum() :
-		m_type(DatumType::UNKNOWN), m_storage_type(DatumStorageType::UNKNOWN), m_size(0), m_capacity(0), m_is_external(false)
+	Datum::Datum(DatumType t_type) :
+		m_type(t_type)
 	{
 	}
 
@@ -14,7 +15,7 @@ namespace FieaGameEngine
 		operator=(t_rhs);
 	}
 
-	Datum::Datum(Datum&& t_rhs):
+	Datum::Datum(Datum&& t_rhs) :
 		m_data(t_rhs.m_data), m_type(t_rhs.m_type), m_storage_type(t_rhs.m_storage_type), m_size(t_rhs.m_size), m_capacity(t_rhs.m_capacity), m_is_external(t_rhs.m_is_external)
 	{
 		t_rhs.m_size = 0;
@@ -60,6 +61,9 @@ namespace FieaGameEngine
 						break;
 					case DatumType::POINTER:
 						set(t_rhs.m_data.d_RTTI_ptr[i], i);
+						break;
+					case DatumType::TABLE:
+						set(t_rhs.m_data.d_scope_ptr[i], i);
 						break;
 					default:
 						break;
@@ -128,6 +132,12 @@ namespace FieaGameEngine
 	}
 
 	Datum& Datum::operator=(RTTI* t_rhs)
+	{
+		set(t_rhs);
+		return *this;
+	}
+
+	Datum & Datum::operator=(Scope * t_rhs)
 	{
 		set(t_rhs);
 		return *this;
@@ -215,7 +225,11 @@ namespace FieaGameEngine
 				++m_size;
 				break;
 			case DatumType::POINTER:
-				new (m_data.d_RTTI_ptr + m_size)RTTI*(nullptr);
+				m_data.d_RTTI_ptr[m_size] = nullptr;
+				++m_size;
+				break;
+			case DatumType::TABLE:
+				m_data.d_scope_ptr[m_size] = nullptr;
 				++m_size;
 				break;
 			default:
@@ -248,7 +262,11 @@ namespace FieaGameEngine
 				break;
 			case DatumType::POINTER:
 				--m_size;
-				new (m_data.d_RTTI_ptr + m_size)RTTI*(nullptr);
+				m_data.d_scope_ptr[m_size] = nullptr;
+				break;
+			case DatumType::TABLE:
+				--m_size;
+				m_data.d_scope_ptr[m_size] = nullptr;
 				break;
 			default:
 				throw std::exception("Invalid Operation! Data type not valid.");
@@ -262,31 +280,10 @@ namespace FieaGameEngine
 		{
 			throw std::exception("Invalid Operation! Memory reservation isn't possible for Unknown / External storage.");
 		}
+		size_t type_size = typeSizeMap[static_cast<int32_t>(m_type)];
 		if (m_capacity < t_new_capacity)
 		{
-			switch (m_type)
-			{
-			case DatumType::INTEGER:
-				m_data.d_int32_t = reinterpret_cast<int32_t*>(realloc(m_data.d_int32_t, t_new_capacity * sizeof(int32_t)));
-				break;
-			case DatumType::FLOAT:
-				m_data.d_float_t = reinterpret_cast<float_t*>(realloc(m_data.d_float_t, t_new_capacity * sizeof(float_t)));
-				break;
-			case DatumType::VECTOR4:
-				m_data.d_glm_vec4 = reinterpret_cast<glm::vec4*>(realloc(m_data.d_glm_vec4, t_new_capacity * sizeof(glm::vec4)));
-				break;
-			case DatumType::MATRIX4X4:
-				m_data.d_glm_mat4x4 = reinterpret_cast<glm::mat4x4*>(realloc(m_data.d_glm_mat4x4, t_new_capacity * sizeof(glm::mat4x4)));
-				break;
-			case DatumType::STRING:
-				m_data.d_string = reinterpret_cast<std::string*>(realloc(m_data.d_string, t_new_capacity * sizeof(std::string)));
-				break;
-			case DatumType::POINTER:
-				m_data.d_RTTI_ptr = reinterpret_cast<RTTI**>(realloc(m_data.d_glm_vec4, t_new_capacity * sizeof(RTTI*)));
-				break;
-			default:
-				throw std::exception("Invalid Operation! Data type is not valid.");
-			}
+			m_data.d_void_ptr = realloc(m_data.d_void_ptr, t_new_capacity * type_size);
 			m_capacity = t_new_capacity;
 		}
 	}
@@ -295,40 +292,17 @@ namespace FieaGameEngine
 	{
 		if (m_storage_type == DatumStorageType::INTERNAL && m_capacity != 0)
 		{
-			switch (m_type)
+			if (m_type == DatumType::STRING)
 			{
-			case DatumType::INTEGER:
-				free(m_data.d_int32_t);
-				break;
-			case DatumType::FLOAT:
-				free(m_data.d_float_t);
-				break;
-			case DatumType::VECTOR4:
-				for (uint32_t i = 0; i < m_size; ++i)
-				{
-					m_data.d_glm_vec4[i].glm::vec4::~vec4();
-				}
-				free(m_data.d_glm_vec4);
-				break;
-			case DatumType::MATRIX4X4:
-				for (uint32_t i = 0; i < m_size; ++i)
-				{
-					m_data.d_glm_mat4x4[i].glm::mat4x4::~mat4x4();
-				}
-				free(m_data.d_glm_mat4x4);
-				break;
-			case DatumType::STRING:
 				for (uint32_t i = 0; i < m_size; ++i)
 				{
 					m_data.d_string[i].std::string::~basic_string();
 				}
 				free(m_data.d_string);
-				break;
-			case DatumType::POINTER:
-				free(m_data.d_RTTI_ptr);
-				break;
-			default:
-				break;
+			}
+			else
+			{
+				free(m_data.d_void_ptr);
 			}
 			m_size = 0;
 			m_capacity = 0;
@@ -349,10 +323,19 @@ namespace FieaGameEngine
 			clear();
 		}
 		m_type = t_type;
-		m_storage_type = DatumStorageType::EXTERNAL;
+		if (m_type == DatumType::TABLE)
+		{
+			m_storage_type = DatumStorageType::INTERNAL;
+			m_is_external = false;
+		}
+		if(m_type != DatumType::TABLE)
+		{
+			m_storage_type = DatumStorageType::EXTERNAL;
+			m_is_external = true;
+		}
 		m_size = t_array_size;
 		m_capacity = t_array_size;
-		m_is_external = true;
+		
 	}
 
 	void Datum::setStorage(int32_t* t_array, uint32_t t_array_size)
@@ -397,6 +380,38 @@ namespace FieaGameEngine
 		if ((m_type == t_rhs.m_type) && (m_size == t_rhs.m_size))
 		{
 			are_equal = true;
+			/*switch (m_type)
+			{
+			case DatumType::STRING:
+				for(uint32_t i = 0; i < m_size; ++i)
+				{
+					if (m_data.d_string[i] != t_rhs.m_data.d_string[i])
+					{
+						are_equal = false;
+						break;
+					}
+				}
+				break;
+			case DatumType::POINTER:
+			case DatumType::TABLE:
+				for (uint32_t i = 0; i < m_size; ++i)
+				{
+					if (!m_data.d_RTTI_ptr[i]->Equals(t_rhs.m_data.d_RTTI_ptr[i]))
+					{
+						are_equal = false;
+						break;
+					}
+				}
+				break;
+			default:
+				size_t type_size = typeSizeMap[static_cast<size_t>(m_type)] * static_cast<size_t>(m_size);
+				if (!memcmp(m_data.d_void_ptr, t_rhs.m_data.d_void_ptr, type_size))
+				{
+					are_equal = true;
+				}
+				break;
+			}*/
+
 			for (uint32_t i = 0; i < m_size; ++i)
 			{
 				switch (m_type)
@@ -443,6 +458,12 @@ namespace FieaGameEngine
 						break;
 					}
 					break;
+				case DatumType::TABLE:
+					if (m_data.d_scope_ptr[i]->Equals(t_rhs.m_data.d_scope_ptr[i]))
+					{
+						return false;
+					}
+					break;
 				default:
 					throw std::exception("Invalid Operation! Data type is not valid.");
 				}
@@ -453,7 +474,7 @@ namespace FieaGameEngine
 
 	bool Datum::operator==(const int32_t& t_rhs) const
 	{
-		return ((m_type == DatumType::INTEGER)&&(m_size > 0)&&(*m_data.d_int32_t == t_rhs));
+		return ((m_type == DatumType::INTEGER) && (m_size > 0) && (*m_data.d_int32_t == t_rhs));
 	}
 
 	bool Datum::operator==(const float_t& t_rhs) const
@@ -479,6 +500,12 @@ namespace FieaGameEngine
 	bool Datum::operator==(const RTTI* t_rhs) const
 	{
 		return ((m_type == DatumType::POINTER) && (m_size > 0) && ((**m_data.d_RTTI_ptr).Equals(t_rhs)));
+	}
+
+	bool Datum::operator==(const Scope* /*t_rhs*/) const
+	{
+		/*return ((m_type == DatumType::TABLE) && (m_size > 0) && ((**m_data.d_scope_ptr).Equals(t_rhs)));*/
+		return true;
 	}
 
 	bool Datum::operator!=(const Datum& t_rhs) const
@@ -516,6 +543,11 @@ namespace FieaGameEngine
 		return !(operator==(t_rhs));
 	}
 
+	bool Datum::operator!=(const Scope* t_rhs) const
+	{
+		return !(operator==(t_rhs));
+	}
+
 	void Datum::set(const DatumType& t_type, uint32_t t_index)
 	{
 		if (m_type == DatumType::UNKNOWN)
@@ -549,7 +581,7 @@ namespace FieaGameEngine
 		set(DatumType::FLOAT, t_index);
 		m_data.d_float_t[t_index] = t_value;
 	}
-	
+
 	void Datum::set(const glm::vec4& t_value, uint32_t t_index)
 	{
 		set(DatumType::VECTOR4, t_index);
@@ -572,6 +604,12 @@ namespace FieaGameEngine
 	{
 		set(DatumType::POINTER, t_index);
 		m_data.d_RTTI_ptr[t_index] = t_value;
+	}
+
+	void Datum::set(Scope* t_value, uint32_t t_index)
+	{
+		set(DatumType::TABLE, t_index);
+		m_data.d_scope_ptr[t_index] = t_value;
 	}
 
 	template<>
@@ -659,6 +697,20 @@ namespace FieaGameEngine
 	}
 
 	template<>
+	Scope*& Datum::get<Scope*>(uint32_t t_index)
+	{
+		if (m_type != DatumType::TABLE)
+		{
+			throw std::exception("Invalid Operation! Cannot get a Scope Pointer due to type mismatch");
+		}
+		if (m_size <= t_index)
+		{
+			throw std::exception("Invalid Operation! Index out of bounds.");
+		}
+		return m_data.d_scope_ptr[t_index];
+	}
+
+	template<>
 	const int32_t& Datum::get(uint32_t t_index) const
 	{
 		if (m_type != DatumType::INTEGER)
@@ -742,6 +794,20 @@ namespace FieaGameEngine
 		return m_data.d_RTTI_ptr[t_index];
 	}
 
+	template<>
+	Scope* const& Datum::get<Scope*>(uint32_t t_index) const
+	{
+		if (m_type != DatumType::TABLE)
+		{
+			throw std::exception("Invalid Operation! Cannot get a Scope Pointer due to type mismatch");
+		}
+		if (m_size <= t_index)
+		{
+			throw std::exception("Invalid Operation! Index out of bounds.");
+		}
+		return m_data.d_scope_ptr[t_index];
+	}
+
 	void Datum::setFromString(const std::string& t_input_string, uint32_t t_index)
 	{
 		if (m_type == DatumType::UNKNOWN)
@@ -754,7 +820,7 @@ namespace FieaGameEngine
 		case DatumType::INTEGER:
 			int32_t temp_int;
 			input_stream >> temp_int;
-			set(temp_int,t_index);
+			set(temp_int, t_index);
 			break;
 		case DatumType::FLOAT:
 			float_t temp_float;
@@ -960,6 +1026,29 @@ namespace FieaGameEngine
 		++m_size;
 	}
 
+	void Datum::pushBack(Scope* t_item)
+	{
+		if (m_is_external)
+		{
+			throw std::exception("Invalid Operation! Cannot write data to external storage.");
+		}
+		if (m_type == DatumType::UNKNOWN)
+		{
+			m_type = DatumType::TABLE;
+			m_storage_type = DatumStorageType::INTERNAL;
+		}
+		if (m_type != DatumType::TABLE)
+		{
+			throw std::exception("Invalid Operation! Datum type must be a Scope pointer.");
+		}
+		if (m_size == m_capacity)
+		{
+			reserve(m_capacity + 3);
+		}
+		m_data.d_scope_ptr[m_size] = t_item;
+		++m_size;
+	}
+
 	void Datum::popBack()
 	{
 		if (m_is_external)
@@ -1038,7 +1127,7 @@ namespace FieaGameEngine
 		if (m_size > 0)
 		{
 			return get<glm::mat4x4>(0);
-		}	
+		}
 		throw std::exception("Invalid Operation! Cannot perform front operation on empty array.");
 	}
 
@@ -1058,7 +1147,7 @@ namespace FieaGameEngine
 		if (m_size > 0)
 		{
 			return get<RTTI*>(0);
-		}		
+		}
 		throw std::exception("Invalid Operation! Cannot perform front operation on empty array.");
 	}
 
@@ -1242,8 +1331,9 @@ namespace FieaGameEngine
 		throw std::exception("Invalid Operation! Cannot perform back operation on empty array.");
 	}
 
-	void Datum::removeAt(uint32_t t_index)
+	bool Datum::removeAt(uint32_t t_index)
 	{
+		bool success = false;
 		if (m_is_external)
 		{
 			throw std::exception("Invalid Operation! Cannot delete data from external storage.");
@@ -1262,24 +1352,28 @@ namespace FieaGameEngine
 				{
 					m_data.d_int32_t[i] = m_data.d_int32_t[i + 1];
 				}
+				success = true;
 				break;
 			case DatumType::FLOAT:
 				for (; i < m_size - 1; ++i)
 				{
 					m_data.d_float_t[i] = m_data.d_float_t[i + 1];
 				}
+				success = true;
 				break;
 			case DatumType::VECTOR4:
 				for (; i < m_size - 1; ++i)
 				{
 					m_data.d_glm_vec4[i] = m_data.d_glm_vec4[i + 1];
 				}
+				success = true;
 				break;
 			case DatumType::MATRIX4X4:
 				for (; i < m_size - 1; ++i)
 				{
 					m_data.d_glm_mat4x4[i] = m_data.d_glm_mat4x4[i + 1];
 				}
+				success = true;
 				break;
 			case DatumType::STRING:
 				for (; i < m_size - 1; ++i)
@@ -1287,6 +1381,7 @@ namespace FieaGameEngine
 					m_data.d_string[i] = m_data.d_string[i + 1];
 				}
 				m_data.d_string[m_size - 1].~basic_string();
+				success = true;
 				break;
 			case DatumType::POINTER:
 				for (; i < m_size - 1; ++i)
@@ -1294,16 +1389,27 @@ namespace FieaGameEngine
 					m_data.d_RTTI_ptr[i] = m_data.d_RTTI_ptr[i + 1];
 				}
 				m_data.d_RTTI_ptr[m_size - 1] = nullptr;
+				success = true;
+				break;
+			case DatumType::TABLE:
+				for (; i < m_size - 1; ++i)
+				{
+					m_data.d_scope_ptr[i] = m_data.d_scope_ptr[i + 1];
+				}
+				m_data.d_scope_ptr[m_size - 1] = nullptr;
+				success = true;
 				break;
 			default:
 				throw std::exception("Invalid Operation! Data type is not valid.");
 			}
 			--m_size;
 		}
+		return success;
 	}
 
-	void Datum::remove(const int32_t& t_item)
+	bool Datum::remove(const int32_t& t_item)
 	{
+		bool success = false;
 		if (m_is_external)
 		{
 			throw std::exception("Invalid Operation! Cannot delete data from external storage.");
@@ -1312,7 +1418,7 @@ namespace FieaGameEngine
 		{
 			throw std::exception("Invalid Operation! Datum Type isn't set.");
 		}
-		uint32_t index = find(t_item);
+		auto[result, index] = find(t_item);
 		if (index < m_size)
 		{
 			for (; index < m_size - 1; ++index)
@@ -1320,11 +1426,14 @@ namespace FieaGameEngine
 				m_data.d_int32_t[index] = m_data.d_int32_t[index + 1];
 			}
 			--m_size;
+			success = true;
 		}
+		return success;
 	}
 
-	void Datum::remove(const float_t& t_item)
+	bool Datum::remove(const float_t& t_item)
 	{
+		bool success = false;
 		if (m_is_external)
 		{
 			throw std::exception("Invalid Operation! Cannot delete data from external storage.");
@@ -1333,7 +1442,7 @@ namespace FieaGameEngine
 		{
 			throw std::exception("Invalid Operation! Datum Type isn't set.");
 		}
-		uint32_t index = find(t_item);
+		auto[result, index] = find(t_item);
 		if (index < m_size)
 		{
 			for (; index < m_size - 1; ++index)
@@ -1341,11 +1450,14 @@ namespace FieaGameEngine
 				m_data.d_float_t[index] = m_data.d_float_t[index + 1];
 			}
 			--m_size;
+			success = true;
 		}
+		return success;
 	}
 
-	void Datum::remove(const glm::vec4& t_item)
+	bool Datum::remove(const glm::vec4& t_item)
 	{
+		bool success = false;
 		if (m_is_external)
 		{
 			throw std::exception("Invalid Operation! Cannot delete data from external storage.");
@@ -1354,7 +1466,7 @@ namespace FieaGameEngine
 		{
 			throw std::exception("Invalid Operation! Datum Type isn't set.");
 		}
-		uint32_t index = find(t_item);
+		auto[result, index] = find(t_item);
 		if (index < m_size)
 		{
 			for (; index < m_size - 1; ++index)
@@ -1362,11 +1474,14 @@ namespace FieaGameEngine
 				m_data.d_glm_vec4[index] = m_data.d_glm_vec4[index + 1];
 			}
 			--m_size;
+			success = true;
 		}
+		return success;
 	}
 
-	void Datum::remove(const glm::mat4x4& t_item)
+	bool Datum::remove(const glm::mat4x4& t_item)
 	{
+		bool success = false;
 		if (m_is_external)
 		{
 			throw std::exception("Invalid Operation! Cannot delete data from external storage.");
@@ -1375,7 +1490,7 @@ namespace FieaGameEngine
 		{
 			throw std::exception("Invalid Operation! Datum Type isn't set.");
 		}
-		uint32_t index = find(t_item);
+		auto[result, index] = find(t_item);
 		if (index < m_size)
 		{
 			for (; index < m_size - 1; ++index)
@@ -1383,11 +1498,14 @@ namespace FieaGameEngine
 				m_data.d_glm_mat4x4[index] = m_data.d_glm_mat4x4[index + 1];
 			}
 			--m_size;
+			success = true;
 		}
+		return success;
 	}
 
-	void Datum::remove(const std::string& t_item)
+	bool Datum::remove(const std::string& t_item)
 	{
+		bool success = false;
 		if (m_is_external)
 		{
 			throw std::exception("Invalid Operation! Cannot delete data from external storage.");
@@ -1396,7 +1514,7 @@ namespace FieaGameEngine
 		{
 			throw std::exception("Invalid Operation! Datum Type isn't set.");
 		}
-		uint32_t index = find(t_item);
+		auto[result, index] = find(t_item);
 		if (index < m_size)
 		{
 			for (; index < m_size - 1; ++index)
@@ -1405,11 +1523,14 @@ namespace FieaGameEngine
 			}
 			m_data.d_string[m_size - 1].~basic_string();
 			--m_size;
+			success = true;
 		}
+		return success;
 	}
 
-	void Datum::remove(const RTTI& t_item)
+	bool Datum::remove(const RTTI& t_item)
 	{
+		bool success = false;
 		if (m_is_external)
 		{
 			throw std::exception("Invalid Operation! Cannot delete data from external storage.");
@@ -1418,7 +1539,7 @@ namespace FieaGameEngine
 		{
 			throw std::exception("Invalid Operation! Datum Type isn't set.");
 		}
-		uint32_t index = find(t_item);
+		auto[result, index] = find(t_item);
 		if (index < m_size)
 		{
 			for (; index < m_size - 1; ++index)
@@ -1426,154 +1547,36 @@ namespace FieaGameEngine
 				m_data.d_RTTI_ptr[index] = m_data.d_RTTI_ptr[index + 1];
 			}
 			--m_size;
+			success = true;
 		}
+		return success;
 	}
 
-	uint32_t& Datum::find(const int32_t& t_item)
+	bool Datum::remove(const Scope& t_item)
 	{
-		bool found = false; 
-		uint32_t index = 0;
+		bool success = false;
+		if (m_is_external)
+		{
+			throw std::exception("Invalid Operation! Cannot delete data from external storage.");
+		}
 		if (m_type == DatumType::UNKNOWN)
 		{
 			throw std::exception("Invalid Operation! Datum Type isn't set.");
 		}
-		if (m_type != DatumType::INTEGER)
+		auto [result, index] = find(t_item);
+		if (index < m_size)
 		{
-			throw std::exception("Invalid Operation! Find operation cannot be performed due to type mismatch.");
-		}
-		for (uint32_t i = 0; i < m_size; ++i)
-		{
-			if (t_item == m_data.d_int32_t[i])
+			for (; index < m_size - 1; ++index)
 			{
-				found = true;
-				index = i;
-				break;
+				m_data.d_RTTI_ptr[index] = m_data.d_RTTI_ptr[index + 1];
 			}
+			--m_size;
+			success = true;
 		}
-		return (found ? index : m_size);
+		return success;
 	}
 
-	uint32_t& Datum::find(const float_t& t_item)
-	{
-		bool found = false;
-		uint32_t index = 0;
-		if (m_type == DatumType::UNKNOWN)
-		{
-			throw std::exception("Invalid Operation! Datum Type isn't set.");
-		}
-		if (m_type != DatumType::FLOAT)
-		{
-			throw std::exception("Invalid Operation! Find operation cannot be performed due to type mismatch.");
-		}
-		for (uint32_t i = 0; i < m_size; ++i)
-		{
-			if (t_item == m_data.d_float_t[i])
-			{
-				found = true;
-				index = i;
-				break;
-			}
-		}
-		return (found ? index : m_size);
-	}
-
-	uint32_t& Datum::find(const glm::vec4& t_item)
-	{
-		bool found = false;
-		uint32_t index = 0;
-		if (m_type == DatumType::UNKNOWN)
-		{
-			throw std::exception("Invalid Operation! Datum Type isn't set.");
-		}
-		if (m_type != DatumType::VECTOR4)
-		{
-			throw std::exception("Invalid Operation! Find operation cannot be performed due to type mismatch.");
-		}
-		for (uint32_t i = 0; i < m_size; ++i)
-		{
-			if (t_item == m_data.d_glm_vec4[i])
-			{
-				found = true;
-				index = i;
-				break;
-			}
-		}
-		return (found ? index : m_size);
-	}
-
-	uint32_t& Datum::find(const glm::mat4x4& t_item)
-	{
-		bool found = false;
-		uint32_t index = 0;
-		if (m_type == DatumType::UNKNOWN)
-		{
-			throw std::exception("Invalid Operation! Datum Type isn't set.");
-		}
-		if (m_type != DatumType::MATRIX4X4)
-		{
-			throw std::exception("Invalid Operation! Find operation cannot be performed due to type mismatch.");
-		}
-		for (uint32_t i = 0; i < m_size; ++i)
-		{
-			if (t_item == m_data.d_glm_mat4x4[i])
-			{
-				found = true;
-				index = i;
-				break;
-			}
-		}
-		return (found ? index : m_size);
-	}
-
-	uint32_t& Datum::find(const std::string& t_item)
-	{
-		bool found = false;
-		uint32_t index = 0;
-		if (m_type == DatumType::UNKNOWN)
-		{
-			throw std::exception("Invalid Operation! Datum Type isn't set.");
-		}
-		if (m_type != DatumType::STRING)
-		{
-			throw std::exception("Invalid Operation! Find operation cannot be performed due to type mismatch.");
-		}
-		for (uint32_t i = 0; i < m_size; ++i)
-		{
-			if (t_item == m_data.d_string[i])
-			{
-				found = true;
-				index = i;
-				break;
-			}
-		}
-		return (found ? index : m_size);
-	}
-
-	uint32_t& Datum::find(const RTTI& t_item)
-	{
-		bool found = false;
-		uint32_t index = 0;
-		if (m_type == DatumType::UNKNOWN)
-		{
-			throw std::exception("Invalid Operation! Datum Type isn't set.");
-		}
-		if (m_type != DatumType::POINTER)
-		{
-			throw std::exception("Invalid Operation! Find operation cannot be performed due to type mismatch.");
-		}
-		for (uint32_t i = 0; i < m_size; ++i)
-		{
-			if (&t_item == m_data.d_RTTI_ptr[i])
-			{
-				found = true;
-				index = i;
-				break;
-			}
-		}
-		return (found ? index : m_size);
-	}
-
-	const uint32_t& Datum::find(const int32_t& t_item) const
+	std::tuple<bool, uint32_t> Datum::find(const int32_t& t_item)
 	{
 		bool found = false;
 		uint32_t index = 0;
@@ -1594,10 +1597,14 @@ namespace FieaGameEngine
 				break;
 			}
 		}
-		return (found ? index : m_size);
+		if (found)
+		{
+			return std::make_tuple(true, index);
+		}
+		return std::make_tuple(false, m_size);
 	}
 
-	const uint32_t& Datum::find(const float_t& t_item) const
+	std::tuple<bool, uint32_t> Datum::find(const float_t& t_item)
 	{
 		bool found = false;
 		uint32_t index = 0;
@@ -1618,10 +1625,14 @@ namespace FieaGameEngine
 				break;
 			}
 		}
-		return (found ? index : m_size);
+		if (found)
+		{
+			return std::make_tuple(true, index);
+		}
+		return std::make_tuple(false, m_size);
 	}
 
-	const uint32_t& Datum::find(const glm::vec4& t_item) const
+	std::tuple<bool, uint32_t> Datum::find(const glm::vec4& t_item)
 	{
 		bool found = false;
 		uint32_t index = 0;
@@ -1642,10 +1653,14 @@ namespace FieaGameEngine
 				break;
 			}
 		}
-		return (found ? index : m_size);
+		if (found)
+		{
+			return std::make_tuple(true, index);
+		}
+		return std::make_tuple(false, m_size);
 	}
 
-	const uint32_t& Datum::find(const glm::mat4x4& t_item) const
+	std::tuple<bool, uint32_t> Datum::find(const glm::mat4x4& t_item)
 	{
 		bool found = false;
 		uint32_t index = 0;
@@ -1666,10 +1681,14 @@ namespace FieaGameEngine
 				break;
 			}
 		}
-		return (found ? index : m_size);
+		if (found)
+		{
+			return std::make_tuple(true, index);
+		}
+		return std::make_tuple(false, m_size);
 	}
 
-	const uint32_t& Datum::find(const std::string& t_item) const
+	std::tuple<bool, uint32_t> Datum::find(const std::string& t_item)
 	{
 		bool found = false;
 		uint32_t index = 0;
@@ -1690,10 +1709,14 @@ namespace FieaGameEngine
 				break;
 			}
 		}
-		return (found ? index : m_size);
+		if (found)
+		{
+			return std::make_tuple(true, index);
+		}
+		return std::make_tuple(false, m_size);
 	}
 
-	const uint32_t& Datum::find(const RTTI& t_item) const
+	std::tuple<bool, uint32_t> Datum::find(const RTTI& t_item)
 	{
 		bool found = false;
 		uint32_t index = 0;
@@ -1714,6 +1737,246 @@ namespace FieaGameEngine
 				break;
 			}
 		}
-		return (found ? index : m_size);
+		if (found)
+		{
+			return std::make_tuple(true, index);
+		}
+		return std::make_tuple(false, m_size);
 	}
+
+	std::tuple<bool, uint32_t> Datum::find(const Scope& t_item)
+	{
+		bool found = false;
+		uint32_t index = 0;
+		if (m_type == DatumType::UNKNOWN)
+		{
+			throw std::exception("Invalid Operation! Datum Type isn't set.");
+		}
+		if (m_type != DatumType::TABLE)
+		{
+			throw std::exception("Invalid Operation! Find operation cannot be performed due to type mismatch.");
+		}
+		for (uint32_t i = 0; i < m_size; ++i)
+		{
+			if (&t_item == m_data.d_scope_ptr[i])
+			{
+				found = true;
+				index = i;
+				break;
+			}
+		}
+		if (found)
+		{
+			return std::make_tuple(true, index);
+		}
+		return std::make_tuple(false, m_size);
+	}
+
+	const std::tuple<bool, uint32_t> Datum::find(const int32_t& t_item) const
+	{
+		bool found = false;
+		uint32_t index = 0;
+		if (m_type == DatumType::UNKNOWN)
+		{
+			throw std::exception("Invalid Operation! Datum Type isn't set.");
+		}
+		if (m_type != DatumType::INTEGER)
+		{
+			throw std::exception("Invalid Operation! Find operation cannot be performed due to type mismatch.");
+		}
+		for (uint32_t i = 0; i < m_size; ++i)
+		{
+			if (t_item == m_data.d_int32_t[i])
+			{
+				found = true;
+				index = i;
+				break;
+			}
+		}
+		if (found)
+		{
+			return std::make_tuple(true, index);
+		}
+		return std::make_tuple(false, m_size);
+	}
+
+	const std::tuple<bool, uint32_t> Datum::find(const float_t& t_item) const
+	{
+		bool found = false;
+		uint32_t index = 0;
+		if (m_type == DatumType::UNKNOWN)
+		{
+			throw std::exception("Invalid Operation! Datum Type isn't set.");
+		}
+		if (m_type != DatumType::FLOAT)
+		{
+			throw std::exception("Invalid Operation! Find operation cannot be performed due to type mismatch.");
+		}
+		for (uint32_t i = 0; i < m_size; ++i)
+		{
+			if (t_item == m_data.d_float_t[i])
+			{
+				found = true;
+				index = i;
+				break;
+			}
+		}
+		if (found)
+		{
+			return std::make_tuple(true, index);
+		}
+		return std::make_tuple(false, m_size);
+	}
+
+	const std::tuple<bool, uint32_t> Datum::find(const glm::vec4& t_item) const
+	{
+		bool found = false;
+		uint32_t index = 0;
+		if (m_type == DatumType::UNKNOWN)
+		{
+			throw std::exception("Invalid Operation! Datum Type isn't set.");
+		}
+		if (m_type != DatumType::VECTOR4)
+		{
+			throw std::exception("Invalid Operation! Find operation cannot be performed due to type mismatch.");
+		}
+		for (uint32_t i = 0; i < m_size; ++i)
+		{
+			if (t_item == m_data.d_glm_vec4[i])
+			{
+				found = true;
+				index = i;
+				break;
+			}
+		}
+		if (found)
+		{
+			return std::make_tuple(true, index);
+		}
+		return std::make_tuple(false, m_size);
+	}
+
+	const std::tuple<bool, uint32_t> Datum::find(const glm::mat4x4& t_item) const
+	{
+		bool found = false;
+		uint32_t index = 0;
+		if (m_type == DatumType::UNKNOWN)
+		{
+			throw std::exception("Invalid Operation! Datum Type isn't set.");
+		}
+		if (m_type != DatumType::MATRIX4X4)
+		{
+			throw std::exception("Invalid Operation! Find operation cannot be performed due to type mismatch.");
+		}
+		for (uint32_t i = 0; i < m_size; ++i)
+		{
+			if (t_item == m_data.d_glm_mat4x4[i])
+			{
+				found = true;
+				index = i;
+				break;
+			}
+		}
+		if (found)
+		{
+			return std::make_tuple(true, index);
+		}
+		return std::make_tuple(false, m_size);
+	}
+
+	const std::tuple<bool, uint32_t> Datum::find(const std::string& t_item) const
+	{
+		bool found = false;
+		uint32_t index = 0;
+		if (m_type == DatumType::UNKNOWN)
+		{
+			throw std::exception("Invalid Operation! Datum Type isn't set.");
+		}
+		if (m_type != DatumType::STRING)
+		{
+			throw std::exception("Invalid Operation! Find operation cannot be performed due to type mismatch.");
+		}
+		for (uint32_t i = 0; i < m_size; ++i)
+		{
+			if (t_item == m_data.d_string[i])
+			{
+				found = true;
+				index = i;
+				break;
+			}
+		}
+		if (found)
+		{
+			return std::make_tuple(true, index);
+		}
+		return std::make_tuple(false, m_size);
+	}
+
+	const std::tuple<bool, uint32_t> Datum::find(const RTTI& t_item) const
+	{
+		bool found = false;
+		uint32_t index = 0;
+		if (m_type == DatumType::UNKNOWN)
+		{
+			throw std::exception("Invalid Operation! Datum Type isn't set.");
+		}
+		if (m_type != DatumType::POINTER)
+		{
+			throw std::exception("Invalid Operation! Find operation cannot be performed due to type mismatch.");
+		}
+		for (uint32_t i = 0; i < m_size; ++i)
+		{
+			if (&t_item == m_data.d_RTTI_ptr[i])
+			{
+				found = true;
+				index = i;
+				break;
+			}
+		}
+		if (found)
+		{
+			return std::make_tuple(true, index);
+		}
+		return std::make_tuple(false, m_size);
+	}
+
+	const std::tuple<bool, uint32_t> Datum::find(const Scope& t_item) const
+	{
+		bool found = false;
+		uint32_t index = 0;
+		if (m_type == DatumType::UNKNOWN)
+		{
+			throw std::exception("Invalid Operation! Datum Type isn't set.");
+		}
+		if (m_type != DatumType::TABLE)
+		{
+			throw std::exception("Invalid Operation! Find operation cannot be performed due to type mismatch.");
+		}
+		for (uint32_t i = 0; i < m_size; ++i)
+		{
+			if (&t_item == m_data.d_scope_ptr[i])
+			{
+				found = true;
+				index = i;
+				break;
+			}
+		}
+		if (found)
+		{
+			return std::make_tuple(true, index);
+		}
+		return std::make_tuple(false, m_size);
+	}
+
+	Scope& Datum::operator[](uint32_t t_index)
+	{
+		return *get<Scope*>(t_index);
+	}
+
+	const Scope & Datum::operator[](uint32_t t_index) const
+	{
+		return *get<Scope*>(t_index);
+	}
+	
+	//uint32_t Datum::typeSizeMap[8] = { 0, sizeof(int32_t), sizeof(float_t), sizeof(glm::vec4), sizeof(glm::mat4x4), sizeof(std::string), sizeof(RTTI*), sizeof(Scope*) };
 }

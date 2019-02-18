@@ -2,6 +2,9 @@
 #include <exception>
 #include <utility>
 #include <initializer_list>
+#include "SList.h"
+#include "Vector.h"
+#include "DefaultHash.h"
 
 namespace FieaGameEngine
 {
@@ -148,7 +151,7 @@ namespace FieaGameEngine
 
 		/// <summary>Parameterised Constructor for HashMap with number of specified buckets.</summary>
 		/// <param name="t_bucket_size">Initial number of buckets for constructing HashMap.</param>
-		explicit HashMap(uint32_t t_bucket_size);
+		explicit HashMap(uint32_t t_bucket_size = DEFAULT_SIZE);
 
 		/// <summary>Support for Initializer list syntax ( C++11 ).</summary>
 		/// <param name="t_list"> Initializer arguments list of Type PairType ( Key-Value pairs ).</param>
@@ -270,10 +273,15 @@ namespace FieaGameEngine
 		/// <summary>Gives ratio of buckets in use with respect to total buckets in HashMap.</summary>
 		/// <returns>Returns ratio in float_t format.</returns>
 		float_t loadFactor() const;
+
+		/// <summary>Get total no.of buckets in HashMap.</summary>
+		/// <returns>Returns total no. of buckets in HashMap as an Unsigned Integer (32-bit).</returns>
+		uint32_t noOfBuckets() const;
 	private:
 		BucketType m_buckets;
 		static const HashFunctor m_hash_function;
 		uint32_t m_size;
+		static const uint32_t DEFAULT_SIZE = 10;
 	};
 }
 #include "HashMap.inl"

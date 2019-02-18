@@ -7,10 +7,13 @@
 #include <cstdint>
 #include <string>
 #include <sstream>
+#include <tuple>
 #include <glm/gtx/string_cast.hpp>
 
 namespace FieaGameEngine
 {
+	/// <summary>Forward declaration of Scope class.</summary>
+	class Scope;
 	/// <summary>Datum - Runtime Polymorphic Data Type.</summary>
 	class Datum final
 	{
@@ -23,7 +26,7 @@ namespace FieaGameEngine
 			FLOAT,
 			VECTOR4,
 			MATRIX4X4,
-			//TABLE .....Future Implementation
+			TABLE,
 			STRING,
 			POINTER
 		};
@@ -37,7 +40,7 @@ namespace FieaGameEngine
 		};
 
 		/// <summary>Default Constructor - Initialize Datum to be empty. No memory is allocated.</summary>
-		Datum();
+		explicit Datum(DatumType t_type = DatumType::UNKNOWN);
 
 		/// <summary>Copy Constructor - Construct a Datum object using another object passed as reference.</summary>
 		/// <param name="t_rhs">Const reference to passed Datum</param>
@@ -86,6 +89,11 @@ namespace FieaGameEngine
 		/// <param name="t_rhs">pointer to RTTI class</param>
 		/// <returns>Returns reference to current Datum.</returns>
 		Datum& operator=(RTTI* t_rhs);
+
+		/// <summary>Datum - Assignment Operator overload for Scope member reference</summary>
+		/// <param name="t_rhs">pointer to a Scope class</param>
+		/// <returns>Returns reference to current Datum.</returns>
+		Datum& operator=(Scope* t_rhs);
 
 		/// <summary>Destructor for Datum. Free any memory owned by this object.</summary>
 		~Datum();
@@ -198,6 +206,11 @@ namespace FieaGameEngine
 		/// <returns>Returns boolean result indicating whether two Datums are equal or not.</returns>
 		bool operator==(const RTTI* t_rhs) const;
 
+		/// <summary>Comparison operator overload to compare Datum Value against passed Scope pointer value.</summary>
+		/// <param name="t_rhs">Const pointer to Scope class</param>
+		/// <returns>Returns boolean result indicating whether two Datums are equal or not.</returns>
+		bool operator==(const Scope* t_rhs) const;
+
 		/// <summary>Not-Equal operator overload for two Datums.</summary>
 		/// <param name="t_rhs">Const reference to passed Datum</param>
 		/// <returns>Returns boolean result indicating whether two Datums are equal or not.</returns>
@@ -228,10 +241,15 @@ namespace FieaGameEngine
 		/// <returns>Returns boolean result indicating whether two Datums are equal or not.</returns>
 		bool operator!=(const std::string& t_rhs) const;
 
-		/// <summary>Not-Equal operator overload to compare Datum Value against passed RTTI reference value.</summary>
+		/// <summary>Not-Equal operator overload to compare Datum Value against passed RTTI pointer value.</summary>
 		/// <param name="t_rhs">Const pointer to RTTI class</param>
 		/// <returns>Returns boolean result indicating whether two Datums are equal or not.</returns>
 		bool operator!=(const RTTI* t_rhs) const;
+
+		/// <summary>Not-Equal operator overload to compare Datum Value against passed Scope pointer value.</summary>
+		/// <param name="t_rhs">Const pointer to Scope class</param>
+		/// <returns>Returns boolean result indicating whether two Datums are equal or not.</returns>
+		bool operator!=(const Scope* t_rhs) const;
 
 		/// <summary>
 		/// Assign appropriate element to array at given index.
@@ -289,6 +307,15 @@ namespace FieaGameEngine
 		/// <param name="t_index">(Optional) Index of the given value. Default is 0.</param>
 		void set(RTTI* t_value, uint32_t t_index = 0);
 
+		/// <summary>
+		/// Assign appropriate element to array at given index.
+		/// If passed Index is greater than size, exception is thrown.
+		/// </summary>
+		/// <param name="t_value">Pointer to a Scope class</param>
+		/// <param name="t_index">(Optional) Index of the given value. Default is 0.</param>
+		void set(Scope* t_value, uint32_t t_index = 0);
+
+
 		/// <summary>For a given index, return appropriate value from array.</summary>
 		/// <param name="t_index">(Optional) Index of the value to be returned. Default is 0.</param>
 		/// <returns>Returns reference of type T</returns>
@@ -342,6 +369,15 @@ namespace FieaGameEngine
 		/// <param name="t_index">index of an element as an Unsigned integer ( 32-bit ).</param>
 		/// <returns>Returns reference to a RTTI pointer.</returns>
 		template<> RTTI*& get(uint32_t t_index);
+
+		/// <summary>
+		/// get() - Template Specialisation (Scope)
+		/// For a given index, return appropriate value from array.
+		/// </summary>
+		/// <param name="t_index">index of an element as an Unsigned integer ( 32-bit ).</param>
+		/// <returns>Returns reference to a Scope pointer.</returns>
+		template<> Scope*& get<Scope*>(uint32_t t_index);
+
 
 		/// <summary>Const version of get() - For a given index, return appropriate value from array.</summary>
 		/// <param name="t_index">(Optional) Index of the value to be returned. Default is 0.</param>
@@ -397,6 +433,15 @@ namespace FieaGameEngine
 		/// <returns>Returns const reference to a RTTI pointer.</returns>
 		template<> RTTI* const& get(uint32_t t_index) const;
 		
+		/// <summary>
+		/// Const version of get() - Template Specialisation (Scope)
+		/// For a given index, return appropriate value from array.
+		/// </summary>
+		/// <param name="t_index">index of an element as an Unsigned integer ( 32-bit ).</param>
+		/// <returns>Returns const reference to a Scope pointer.</returns>
+		template<> Scope* const& get<Scope*>(uint32_t t_index) const;
+
+
 		/// <summary>Set Datum values directly from the given STL string. (Data type of Datum must have to be set before calling this function ).</summary>
 		/// <param name="t_input_string">Const reference to passed STL string which is parsed.</param>
 		/// <param name="t_index">(Optional) index of array where parsed element should be placed.</param>
@@ -431,6 +476,10 @@ namespace FieaGameEngine
 		/// <param name="t_item">Pointer to a RTTI class.</param>
 		void pushBack(RTTI* t_item);
 
+		/// <summary>Push Back function For Scope (Scope*) datatype. Append data to the end of the array.</summary>
+		/// <param name="t_item">Pointer to a Scope class.</param>
+		void pushBack(Scope* t_item);
+
 		/// <summary>Remove last element from the values array of Datum.</summary>
 		void popBack();
 
@@ -460,92 +509,113 @@ namespace FieaGameEngine
 
 		/// <summary>Remove given element from the Datum. If element isn't found in the Datum, does nothing.</summary>
 		/// <param name="t_item">Const reference to an element of Type Integer ( 32-Bit ).</param>
-		void remove(const int32_t& t_item);
+		bool remove(const int32_t& t_item);
 
 		/// <summary>Remove given element from the Datum. If element isn't found in the Datum, does nothing.</summary>
 		/// <param name="t_item">Const reference to anelement of Type Float ( 32-Bit ).</param>
-		void remove(const float_t& t_item);
+		bool remove(const float_t& t_item);
 
 		/// <summary>Remove given element from the Datum. If element isn't found in the Datum, does nothing.</summary>
 		/// <param name="t_item">Const reference to OpenGL standard 4-Components floating point Vector.</param>
-		void remove(const glm::vec4& t_item);
+		bool remove(const glm::vec4& t_item);
 
 		/// <summary>Remove given element from the Datum. If element isn't found in the Datum, does nothing.</summary>
 		/// <param name="t_item">Const reference to OpenGL standard 4x4 Matrix structure of single precision floating point numbers.</param>
-		void remove(const glm::mat4x4& t_item);
+		bool remove(const glm::mat4x4& t_item);
 
 		/// <summary>Remove given element from the Datum. If element isn't found in the Datum, does nothing.</summary>
 		/// <param name="t_item">Const reference to an element of Type STL string ( std::string )</param>
-		void remove(const std::string& t_item);
+		bool remove(const std::string& t_item);
 
 		/// <summary>Remove given element from the Datum. If element isn't found in the Datum, does nothing.</summary>
 		/// <param name="t_item">Const reference to RTTI class.</param>
-		void remove(const RTTI& t_item);
+		bool remove(const RTTI& t_item);
+
+		bool remove(const Scope& t_item);
 
 		/// <summary>Remove element at specified index from the Datum. If element isn't found in the Datum, does nothing.</summary>
 		/// <param name="t_index">Unsigned integer of 32-Bit</param>
-		void removeAt(uint32_t t_index);
+		bool removeAt(uint32_t t_index);
 
 		/// <summary>Search Given element in the values array of Datum.</summary>
 		/// <param name="t_item">Const reference to an element of Type Unsigned Integer ( 32-Bit )</param>
-		/// <returns>Returns index of element if found else return size of an array.</returns>
-		uint32_t& find(const int32_t& t_item);
+		/// <returns>Returns std::tuple of boolean result & index of an element. Index will be size of an array if element isn't found.</returns>
+		std::tuple<bool, uint32_t> find(const int32_t& t_item);
 
 		/// <summary>Search Given element in the values array of Datum.</summary>
 		/// <param name="t_item">Const reference to an element of Type Float.</param>
-		/// <returns>Returns index of element if found else return size of an array.</returns>
-		uint32_t& find(const float_t& t_item);
+		/// <returns>Returns std::tuple of boolean result & index of an element. Index will be size of an array if element isn't found.</returns>
+		std::tuple<bool, uint32_t> find(const float_t& t_item);
 
 		/// <summary>Search Given element in the values array of Datum.</summary>
 		/// <param name="t_item">Const reference to an OpenGL standard 4-Components floating point Vector.</param>
-		/// <returns>Returns index of element if found else return size of an array.</returns>
-		uint32_t& find(const glm::vec4& t_item);
+		/// <returns>Returns std::tuple of boolean result & index of an element. Index will be size of an array if element isn't found.</returns>
+		std::tuple<bool, uint32_t> find(const glm::vec4& t_item);
 
 		/// <summary>Search Given element in the values array of Datum.</summary>
 		/// <param name="t_item">Const reference to an OpenGL standard 4x4 Matrix of Single Precision floating point numbers.</param>
-		/// <returns>Returns index of element if found else return size of an array.</returns>
-		uint32_t& find(const glm::mat4x4& t_item);
+		/// <returns>Returns std::tuple of boolean result & index of an element. Index will be size of an array if element isn't found.</returns>
+		std::tuple<bool, uint32_t> find(const glm::mat4x4& t_item);
 
 		/// <summary>Search Given element in the values array of Datum.</summary>
 		/// <param name="t_item">Const reference to a STL string ( std::string ).</param>
-		/// <returns>Returns index of element if found else return size of an array.</returns>
-		uint32_t& find(const std::string& t_item);
+		/// <returns>Returns std::tuple of boolean result & index of an element. Index will be size of an array if element isn't found.</returns>
+		std::tuple<bool, uint32_t> find(const std::string& t_item);
 
 		/// <summary>Search Given element in the values array of Datum.</summary>
 		/// <param name="t_item">Const reference to a RTTI class</param>
-		/// <returns>Returns index of element if found else return size of an array.</returns>
-		uint32_t& find(const RTTI& t_item);
+		/// <returns>Returns std::tuple of boolean result & index of an element. Index will be size of an array if element isn't found.</returns>
+		std::tuple<bool, uint32_t> find(const RTTI& t_item);
+
+		/// <summary>Search Given element in the values array of Datum.</summary>
+		/// <param name="t_item">Const reference to a Scope</param>
+		/// <returns>Returns std::tuple of boolean result & index of an element. Index will be size of an array if element isn't found.</returns>
+		std::tuple<bool, uint32_t> find(const Scope& t_item);
 
 		/// <summary>Const version of find() - Search Given element in the values array of Datum.</summary>
 		/// <param name="t_item">Const reference to an element of Type Unsigned Integer ( 32-Bit )</param>
-		/// <returns>Returns index of element if found else return size of an array ( const unsigned integer ).</returns>
-		const uint32_t& find(const int32_t& t_item) const;
+		/// <returns>Returns const std::tuple of boolean result & index of an element. Index will be size of an array if element isn't found.</returns>
+		const std::tuple<bool, uint32_t> find(const int32_t& t_item) const;
 
 		/// <summary>Const version of find() - Search Given element in the values array of Datum.</summary>
 		/// <param name="t_item">Const reference to an element of Type Float.</param>
-		/// <returns>Returns index of element if found else return size of an array ( const unsigned integer ).</returns>
-		const uint32_t& find(const float_t& t_item) const;
+		/// <returns>Returns const std::tuple of boolean result & index of an element. Index will be size of an array if element isn't found.</returns>
+		const std::tuple<bool, uint32_t> find(const float_t& t_item) const;
 
 		/// <summary>Const version of find() - Search Given element in the values array of Datum.</summary>
 		/// <param name="t_item">Const reference to an OpenGL standard 4-Components floating point Vector.</param>
-		/// <returns>Returns index of element if found else return size of an array ( const unsigned integer ).</returns>
-		const uint32_t& find(const glm::vec4& t_item) const;
+		/// <returns>Returns const std::tuple of boolean result & index of an element. Index will be size of an array if element isn't found.</returns>
+		const std::tuple<bool, uint32_t> find(const glm::vec4& t_item) const;
 
 		/// <summary>Const version of find() - Search Given element in the values array of Datum.</summary>
 		/// <param name="t_item">Const reference to an OpenGL standard 4x4 Matrix of Single Precision floating point numbers.</param>
-		/// <returns>Returns index of element if found else return size of an array ( const unsigned integer ).</returns>
-		const uint32_t& find(const glm::mat4x4& t_item) const;
+		/// <returns>Returns const std::tuple of boolean result & index of an element. Index will be size of an array if element isn't found.</returns>
+		const std::tuple<bool, uint32_t> find(const glm::mat4x4& t_item) const;
 
 		/// <summary>Const version of find() - Search Given element in the values array of Datum.</summary>
 		/// <param name="t_item">Const reference to a STL string ( std::string ).</param>
-		/// <returns>Returns index of element if found else return size of an array ( const unsigned integer ).</returns>
-		const uint32_t& find(const std::string& t_item) const;
+		/// <returns>Returns const std::tuple of boolean result & index of an element. Index will be size of an array if element isn't found.</returns>
+		const std::tuple<bool, uint32_t> find(const std::string& t_item) const;
 
 		/// <summary>Const version of find() - Search Given element in the values array of Datum.</summary>
 		/// <param name="t_item">Const reference to a RTTI class</param>
-		/// <returns>Returns index of element if found else return size of an array ( const unsigned integer ).</returns>
-		const uint32_t& find(const RTTI& t_item) const;
+		/// <returns>Returns const std::tuple of boolean result & index of an element. Index will be size of an array if element isn't found.</returns>
+		const std::tuple<bool, uint32_t> find(const RTTI& t_item) const;
 		
+		/// <summary>Const version of find() - Search Given element in the values array of Datum.</summary>
+		/// <param name="t_item">Const reference to a Scope.</param>
+		/// <returns>Returns const std::tuple of boolean result & index of an element. Index will be size of an array if element isn't found.</returns>
+		const std::tuple<bool, uint32_t> find(const Scope& t_item) const;
+
+		/// <summary>Nested Scope dereference operator for datum.</summary>
+		/// <param name="t_index">index of a Scope to get from.</param>
+		/// <returns>Returns reference to the Scope.</returns>
+		Scope& operator[](uint32_t t_index);
+
+		/// <summary>Const version of Nested Scope dereference operator for datum.</summary>
+		/// <param name="t_index">index of a Scope to get from.</param>
+		/// <returns>Returns const reference to the Scope.</returns>
+		const Scope& operator[](uint32_t t_index) const;
 	private:
 		/// <summary>Discriminated Union for storing Data pointer.</summary>
 		union Data
@@ -556,6 +626,8 @@ namespace FieaGameEngine
 			glm::mat4x4* d_glm_mat4x4;
 			std::string* d_string;
 			RTTI** d_RTTI_ptr;
+			Scope** d_scope_ptr;
+			void* d_void_ptr;
 		};
 
 		Data m_data;
@@ -564,5 +636,7 @@ namespace FieaGameEngine
 		uint32_t m_size = 0;
 		uint32_t m_capacity = 0;
 		bool m_is_external = false;
+		//static uint32_t typeSizeMap[];
+		const static inline size_t typeSizeMap[8] { 0, sizeof(int32_t), sizeof(float_t), sizeof(glm::vec4), sizeof(glm::mat4x4), sizeof(Scope*), sizeof(std::string), sizeof(RTTI*) };
 	};
 }
