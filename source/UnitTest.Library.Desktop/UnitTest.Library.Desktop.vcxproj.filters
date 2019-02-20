@@ -10,10 +10,13 @@
     <ClCompile Include="Bar.cpp" />
     <ClCompile Include="DatumTest.cpp" />
     <ClCompile Include="ScopeTest.cpp" />
+    <ClCompile Include="AttributedFoo.cpp" />
+    <ClCompile Include="TestModuleInitialize.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
     <ClInclude Include="Foo.h" />
     <ClInclude Include="Bar.h" />
+    <ClInclude Include="AttributedFoo.h" />
   </ItemGroup>
 </Project>
