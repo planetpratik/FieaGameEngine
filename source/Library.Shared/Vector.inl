@@ -58,6 +58,15 @@ namespace FieaGameEngine
 		operator=(t_rhs);
 	}
 
+	template<typename T>
+	Vector<T>::Vector(Vector&& t_rhs) :
+		m_size(t_rhs.m_size), m_capacity(t_rhs.m_capacity), m_data_array(t_rhs.m_data_array)
+	{
+		t_rhs.m_size = 0;
+		t_rhs.m_capacity = 0;
+		t_rhs.m_data_array = nullptr;
+	}
+
 	template <typename T>
 	typename Vector<T>& Vector<T>::operator=(const Vector& t_rhs)
 	{
@@ -69,6 +78,23 @@ namespace FieaGameEngine
 			{
 				pushBack(value);
 			}
+		}
+		return *this;
+	}
+
+	template<typename T>
+	Vector<T>& Vector<T>::operator=(Vector&& t_rhs)
+	{
+		if (this != &t_rhs)
+		{
+			clear();
+			m_size = t_rhs.m_size;
+			m_capacity = t_rhs.m_capacity;
+			m_data_array = t_rhs.m_data_array;
+
+			t_rhs.m_size = 0;
+			t_rhs.m_capacity = 0;
+			t_rhs.m_data_array = nullptr;
 		}
 		return *this;
 	}

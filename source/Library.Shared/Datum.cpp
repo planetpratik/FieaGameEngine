@@ -328,14 +328,14 @@ namespace FieaGameEngine
 			m_storage_type = DatumStorageType::INTERNAL;
 			m_is_external = false;
 		}
-		if(m_type != DatumType::TABLE)
+		if (m_type != DatumType::TABLE)
 		{
 			m_storage_type = DatumStorageType::EXTERNAL;
 			m_is_external = true;
 		}
 		m_size = t_array_size;
 		m_capacity = t_array_size;
-		
+
 	}
 
 	void Datum::setStorage(int32_t* t_array, uint32_t t_array_size)
@@ -376,14 +376,13 @@ namespace FieaGameEngine
 
 	bool Datum::operator==(const Datum& t_rhs) const
 	{
-		bool are_equal = false;
+		bool are_equal = true;
 		if ((m_type == t_rhs.m_type) && (m_size == t_rhs.m_size))
 		{
-			are_equal = true;
-			/*switch (m_type)
+			switch (m_type)
 			{
 			case DatumType::STRING:
-				for(uint32_t i = 0; i < m_size; ++i)
+				for (uint32_t i = 0; i < m_size; ++i)
 				{
 					if (m_data.d_string[i] != t_rhs.m_data.d_string[i])
 					{
@@ -396,78 +395,31 @@ namespace FieaGameEngine
 			case DatumType::TABLE:
 				for (uint32_t i = 0; i < m_size; ++i)
 				{
-					if (!m_data.d_RTTI_ptr[i]->Equals(t_rhs.m_data.d_RTTI_ptr[i]))
+					RTTI* lhsPointer = m_data.d_RTTI_ptr[i];
+					RTTI* rhsPointer = t_rhs.m_data.d_RTTI_ptr[i];
+					if (lhsPointer != rhsPointer && lhsPointer != nullptr)
 					{
-						are_equal = false;
-						break;
+						if (lhsPointer->Equals(rhsPointer) == false)
+						{
+							are_equal = false;
+							break;
+						}
 					}
 				}
 				break;
-			default:
-				size_t type_size = typeSizeMap[static_cast<size_t>(m_type)] * static_cast<size_t>(m_size);
-				if (!memcmp(m_data.d_void_ptr, t_rhs.m_data.d_void_ptr, type_size))
-				{
-					are_equal = true;
-				}
-				break;
-			}*/
 
-			for (uint32_t i = 0; i < m_size; ++i)
-			{
-				switch (m_type)
+			default:
+				size_t type_size = typeSizeMap[static_cast<size_t>(m_type)] * m_size;
+				if (memcmp(m_data.d_void_ptr, t_rhs.m_data.d_void_ptr, type_size) != 0)
 				{
-				case DatumType::INTEGER:
-					if (m_data.d_int32_t[i] != t_rhs.m_data.d_int32_t[i])
-					{
-						are_equal = false;
-						break;
-					}
-					break;
-				case DatumType::FLOAT:
-					if (m_data.d_float_t[i] != t_rhs.m_data.d_float_t[i])
-					{
-						are_equal = false;
-						break;
-					}
-					break;
-				case DatumType::VECTOR4:
-					if (m_data.d_glm_vec4[i] != t_rhs.m_data.d_glm_vec4[i])
-					{
-						are_equal = false;
-						break;
-					}
-					break;
-				case DatumType::MATRIX4X4:
-					if (m_data.d_glm_mat4x4[i] != t_rhs.m_data.d_glm_mat4x4[i])
-					{
-						are_equal = false;
-						break;
-					}
-					break;
-				case DatumType::STRING:
-					if (m_data.d_string[i] != t_rhs.m_data.d_string[i])
-					{
-						are_equal = false;
-						break;
-					}
-					break;
-				case DatumType::POINTER:
-					if (m_data.d_RTTI_ptr[i] != t_rhs.m_data.d_RTTI_ptr[i])
-					{
-						are_equal = false;
-						break;
-					}
-					break;
-				case DatumType::TABLE:
-					if (m_data.d_scope_ptr[i]->Equals(t_rhs.m_data.d_scope_ptr[i]))
-					{
-						return false;
-					}
-					break;
-				default:
-					throw std::exception("Invalid Operation! Data type is not valid.");
+					are_equal = false;
 				}
+				break;
 			}
+		}
+		else
+		{
+			are_equal = false;
 		}
 		return are_equal;
 	}
@@ -1563,7 +1515,7 @@ namespace FieaGameEngine
 		{
 			throw std::exception("Invalid Operation! Datum Type isn't set.");
 		}
-		auto [result, index] = find(t_item);
+		auto[result, index] = find(t_item);
 		if (index < m_size)
 		{
 			for (; index < m_size - 1; ++index)
@@ -1977,6 +1929,5 @@ namespace FieaGameEngine
 	{
 		return *get<Scope*>(t_index);
 	}
-	
-	//uint32_t Datum::typeSizeMap[8] = { 0, sizeof(int32_t), sizeof(float_t), sizeof(glm::vec4), sizeof(glm::mat4x4), sizeof(std::string), sizeof(RTTI*), sizeof(Scope*) };
+
 }

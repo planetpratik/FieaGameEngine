@@ -105,7 +105,7 @@ namespace FieaGameEngine
 		/// <summary>Given Type enumeration, assign the type of data this object stores.</summary>
 		/// <param name="t_type">Enumeration of class DatumType.</param>
 		void setType(DatumType t_type);
-		
+
 		/// <summary>Get number of elements stored in the Datum.</summary>
 		/// <returns>Returns unsigned integer no. of values.</returns>
 		uint32_t size() const;
@@ -128,10 +128,10 @@ namespace FieaGameEngine
 		/// </summary>
 		/// <param name="t_size">Number of values ( size ) in Unsigned Integer.</param>
 		void setSize(uint32_t t_size);
-		
+
 		/// <summary>Clear Datum object ( Array of Elements ) without shrinking the capacity. Only works if Storage Type is INTERNAL.</summary>
 		void clear();
-		
+
 		/// <summary>Given a new capacity, allocate / reallocate array elements to new position in memory.</summary>
 		/// <param name="t_new_capacity">Capacity of new array to which current array to be expanded.</param>
 		void reserve(uint32_t t_new_capacity);
@@ -432,7 +432,7 @@ namespace FieaGameEngine
 		/// <param name="t_index">index of an element as an Unsigned integer ( 32-bit ).</param>
 		/// <returns>Returns const reference to a RTTI pointer.</returns>
 		template<> RTTI* const& get(uint32_t t_index) const;
-		
+
 		/// <summary>
 		/// Const version of get() - Template Specialisation (Scope)
 		/// For a given index, return appropriate value from array.
@@ -601,7 +601,7 @@ namespace FieaGameEngine
 		/// <param name="t_item">Const reference to a RTTI class</param>
 		/// <returns>Returns const std::tuple of boolean result & index of an element. Index will be size of an array if element isn't found.</returns>
 		const std::tuple<bool, uint32_t> find(const RTTI& t_item) const;
-		
+
 		/// <summary>Const version of find() - Search Given element in the values array of Datum.</summary>
 		/// <param name="t_item">Const reference to a Scope.</param>
 		/// <returns>Returns const std::tuple of boolean result & index of an element. Index will be size of an array if element isn't found.</returns>
@@ -637,6 +637,6 @@ namespace FieaGameEngine
 		uint32_t m_capacity = 0;
 		bool m_is_external = false;
 		//static uint32_t typeSizeMap[];
-		const static inline size_t typeSizeMap[8] { 0, sizeof(int32_t), sizeof(float_t), sizeof(glm::vec4), sizeof(glm::mat4x4), sizeof(Scope*), sizeof(std::string), sizeof(RTTI*) };
+		const static inline size_t typeSizeMap[8]{ 0, sizeof(int32_t), sizeof(float_t), sizeof(glm::vec4), sizeof(glm::mat4x4), sizeof(Scope*), sizeof(std::string), sizeof(RTTI*) };
 	};
 }

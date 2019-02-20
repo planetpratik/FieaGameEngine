@@ -9,7 +9,7 @@
 namespace FieaGameEngine
 {
 	/// <summary>Template Class for HashMap</summary>
-	template <typename TKey, typename TData, typename HashFunctor=DefaultHash<TKey>>
+	template <typename TKey, typename TData, typename HashFunctor = DefaultHash<TKey>>
 	class HashMap final
 	{
 	public:
@@ -187,7 +187,7 @@ namespace FieaGameEngine
 		/// <param name="t_key">Const reference to a key of type TKey.</param>
 		/// <returns> Returns copy of a ConstIterator to an element if found else return an end.</returns>
 		ConstIterator find(const TKey& t_key) const;
-		
+
 		/// <summary>Inserts element into HashMap for a specified PairType.</summary>
 		/// <param name="t_pair">Const reference to a PairType ( Key-Value Pair ).</param>
 		/// <returns>Returns copy of an Iterator if element is inserted else return Iterator to an element if already exists.</returns>

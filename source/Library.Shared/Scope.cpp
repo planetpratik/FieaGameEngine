@@ -6,28 +6,21 @@ namespace FieaGameEngine
 	RTTI_DEFINITIONS(Scope);
 
 	Scope::Scope(const uint32_t& t_default_size) :
-		m_parent(nullptr), m_lookup_table(), m_pointers_list(t_default_size)
+		m_pointers_list(t_default_size)
 	{
 	}
 
 	Scope::Scope(const Scope& t_rhs) :
-		m_parent(nullptr), m_lookup_table(), m_pointers_list(t_rhs.m_pointers_list.size())
+		m_pointers_list(t_rhs.m_pointers_list.size())
 	{
-		if (this != &t_rhs)
-		{
-			/*operator=(t_rhs);*/
-			doRecursiveChildrenCopy(t_rhs);
-		}
+		doRecursiveChildrenCopy(t_rhs);
 	}
 
 	Scope::Scope(Scope&& t_rhs) :
 		m_parent(t_rhs.m_parent), m_lookup_table(std::move(t_rhs.m_lookup_table)), m_pointers_list(std::move(t_rhs.m_pointers_list))
 	{
-		/*if (this != &t_rhs)
-		{
-			fixParentPointer(t_rhs);
-			t_rhs.m_parent = nullptr;
-		}*/
+		fixParentPointer(std::move(t_rhs));
+		//t_rhs.m_parent = nullptr;
 	}
 
 	Scope& Scope::operator=(const Scope& t_rhs)
@@ -35,7 +28,6 @@ namespace FieaGameEngine
 		if (this != &t_rhs)
 		{
 			clear();
-			m_lookup_table.rehash(DEFAULT_SIZE);
 			m_pointers_list.reserve(t_rhs.m_lookup_table.size());
 			doRecursiveChildrenCopy(t_rhs);
 		}
@@ -69,7 +61,8 @@ namespace FieaGameEngine
 				}
 			}
 		}
-		/*m_lookup_table.clear();*/
+
+		m_lookup_table.clear();
 		m_pointers_list.clear();
 	}
 
@@ -154,7 +147,7 @@ namespace FieaGameEngine
 		return *scope;
 	}
 
-	void Scope::adopt(const std::string& t_name, Scope& t_child)
+	/*void Scope::adopt(const std::string& t_name, Scope& t_child)
 	{
 		Datum* temp = find(t_name);
 		if (temp == nullptr)
@@ -170,7 +163,25 @@ namespace FieaGameEngine
 		t_child.makeChildOrphan();
 		t_child.m_parent = this;
 		datum.pushBack(&t_child);
+	}*/
+
+	void Scope::adopt(const std::string& t_name, Scope& t_child)
+	{
+		if (this == &t_child)
+		{
+			throw std::exception("Invalid operation! Child cannot adopt itself.");
+		}
+		if (this->isAncestorOf(t_child))
+		{
+			throw std::exception("Invalid operation! Cannot adopt an Ancestor.");
+		}
+		Datum& datum = append(t_name);
+		datum.setType(Datum::DatumType::TABLE);
+		t_child.makeChildOrphan();
+		t_child.m_parent = this;
+		datum.pushBack(&t_child);
 	}
+
 
 	Scope* Scope::getParent() const
 	{
@@ -225,7 +236,7 @@ namespace FieaGameEngine
 		return *datum;
 	}
 
-	bool Scope::operator==(const Scope& t_rhs)
+	bool Scope::operator==(const Scope& t_rhs) const
 	{
 		if (m_pointers_list.size() == t_rhs.m_pointers_list.size())
 		{
@@ -233,7 +244,10 @@ namespace FieaGameEngine
 			auto j = t_rhs.m_pointers_list.begin();
 			for (; i != m_pointers_list.end(); ++i, ++j)
 			{
-				if (*(*i) != *(*j))
+				const auto& lhsPair = **i;
+				const auto& rhsPair = **j;
+
+				if (lhsPair != rhsPair)
 				{
 					return false;
 				}
@@ -243,9 +257,30 @@ namespace FieaGameEngine
 		return false;
 	}
 
-	bool Scope::operator!=(const Scope& t_rhs)
+	bool Scope::operator!=(const Scope& t_rhs) const
 	{
 		return !(operator==(t_rhs));
+	}
+
+	std::pair<Datum*, uint32_t> Scope::findNestedScope(const Scope& t_child) const
+	{
+		for (uint32_t i = 0; i < m_pointers_list.size(); ++i)
+		{
+			Datum& datum = m_pointers_list[i]->second;
+			if (datum.type() == Datum::DatumType::TABLE)
+			{
+				for (uint32_t j = 0; j < datum.size(); ++j)
+				{
+					Scope* child = &datum[j];
+					if (child == &t_child)
+					{
+						return std::make_pair(&datum, j);
+					}
+				}
+			}
+		}
+
+		return {};
 	}
 
 	std::string Scope::findName(const Scope& t_child) const
@@ -253,8 +288,7 @@ namespace FieaGameEngine
 		std::string name;
 		for (uint32_t i = 0; i < m_pointers_list.size(); ++i)
 		{
-			Datum child;
-			child = m_pointers_list[i]->second;
+			Datum& child = m_pointers_list[i]->second;
 			if (child.type() == Datum::DatumType::TABLE)
 			{
 				for (uint32_t j = 0; j < child.size(); ++j)
@@ -291,24 +325,28 @@ namespace FieaGameEngine
 	}
 
 
-	void Scope::fixParentPointer(Scope& /*t_rhs*/)
+	void Scope::fixParentPointer(Scope&& t_rhs)
 	{
-		/*if (m_parent != nullptr)
+		if (m_parent != nullptr)
 		{
-			std::string name = t_rhs.m_parent->findName(t_rhs);
-			t_rhs.makeChildOrphan();
-			m_parent->adopt(name, *this);
+			// Inform the parent that the child has a new address
+			auto[datum, index] = m_parent->findNestedScope(t_rhs);
+			assert(datum != nullptr);
+			datum->set(this, index);
 		}
+
+		// Update and nested scopes to refer to 'this' as their parent.
 		for (auto& it : m_pointers_list)
 		{
-			if (it->second.type() == Datum::DatumType::TABLE)
+			Datum& datum = it->second;
+			if (datum.type() == Datum::DatumType::TABLE)
 			{
-				for (uint32_t i = 0; i < it->second.size(); ++i)
+				for (uint32_t i = 0; i < datum.size(); ++i)
 				{
-					it->second[i].m_parent = this;
+					datum[i].m_parent = this;
 				}
 			}
-		}*/
+		}
 	}
 
 	void Scope::makeChildOrphan()
@@ -330,7 +368,7 @@ namespace FieaGameEngine
 	}
 
 
-	bool Scope::Equals(const RTTI* t_rhs)
+	bool Scope::Equals(const RTTI* t_rhs) const
 	{
 		if (t_rhs == nullptr)
 		{
@@ -347,5 +385,26 @@ namespace FieaGameEngine
 	std::string Scope::ToString() const
 	{
 		return "Scope";
+	}
+
+	bool Scope::isAncestorOf(const Scope& t_scope) const
+	{
+		bool result = false;
+		Scope* parent = t_scope.m_parent;
+		while (parent != nullptr)
+		{
+			if (parent == this)
+			{
+				result = true;
+				break;
+			}
+			parent = parent->m_parent;
+		}
+		return result;
+	}
+
+	bool Scope::isDescendentOf(const Scope& t_scope) const
+	{
+		return t_scope.isAncestorOf(*this);
 	}
 }
