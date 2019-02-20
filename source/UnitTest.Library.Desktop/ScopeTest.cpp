@@ -62,9 +62,9 @@ namespace UnitTestLibraryDesktop
 			Scope& inventory = zork.appendScope("inventory");
 			Datum& key = inventory.append("key");
 			key = 5549;
-			Scope& food = inventory.appendScope("food");
+			/*Scope& food = inventory.appendScope("food");
 			Datum& almonds = food.append("almonds");
-			almonds = 43;
+			almonds = 43;*/
 
 			Scope another_zork;
 			Datum& another_rooms = another_zork.append("rooms");
@@ -264,15 +264,15 @@ namespace UnitTestLibraryDesktop
 			Scope& inventory = zork.appendScope("inventory");
 			Datum& key = inventory.append("key");
 			key = 5549;
-			Scope food;
-			Datum& almonds = food.append("almonds");
+			Assert::AreEqual(1U, zork.find("inventory")->size());
+			Scope* food = new Scope();
+			Datum& almonds = food->append("almonds");
 			almonds = 43;
-			zork.adopt("inventory", food);
-			Assert::IsTrue(&zork == food.getParent());
-			Assert::AreEqual(2U, zork.find("inventory")->size());
-			auto expression = [&] {inventory.adopt("Paul", zork); };
+			zork.adopt("inventory", *food);
+			Assert::IsTrue(&zork == food->getParent());
+			auto expression = [&] {inventory.adopt("inventory", inventory); };
 			Assert::ExpectException<std::exception>(expression);
-			auto expression_two = [&] {inventory.adopt("inventory", inventory); };
+			auto expression_two = [&] {zork.adopt("inventory", inventory); };
 			Assert::ExpectException<std::exception>(expression_two);
 		}
 

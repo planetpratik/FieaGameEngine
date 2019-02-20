@@ -159,10 +159,15 @@ namespace FieaGameEngine
 		/// <param name="t_rhs">Const reference to passed Vector of Type T.</param>
 		Vector(const Vector& t_rhs);
 
+		Vector(Vector&& t_rhs);
+
 		/// <summary>Assignment Operator Overload.</summary>
 		/// <param name="t_rhs">Const reference to passed Vector of Type T.</param>
 		/// <returns>Returns Mutable Reference to "This" Vector.</returns>
 		Vector& operator=(const Vector& t_rhs);
+
+		Vector& operator=(Vector&& t_rhs);
+
 
 		/// <summary>Non-const version of Subscript Operator overload. Throws an exception if index is invalid.</summary>
 		/// <param name="t_rhs">Const reference to passed Vector of Type T.</param>

@@ -112,35 +112,43 @@ namespace FieaGameEngine
 		/// <summary>Comparison operator overload (==) for Scope. ( Deep checking of nested Scopes and children ).</summary>
 		/// <param name="t_rhs">Const reference to the passed Scope which is to be compared.</param>
 		/// <returns>Returns boolean value indicating whether 2 Scopes are equal or not.</returns>
-		bool operator==(const Scope& t_rhs);
+		bool operator==(const Scope& t_rhs) const;
 
 		/// <summary>Not Equal operator overload (!=) for Scope. ( Deep checking of nested Scopes and children ).</summary>
 		/// <param name="t_rhs">Const reference to the passed Scope which is to be compared.</param>
 		/// <returns>Returns boolean value indicating whether 2 Scopes are equal or not.</returns>
-		bool operator!=(const Scope& t_rhs);
+		bool operator!=(const Scope& t_rhs) const;
 
 		/// <summary>Finds the name of the Datum the given Scope is stored in.</summary>
 		/// <param name="t_child">Const reference to the Scope child which is to be searched.</param>
 		/// <returns>Returns name of the Datum if found. Returns empty STL std::string otherwise.</returns>
 		std::string findName(const Scope& t_child) const;
 
+
+		std::pair<Datum*, uint32_t> findNestedScope(const Scope& t_child) const;
+
 		/// <summary>Compares whether given RTTI is Scope or not. ( Overriden from RTTI Interface ).</summary>
 		/// <param name="t_rhs">Const pointer to RTTI object.</param>
 		/// <returns>Returns true if given RTTI is Scope. Returns false otherwise.</returns>
-		virtual bool Equals(const RTTI* t_rhs);
+		virtual bool Equals(const RTTI* t_rhs) const override;
 
 		/// <summary>Gets name of the class ( Overriden from RTTI Interface ).</summary>
 		/// <returns>Returns name of the class as Type STL std::string</returns>
 		virtual std::string ToString() const;
 
+		bool isAncestorOf(const Scope& t_scope) const;
+
+		bool isDescendentOf(const Scope& t_scope) const;
+
 	private:
 
 		void doRecursiveChildrenCopy(const Scope& t_rhs);
-		void fixParentPointer(Scope& t_rhs);
+		void fixParentPointer(Scope&& t_rhs);
 		void makeChildOrphan();
+		
 
 		static const uint32_t DEFAULT_SIZE = 15;
-		Scope* m_parent;
+		Scope* m_parent = nullptr;
 		LookupTable m_lookup_table;
 		PointersList m_pointers_list;
 	};

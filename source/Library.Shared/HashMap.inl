@@ -108,7 +108,11 @@ namespace FieaGameEngine
 	template <typename TKey, typename TData, typename HashFunctor>
 	inline void HashMap<TKey, TData, HashFunctor>::clear()
 	{
-		m_buckets.~BucketType();
+		for (auto& chain : m_buckets)
+		{
+			chain.clear();
+		}
+
 		m_size = 0;
 	}
 
@@ -147,7 +151,7 @@ namespace FieaGameEngine
 		}
 		return((*it).second);
 	}
-	
+
 	template <typename TKey, typename TData, typename HashFunctor>
 	inline const TData& FieaGameEngine::HashMap<TKey, TData, HashFunctor>::at(const TKey& t_key) const
 	{
@@ -164,7 +168,7 @@ namespace FieaGameEngine
 	{
 		for (uint32_t i = 0; i < m_buckets.size(); ++i)
 		{
-			if(!(0 == m_buckets[i].size()))
+			if (!(0 == m_buckets[i].size()))
 			{
 				return Iterator(*this, i, m_buckets[i].begin());
 			}
@@ -336,7 +340,7 @@ namespace FieaGameEngine
 		m_current_pair(t_current_pair), m_current_bucket_index(t_current_bucket_index), m_owner(&t_owner)
 	{
 	}
-	
+
 	template <typename TKey, typename TData, typename HashFunctor>
 	HashMap<TKey, TData, HashFunctor>::ConstIterator::ConstIterator(const Iterator& t_rhs) :
 		m_current_bucket_index(t_rhs.m_current_bucket_index), m_owner(t_rhs.m_owner), m_current_pair(t_rhs.m_current_pair)
@@ -360,7 +364,7 @@ namespace FieaGameEngine
 			++m_current_bucket_index;
 			while ((m_current_bucket_index < m_owner->m_buckets.size()) && m_owner->m_buckets[m_current_bucket_index].isEmpty())
 			{
-			++m_current_bucket_index;
+				++m_current_bucket_index;
 			}
 			if (m_current_bucket_index < m_owner->m_buckets.size())
 			{

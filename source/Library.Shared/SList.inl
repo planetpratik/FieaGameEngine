@@ -18,6 +18,16 @@ namespace FieaGameEngine
 	}
 
 	template <typename T>
+	SList<T>::SList(SList&& t_rhs) :
+		m_front(t_rhs.m_front), m_back(t_rhs.m_back),
+		m_size(t_rhs.m_size)
+	{
+		t_rhs.m_front = nullptr;
+		t_rhs.m_back = nullptr;
+		t_rhs.m_size = 0;
+	}
+
+	template <typename T>
 	SList<T>::SList(std::initializer_list<T> t_list)
 	{
 		for (const auto& value : t_list)
@@ -42,12 +52,31 @@ namespace FieaGameEngine
 		return *this;
 	}
 
+	template <typename T>
+	SList<T>& SList<T>::operator=(SList&& t_rhs)
+	{
+		if (this != &t_rhs)
+		{
+			// Clear list associated to "this" before assigning passed list.
+			clear();
+
+			m_front = t_rhs.m_front;
+			m_back = t_rhs.m_back;
+			m_size = t_rhs.m_size;
+
+			t_rhs.m_front = nullptr;
+			t_rhs.m_back = nullptr;
+			t_rhs.m_size = 0;
+		}
+		return *this;
+	}
+
 	template<typename T>
 	typename SList<T>::Iterator SList<T>::pushFront(const T& t_item)
 	{
 		m_front = new Node(t_item, m_front);
 		// If list is empty
-		if (m_back ==  nullptr)
+		if (m_back == nullptr)
 		{
 			m_back = m_front;
 		}
@@ -247,7 +276,7 @@ namespace FieaGameEngine
 	typename SList<T>::Iterator SList<T>::find(const T& t_value) const
 	{
 		Iterator it = begin();
-		for ( ; it != end(); ++it)
+		for (; it != end(); ++it)
 		{
 			if (*it == t_value)
 			{

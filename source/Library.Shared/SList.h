@@ -31,7 +31,7 @@ namespace FieaGameEngine
 		public:
 			/// <summary>Default Constructor for Iterator.</summary>
 			Iterator() = default;
-	
+
 			/// <summary>Copy Constructor for Iterator.</summary>
 			/// <param name="t_rhs">Const reference to passed Iterator</param>
 			Iterator(const Iterator&) = default;
@@ -87,10 +87,13 @@ namespace FieaGameEngine
 		/// <param name="t_rhs">Const reference to passed List of Type T.</param>
 		SList(const SList &t_rhs);
 
+		SList(SList &&t_rhs);
+
 		/// <summary>Assignment Operator Overload.</summary>
 		/// <param name="t_rhs">Const reference to passed List of Type T.</param>
 		/// <returns>Returns Mutable Reference to "This" list.</returns>
-		SList<T>& operator= (const SList &t_rhs);
+		SList& operator= (const SList &t_rhs);
+		SList& operator= (SList &&t_rhs);
 
 		/// <summary>Destructor for SList.</summary>
 		~SList();
@@ -103,7 +106,7 @@ namespace FieaGameEngine
 		/// <param name="t_item">Const reference to passed element of Type T.</param>
 		/// <returns>Returns Iterator to front element in List</returns>
 		Iterator pushFront(const T& t_item);
-		
+
 		/// <summary>Removes foremost element from the List.</summary>
 		void popFront();
 
