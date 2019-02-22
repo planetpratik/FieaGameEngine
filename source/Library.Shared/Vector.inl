@@ -1,5 +1,6 @@
 #pragma once
 #include "Vector.h"
+#include <algorithm>
 
 namespace FieaGameEngine
 {
@@ -19,32 +20,43 @@ namespace FieaGameEngine
 #pragma region Vector
 
 	template <typename T>
-	inline Vector<T>::Vector(const uint32_t& t_default_capacity, bool t_fixed_size) :
+	inline Vector<T>::Vector(const uint32_t& t_default_capacity) :
 		m_capacity(0), m_size(0), m_data_array(nullptr)
 	{
-		reserve(t_default_capacity, t_fixed_size);
+		reserve(t_default_capacity);
 	}
 
 	template <typename T>
-	void Vector<T>::reserve(const uint32_t t_new_capacity, bool t_fixed_size)
+	void Vector<T>::reserve(const uint32_t t_new_capacity)
 	{
 		m_data_array = static_cast<T*>(realloc(m_data_array, t_new_capacity * sizeof(T)));
 		m_capacity = t_new_capacity;
-		if (t_fixed_size)
+	}
+
+	template <typename T>
+	void Vector<T>::resize(const uint32_t t_size)
+	{
+		if (t_size < m_size)
 		{
-			for (uint32_t i = m_size; i < t_new_capacity; i++)
+			for (size_t i = t_size; i < m_size; ++i)
 			{
-				new (m_data_array + i)T();
+				m_data_array[i].~T();
 			}
-			m_size = t_new_capacity;
 		}
+
+		m_data_array = reinterpret_cast<T*>(realloc(m_data_array, sizeof(T) * t_size));
+		for (size_t i = m_size; i < t_size; i++)
+		{
+			new (m_data_array + i)T();
+		}
+
+		m_size = m_capacity = t_size;
 	}
 
 	template <typename T>
 	Vector<T>::Vector(std::initializer_list<T> t_list):
 		m_capacity(0), m_size(0), m_data_array(nullptr)
 	{
-		//reserve(static_cast<uint32_t>(t_list.size()), true);
 		for (const auto& value : t_list)
 		{
 			pushBack(value);
@@ -117,6 +129,31 @@ namespace FieaGameEngine
 			throw std::exception("Array out of bounds Exception !");
 		}
 		return m_data_array[t_index];
+	}
+
+	template<typename T>
+	inline bool Vector<T>::operator==(const Vector & rhs) const
+	{
+		if (m_size != rhs.m_size)
+		{
+			return false;
+		}
+
+		for (uint32_t i = 0; i < m_size; ++i)
+		{
+			if (m_data_array[i] != rhs.m_data_array[i])
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	template<typename T>
+	inline bool Vector<T>::operator!=(const Vector & rhs) const
+	{
+		return !(operator==(rhs));
 	}
 
 	template <typename T>

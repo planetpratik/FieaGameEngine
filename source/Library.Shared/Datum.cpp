@@ -374,6 +374,15 @@ namespace FieaGameEngine
 		m_data.d_RTTI_ptr = t_array;
 	}
 
+	void Datum::setStorage(void* t_storage, uint32_t t_size)
+	{
+		//setStorage(DatumType::TABLE, t_size);
+		m_storage_type = DatumStorageType::EXTERNAL;
+		m_size = t_size;
+		m_capacity = t_size;
+		m_data.d_void_ptr = t_storage;
+	}
+
 	bool Datum::operator==(const Datum& t_rhs) const
 	{
 		bool are_equal = true;

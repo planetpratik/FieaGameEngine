@@ -26,12 +26,18 @@ namespace FieaGameEngine
 			{ "ExternalStringArray", Datum::DatumType::STRING, ARRAY_SIZE, offsetof(AttributedFoo,external_string_array) },
 			{ "ExternalVectorArray", Datum::DatumType::VECTOR4, ARRAY_SIZE, offsetof(AttributedFoo,external_glm_vector_array) },
 			{ "ExternalMatrixArray", Datum::DatumType::MATRIX4X4, ARRAY_SIZE, offsetof(AttributedFoo,external_glm_matrix_array) },
-			{ "NestedScope", Datum::DatumType::TABLE, 0, 0 }
+			{ "NestedScope", Datum::DatumType::TABLE, 0, 0 },
+			{ "NestedScopeArray", Datum::DatumType::TABLE, ARRAY_SIZE, 0 }
 		};
 	}
 
 	bool AttributedFoo::Equals(const RTTI* t_rhs) const
 	{
+		auto attirbuted_foo = t_rhs->As<AttributedFoo>();
+		if (attirbuted_foo != nullptr)
+		{
+			return *attirbuted_foo == *this;
+		}
 		return false;
 	}
 	

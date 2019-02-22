@@ -34,7 +34,7 @@ namespace FieaGameEngine
 		return *this;
 	}
 
-	/*(Scope& Scope::operator=(Scope&& t_rhs)
+	Scope& Scope::operator=(Scope&& t_rhs)
 	{
 		if (this != &t_rhs)
 		{
@@ -42,11 +42,11 @@ namespace FieaGameEngine
 			m_parent = t_rhs.m_parent;
 			m_lookup_table = std::move(t_rhs.m_lookup_table);
 			m_pointers_list = std::move(t_rhs.m_pointers_list);
-			fixParentPointer(t_rhs);
+			//fixParentPointer(t_rhs);
 			t_rhs.m_parent = nullptr;
 		}
 		return *this;
-	}*/
+	}
 
 	void Scope::clear()
 	{
@@ -137,6 +137,22 @@ namespace FieaGameEngine
 		return it->second;
 	}
 
+	Datum& Scope::append(const std::string& t_name, const Datum& t_datum)
+	{
+		if (t_name.empty())
+		{
+			throw std::exception("Invalid Operation! String must not be empty.");
+		}
+		bool isItemNotExists = false;
+		auto it = m_lookup_table.insert(std::make_pair(t_name, t_datum), isItemNotExists);
+
+		if (isItemNotExists)
+		{
+			m_pointers_list.pushBack(&*it);
+		}
+		return it->second;
+	}
+
 	Scope& Scope::appendScope(const std::string& t_name)
 	{
 		Datum& datum = append(t_name);
@@ -146,24 +162,6 @@ namespace FieaGameEngine
 		datum.pushBack(scope);
 		return *scope;
 	}
-
-	/*void Scope::adopt(const std::string& t_name, Scope& t_child)
-	{
-		Datum* temp = find(t_name);
-		if (temp == nullptr)
-		{
-			throw std::exception("Invalid operation! Datum for given name doesn't exist in scope.");
-		}
-		if (this == &t_child)
-		{
-			throw std::exception("Invalid operation! Child cannot adopt itself.");
-		}
-		Datum& datum = append(t_name);
-		datum.setType(Datum::DatumType::TABLE);
-		t_child.makeChildOrphan();
-		t_child.m_parent = this;
-		datum.pushBack(&t_child);
-	}*/
 
 	void Scope::adopt(const std::string& t_name, Scope& t_child)
 	{
@@ -407,4 +405,15 @@ namespace FieaGameEngine
 	{
 		return t_scope.isAncestorOf(*this);
 	}
+
+	size_t Scope::size()
+	{
+		return m_pointers_list.size();
+	}
+
+	const Vector<std::pair<std::string, Datum>*> Scope::getTableEntryPointers() const
+	{
+		return m_pointers_list;
+	}
+
 }

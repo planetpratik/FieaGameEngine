@@ -11,7 +11,9 @@
 #include "DefaultHash.h"
 #include "HashMap.h"
 #include "Datum.h"
+#include "AttributedFoo.h"
 #include "Scope.h"
+#include "Attributed.h"
 
 #pragma warning(disable: 4189)
 // TODO: reference additional headers your program requires here

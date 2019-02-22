@@ -143,13 +143,13 @@ namespace FieaGameEngine
 
 		/// <summary>Default constructor for Vector array initialisation. It'll be empty initially.</summary>
 		/// <param name="t_default_capacity">Default capacity for new Vector array.</param>
-		/// <param name="t_fixed_size">boolean indicating whether we required fixed size or not.</param>
-		explicit Vector(const uint32_t& t_default_capacity = DEFAULT_CAPACITY, bool t_fixed_size = false);
+		explicit Vector(const uint32_t& t_default_capacity = DEFAULT_CAPACITY);
 
 		/// <summary>Reserve capacity for the Vector array.</summary>
 		/// <param name="t_default_capacity">New capacity for the Vector array.</param>
-		/// <param name="t_fixed_size">boolean value indicating whether we required fixed size or not.</param>
-		void reserve(const uint32_t t_new_capacity, bool t_fixed_size = false);
+		void reserve(const uint32_t t_new_capacity);
+		
+		void resize(const uint32_t t_size);
 
 		/// <summary>Support for Initializer list syntax ( C++11 ).</summary>
 		/// <param name="t_list"> Initializer arguments list of Type T.</param>
@@ -178,6 +178,9 @@ namespace FieaGameEngine
 		/// <param name="t_rhs">Const reference to passed Vector of Type T.</param>
 		/// <returns>Returns Const Reference to item at given index.</returns>
 		const T& operator[](const uint32_t& t_index) const;
+
+		bool operator==(const Vector& rhs) const;
+		bool operator!=(const Vector& rhs) const;
 
 		/// <summary>Destructor for Vector.</summary>
 		~Vector();

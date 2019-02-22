@@ -12,6 +12,7 @@
     <ClCompile Include="ScopeTest.cpp" />
     <ClCompile Include="AttributedFoo.cpp" />
     <ClCompile Include="TestModuleInitialize.cpp" />
+    <ClCompile Include="AttributedTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />

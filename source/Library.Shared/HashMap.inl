@@ -10,13 +10,14 @@ namespace FieaGameEngine
 
 	template <typename TKey, typename TData, typename HashFunctor>
 	HashMap<TKey, TData, HashFunctor>::HashMap(uint32_t t_bucket_size) :
-		m_size(0), m_buckets(t_bucket_size, true)
+		m_size(0), m_buckets(0)
 	{
+		m_buckets.resize(t_bucket_size);
 	}
 
 	template <typename TKey, typename TData, typename HashFunctor>
 	inline HashMap<TKey, TData, HashFunctor>::HashMap(std::initializer_list<PairType> t_list) :
-		m_size(0), m_buckets(static_cast<uint32_t>(t_list.size()), true)
+		HashMap(static_cast<uint32_t>(t_list.size()))
 	{
 		for (const auto& value : t_list)
 		{

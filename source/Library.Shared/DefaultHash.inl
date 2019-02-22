@@ -27,6 +27,7 @@ namespace FieaGameEngine
 		return hash;
 	}
 
+
 	inline uint32_t DefaultHash<std::string>::operator()(const std::string& t_key) const
 	{
 		uint32_t hash = 0;

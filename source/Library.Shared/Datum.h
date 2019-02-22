@@ -171,6 +171,10 @@ namespace FieaGameEngine
 		/// <param name="t_array_size">Number of elements in passed array.</param>
 		void setStorage(RTTI** t_array, uint32_t t_array_size);
 
+
+		void setStorage(void* t_storage, uint32_t t_size);
+
+
 		/// <summary>Comparison operator overload for two Datums.</summary>
 		/// <param name="t_rhs">Const reference to passed Datum</param>
 		/// <returns>Returns boolean result indicating whether two Datums are equal or not.</returns>

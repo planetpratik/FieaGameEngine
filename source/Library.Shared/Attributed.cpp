@@ -6,60 +6,49 @@ namespace FieaGameEngine
 {
 	RTTI_DEFINITIONS(Attributed);
 
-#pragma region Signature
-
-	Signature::Signature(const std::string & t_name, const Datum::DatumType & t_type, const uint32_t & t_size, const size_t & t_offset) :
-		sig_name(t_name), sig_type(t_type), sig_size(t_size), sig_offset(t_offset)
-	{
-
-	}
-
-#pragma endregion
-
-
 #pragma region Attributed
 
-	Attributed::Attributed() :
-		Scope(), m_prescribed_attributes(), m_auxillary_attributes()
+	Attributed::Attributed(uint64_t t_type_id) :
+		Scope()
 	{
-		(*this)["this"].set(this);
-	}
-
-	Attributed::Attributed(uint32_t t_type_id) :
-		Scope(), m_prescribed_attributes(), m_auxillary_attributes()
-	{
+		Datum& datum = append("this");
+		datum.pushBack(static_cast<RTTI*>(this));
 		populate(t_type_id);
 	}
 
 	Attributed::Attributed(const Attributed& t_rhs) :
-		Scope(t_rhs), m_prescribed_attributes(t_rhs.m_prescribed_attributes), m_auxillary_attributes(t_rhs.m_auxillary_attributes)
+		Scope(t_rhs)
 	{
-		(*this)["this"].set(this);
+		(*this)["this"].set(static_cast<RTTI*>(this));
 		populate(t_rhs.TypeIdInstance());
 	}
+
 	Attributed::Attributed(Attributed&& t_rhs) :
-		Scope(std::move(t_rhs)), m_prescribed_attributes(t_rhs.m_prescribed_attributes), m_auxillary_attributes(t_rhs.m_auxillary_attributes)
+		Scope(std::move(t_rhs))
 	{
-		(*this)["this"].set(this);
+		(*this)["this"].set(static_cast<RTTI*>(this));
+		populate(t_rhs.TypeIdInstance());
 	}
+
 	Attributed& Attributed::operator=(const Attributed& t_rhs)
 	{
 		if (this != &t_rhs)
 		{
 			clear();
 			Scope::operator=(t_rhs);
-			(*this)["this"].set(this);
+			(*this)["this"].set(static_cast<RTTI*>(this));
 			populate(t_rhs.TypeIdInstance());
 		}
 		return *this;
 	}
+
 	Attributed& Attributed::operator=(Attributed&& t_rhs)
 	{
 		if (this != &t_rhs)
 		{
 			clear();
 			Scope::operator=(std::move(t_rhs));
-			(*this)["this"].set(this);
+			(*this)["this"].set(static_cast<RTTI*>(this));
 			populate(t_rhs.TypeIdInstance());
 		}
 		return *this;
@@ -68,27 +57,41 @@ namespace FieaGameEngine
 	void Attributed::clear()
 	{
 		Scope::clear();
-		m_prescribed_attributes.clear();
-		m_auxillary_attributes.clear();
 	}
 	
 	bool Attributed::isAttribute(const std::string& t_name)
 	{
 		return (find(t_name) != nullptr);
 	}
+
 	bool Attributed::isPrescribedAttribute(const std::string& t_name)
 	{
-		bool found = true;
-		if (m_prescribed_attributes.find(t_name) == m_prescribed_attributes.end())
+		bool found = false;
+		const Vector<std::pair<std::string, Datum>*> attribute_pointers = getTableEntryPointers();
+		if ("this" == t_name)
 		{
-			found = false;
+			if (attribute_pointers[0]->first == "this")
+			{
+				return true;
+			}
+		}
+		Vector<Signature> signatures = TypeManager::getSignatures(TypeIdInstance());
+		for (auto& signature : signatures)
+		{
+			if (signature.sig_name == t_name)
+			{
+				found = true;
+				break;
+			}
 		}
 		return found;
 	}
+
 	bool Attributed::isAuxillaryAttribute(const std::string& t_name)
 	{
 		return isAttribute(t_name) && !isPrescribedAttribute(t_name);
 	}
+
 	Datum& Attributed::appendAuxillaryAttribute(const std::string& t_name)
 	{
 		if (isPrescribedAttribute(t_name))
@@ -96,93 +99,83 @@ namespace FieaGameEngine
 			throw std::exception("Invalid Operation! You cannot append already appended prescribed attribute as Auxillary.");
 		}
 		Datum& datum = append(t_name);
-		m_auxillary_attributes.insert(std::pair<std::string, Datum*>(t_name, &datum));
+		return datum;
 	}
 
-	void Attributed::populate(uint32_t t_type_id)
+	Datum& Attributed::appendAuxillaryAttribute(const std::string& t_name, const Datum& t_datum)
 	{
-
+		if (isPrescribedAttribute(t_name))
+		{
+			throw std::exception("Invalid Operation! You cannot append already appended prescribed attribute as Auxillary.");
+		}
+		Datum& datum = append(t_name, t_datum);
+		return datum;
 	}
 
-	const HashMap<std::string, Datum*> Attributed::getPrescribedAttributes() const
+	Datum& Attributed::appendAuxillaryAttribute(const std::pair<std::string, Datum>& t_pair)
 	{
-		return m_prescribed_attributes;
+		if (isPrescribedAttribute(t_pair.first))
+		{
+			throw std::exception("Invalid Operation! You cannot append already appended prescribed attribute as Auxillary.");
+		}
+		Datum& datum = append(t_pair.first, t_pair.second);
+		return datum;
 	}
 
-	const HashMap<std::string, Datum*> Attributed::getAuxillaryAttributes() const
+
+	void Attributed::populate(uint64_t t_type_id)
 	{
-		return m_auxillary_attributes;
+		Vector<Signature> signatures = TypeManager::getSignatures(t_type_id);
+		for (auto& signature : signatures)
+		{
+			Datum& datum = append(signature.sig_name);
+			datum.setType(signature.sig_type);
+			if (signature.sig_type != Datum::DatumType::TABLE)
+			{
+				void* offset = reinterpret_cast<uint8_t*>(this) + signature.sig_offset;
+				datum.setStorage(offset, signature.sig_size);
+			}
+		}
+	}
+
+	const Vector<std::pair<std::string, Datum>*> Attributed::getAttributes() const
+	{
+		const Vector<std::pair<std::string, Datum>*> attribute_pointers = getTableEntryPointers();
+		return attribute_pointers;
+	}
+
+	const Vector<std::pair<std::string, Datum>*> Attributed::getPrescribedAttributes() const
+	{
+		Vector<Signature> signatures = TypeManager::getSignatures(TypeIdInstance());
+		Vector<std::pair<std::string, Datum>*> attribute_pointers = getTableEntryPointers();
+		Vector<std::pair<std::string, Datum>*> prescribed_attributes;
+		for (auto& attribute_ptr : attribute_pointers)
+		{
+			for (auto& signature : signatures)
+			{
+				if (attribute_ptr->first == signature.sig_name)
+				{
+					prescribed_attributes.pushBack(attribute_ptr);
+				}
+			}
+		}
+		return prescribed_attributes;
+	}
+
+	const Vector<std::pair<std::string, Datum>*> Attributed::getAuxillaryAttributes() const
+	{
+		uint32_t prescribed_signatures_count = TypeManager::getSignatures(TypeIdInstance()).size();
+		Vector<std::pair<std::string, Datum>*> attribute_pointers = getTableEntryPointers();
+		Vector<std::pair<std::string, Datum>*> auxillary_attributes;
+
+		for (uint32_t i = prescribed_signatures_count + 1; i < attribute_pointers.size(); ++i)
+		{
+			auxillary_attributes.pushBack(attribute_pointers[i]);
+		}
+		return auxillary_attributes;
 	}
 
 #pragma endregion
 
-#pragma region AddInternalAttributes
-
-	Datum& Attributed::addInternalAttribute(const std::string& t_name, const int32_t& t_value, const uint32_t& t_size)
-	{
-		Datum& datum = append(t_name);
-		//
-	}
-
-	Datum& Attributed::addInternalAttribute(const std::string& t_name, const float_t& t_value, const uint32_t& t_size)
-	{
-		// TODO: insert return statement here
-	}
-
-	Datum& Attributed::addInternalAttribute(const std::string& t_name, const std::string& t_value, const uint32_t& t_size)
-	{
-		// TODO: insert return statement here
-	}
-
-	Datum& Attributed::addInternalAttribute(const std::string& t_name, const glm::vec4& t_value, const uint32_t& t_size)
-	{
-		// TODO: insert return statement here
-	}
-
-	Datum& Attributed::addInternalAttribute(const std::string& t_name, const glm::mat4x4& t_value, const uint32_t& t_size)
-	{
-		// TODO: insert return statement here
-	}
-
-#pragma endregion
-
-#pragma region AddExternalAttributes
-
-	Datum& Attributed::addExternalAttribute(const std::string& t_name, int32_t* t_value, const uint32_t& t_size)
-	{
-		// TODO: insert return statement here
-	}
-
-	Datum& Attributed::addExternalAttribute(const std::string& t_name, float_t* t_value, const uint32_t& t_size)
-	{
-		// TODO: insert return statement here
-	}
-
-	Datum& Attributed::addExternalAttribute(const std::string& t_name, std::string* t_value, const uint32_t& t_size)
-	{
-		// TODO: insert return statement here
-	}
-
-	Datum& Attributed::addExternalAttribute(const std::string& t_name, glm::vec4* t_value, const uint32_t& t_size)
-	{
-		// TODO: insert return statement here
-	}
-
-	Datum& Attributed::addExternalAttribute(const std::string& t_name, glm::mat4x4* t_value, const uint32_t& t_size)
-	{
-		// TODO: insert return statement here
-	}
-
-#pragma endregion
-
-	Datum& FieaGameEngine::Attributed::addNestedScope(const std::string& t_name)
-	{
-		// TODO: insert return statement here
-	}
-
-	Datum& Attributed::createNestedScope(const std::string& t_name)
-	{
-		// TODO: insert return statement here
-	}
 }
 

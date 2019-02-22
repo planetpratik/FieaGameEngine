@@ -7,53 +7,88 @@
 
 namespace FieaGameEngine
 {
-	class Signature final
-	{
-	public:
-		std::string sig_name;
-		Datum::DatumType sig_type;
-		uint32_t sig_size;
-		size_t sig_offset;
-		Signature(const std::string& t_name, const Datum::DatumType& t_type, const uint32_t& t_size, const size_t& t_offset);
-	};
-
 	class Attributed : public Scope
 	{
 		RTTI_DECLARATIONS(Attributed, Scope);
 
 	public:
-		Attributed();
+
+		/// <summary>Copy Constructor for Attributed Class. Makes Deep copy of elements.</summary>
+		/// <param name="t_rhs">Const reference to passed Attribute.</param>
 		Attributed(const Attributed& t_rhs);
+
+		/// <summary>Move Constructor for Attributed Class. </summary>
+		/// <param name="t_rhs">R-Value reference to passed scope which is to be moved.</param>
 		Attributed(Attributed&& t_rhs);
+
+		/// <summary>Copy Assignment operator for Attributed Class. Makes Deep copy of elements.</summary>
+		/// <param name="t_rhs">Const reference to passed Attribute.</param>
+		/// <returns>Reference to current Attributed instance.</returns>
 		Attributed& operator=(const Attributed& t_rhs);
+
+		/// <summary>Move Assignment operator for Attributed Class.</summary>
+		/// <param name="t_rhs">R-Value reference to passed Attributed which is to be moved.</param>
+		/// <returns>Reference to current Attributed instance.</returns>
 		Attributed& operator=(Attributed&& t_rhs);
+
+		/// <summary>Clear method for Attributed Class - Clear contents of underlying Scope. ( Overrided )</summary>
 		void clear() override;
+
+		/// <summary>Destructor for Attributed Class.</summary>
 		virtual ~Attributed() = default;
+
+		/// <summary>Checks whether attribute with given name exists in the Scope or not.</summary>
+		/// <param name="t_name">Const reference to name ( std::string ) to be searched as an Attribute.</param>
+		/// <returns>Returns boolean result indicating whether given name exists as an attribute or not.</returns>
 		bool isAttribute(const std::string& t_name);
+
+		/// <summary>Checks whether Prescribed attribute with given name exists in the Scope or not.</summary>
+		/// <param name="t_name">Const reference to name ( std::string ) to be searched as a Prescribed Attribute.</param>
+		/// <returns>Returns boolean result indicating whether given name exists as a Prescribed attribute or not.</returns>
 		bool isPrescribedAttribute(const std::string& t_name);
+
+		/// <summary>Checks whether Auxillary attribute with given name exists in the Scope or not.</summary>
+		/// <param name="t_name">Const reference to name ( std::string ) to be searched as an Auxillary Attribute.</param>
+		/// <returns>Returns boolean result indicating whether given name exists as an Auxillary attribute or not.</returns>
 		bool isAuxillaryAttribute(const std::string& t_name);
+
+		/// <summary>Append Auxillary attribute to a Scope. If attribute with given name already exists, then return it.</summary>
+		/// <param name="t_name">Const reference to name of attribute ( std::string ) to be appended.</param>
+		/// <returns>Returns newly appended Auxillary Attribute else return the attribute if already exists.</returns>
 		Datum& appendAuxillaryAttribute(const std::string& t_name);
 
+		/// <summary>Append Auxillary attribute to a Scope. If attribute with given name already exists, then return it.</summary>
+		/// <param name="t_name">Const reference to name of attribute ( std::string ) to be appended.</param>
+		/// <param name="t_datum">Const reference to datum to be appended.</param>
+		/// <returns>Returns newly appended Auxillary Attribute else return the attribute if already exists.</returns>
+		Datum& appendAuxillaryAttribute(const std::string& t_name, const Datum& t_datum);
+
+		/// <summary>Append Auxillary attribute to a Scope. If attribute with given name already exists, then return it.</summary>
+		/// <param name="t_pair">Const reference to String-Datum pair</param>
+		/// <returns>Returns newly appended Auxillary Attribute else return the attribute if already exists.</returns>
+		Datum& appendAuxillaryAttribute(const std::pair<std::string, Datum>& t_pair);
+
+		/// <summary>Accessor method for Attributes in underlying scope.</summary>
+		/// <returns>Returns Const Vector of pointers of attributes string-datum pairs.</returns>
+		const Vector<std::pair<std::string, Datum>*> getAttributes() const;
+
+		/// <summary>Accessor method for Prescribed Atrributes in underlying scope.</summary>
+		/// <returns>Returns Const Vector of pointers of prescribed attributes string-datum pairs.</returns>
+		const Vector<std::pair<std::string, Datum>*> getPrescribedAttributes() const;
+
+		/// <summary>Accessor method for Auxillary Attributes in underlying scope.</summary>
+		/// <returns>Returns Const Vector of pointers of auxillary attributes string-datum pairs.</returns>
+		const Vector<std::pair<std::string, Datum>*> getAuxillaryAttributes() const;
+
 	protected:
-		explicit Attributed(uint32_t t_type_id);
-		void populate(uint32_t t_type_id);
-		const HashMap<std::string, Datum*> getPrescribedAttributes() const;
-		const HashMap<std::string, Datum*> getAuxillaryAttributes() const;
 
-		Datum& addInternalAttribute(const std::string& t_name, const int32_t& t_value, const uint32_t& t_size);
-		Datum& addInternalAttribute(const std::string& t_name, const float_t& t_value, const uint32_t& t_size);
-		Datum& addInternalAttribute(const std::string& t_name, const std::string& t_value, const uint32_t& t_size);
-		Datum& addInternalAttribute(const std::string& t_name, const glm::vec4& t_value, const uint32_t& t_size);
-		Datum& addInternalAttribute(const std::string& t_name, const glm::mat4x4& t_value, const uint32_t& t_size);
+		/// <summary>Explicit Constructor for Attributed Class.</summary>
+		/// <param name="t_type_id">Runtime TypeID of Type uint64_t</param>
+		explicit Attributed(uint64_t t_type_id);
 
-		Datum& addExternalAttribute(const std::string& t_name, int32_t* t_location, const uint32_t& t_size);
-		Datum& addExternalAttribute(const std::string& t_name, float_t* t_location, const uint32_t& t_size);
-		Datum& addExternalAttribute(const std::string& t_name, std::string* t_location, const uint32_t& t_size);
-		Datum& addExternalAttribute(const std::string& t_name, glm::vec4* t_location, const uint32_t& t_size);
-		Datum& addExternalAttribute(const std::string& t_name, glm::mat4x4* t_location, const uint32_t& t_size);
-
-		Datum& addNestedScope(const std::string& t_name);
-		Datum& createNestedScope(const std::string& t_name);
+		/// <summary>To Fetch data using TypeManager & populate scope using it.</summary>
+		/// <param name="t_type_id">Runtime TypeID of Type uint64_t</param>
+		void populate(uint64_t t_type_id);
 
 	};
 }

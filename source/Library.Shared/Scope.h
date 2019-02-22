@@ -36,7 +36,7 @@ namespace FieaGameEngine
 		/// <summary>Move Assignment Operator for Scope.</summary>
 		/// <param name="t_rhs">R-Value reference to passed Scope which is to be moved.</param>
 		/// <returns>Returns reference to current Scope.</returns>
-		//Scope& operator=(Scope&& t_rhs);
+		Scope& operator=(Scope&& t_rhs);
 
 		/// <summary>Recursively delete contents of this scope.</summary>
 		virtual void clear();
@@ -64,6 +64,12 @@ namespace FieaGameEngine
 		/// <param name="t_name">Const reference to a name of datum to be added of type STL std::string.</param>
 		/// <returns>Returns reference to a Datum in the scope which is stored with given name.</returns>
 		Datum& append(const std::string& t_name);
+
+		/// <summary>Adds datum of the given name to the Scope if doesn't exist. If already exists, reuses it.</summary>
+		/// <param name="t_name">Const reference to a name of datum to be added of type STL std::string.</param>
+		/// <param name="t_datum">Const reference to a datum to be appended.</param>
+		/// <returns>Returns reference to a Datum in the scope which is stored with given name.</returns>
+		Datum & append(const std::string & t_name, const Datum & t_datum);
 
 		/// <summary>Special case of append() - Add scope to the datum stored with the given name.</summary>
 		/// <param name="t_name">Const reference to a passed name of Type STL std::string for a datum which is to be added.</param>
@@ -124,7 +130,9 @@ namespace FieaGameEngine
 		/// <returns>Returns name of the Datum if found. Returns empty STL std::string otherwise.</returns>
 		std::string findName(const Scope& t_child) const;
 
-
+		/// <summary>Finds the datum in which given Scope resides.</summary>
+		/// <param name="t_child">Const reference to the Scope which is to be searched.</param>
+		/// <returns>Returns std::pair of Datum* - Unsigned Int containing pointer to datum & index.</returns>
 		std::pair<Datum*, uint32_t> findNestedScope(const Scope& t_child) const;
 
 		/// <summary>Compares whether given RTTI is Scope or not. ( Overriden from RTTI Interface ).</summary>
@@ -136,9 +144,25 @@ namespace FieaGameEngine
 		/// <returns>Returns name of the class as Type STL std::string</returns>
 		virtual std::string ToString() const;
 
+		/// <summary>To check whether given scope is an ancestor of passed scope or not.</summary>
+		/// <param name="t_scope">Const reference to passed scope which is to be checked for ancestor test.</param>
+		/// <returns>Returns boolean result indicating whether given scope is an ancestor or not.</returns>
 		bool isAncestorOf(const Scope& t_scope) const;
 
+		/// <summary>To check whether given scope is an descendent of passed scope or not.</summary>
+		/// <param name="t_scope">Const reference to passed scope which is to be checked for descendent ( child ) test.</param>
+		/// <returns>Returns boolean result indicating whether given scope is a descendent or not.</returns>
 		bool isDescendentOf(const Scope& t_scope) const;
+
+		/// <summary>Gets size of Scope.</summary>
+		/// <returns>Returns total no. of elements in Lookup Table Pointer List.</returns>
+		size_t size();
+
+	protected:
+
+		/// <summary>Gets Pointers list from the Lookup Table.</summary>
+		/// <returns>Returns Vector of Const pointer to string-datum pairs in Lookup Table.</returns>
+		const Vector<std::pair<std::string, Datum>*> getTableEntryPointers() const;
 
 	private:
 
@@ -146,7 +170,6 @@ namespace FieaGameEngine
 		void fixParentPointer(Scope&& t_rhs);
 		void makeChildOrphan();
 		
-
 		static const uint32_t DEFAULT_SIZE = 15;
 		Scope* m_parent = nullptr;
 		LookupTable m_lookup_table;
