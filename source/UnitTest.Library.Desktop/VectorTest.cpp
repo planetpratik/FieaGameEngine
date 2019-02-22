@@ -596,6 +596,50 @@ namespace UnitTestLibraryDesktop
 			auto expression = [&] {Foo e = *it; };
 			Assert::ExpectException<std::exception>(expression);
 		}
+
+		TEST_METHOD(VectorTestResize)
+		{
+			Vector<Foo> vector_of_foos(5);
+			Foo a(10);
+			Foo b(20);
+			Foo c(30);
+			vector_of_foos.pushBack(a);
+			vector_of_foos.pushBack(b);
+			vector_of_foos.pushBack(c);
+			Assert::AreEqual(3U, vector_of_foos.size());
+			vector_of_foos.resize(2);
+			Assert::AreEqual(2U, vector_of_foos.size());
+			Assert::AreEqual(a, vector_of_foos[0]);
+			Assert::AreEqual(b, vector_of_foos[1]);
+		}
+
+		TEST_METHOD(VectorTestComparisonOperator)
+		{
+			Bar a(10);
+			Bar b(20);
+			Bar c(30);
+			Vector<Bar> vector_of_bar(3);
+			vector_of_bar.pushBack(a);
+			vector_of_bar.pushBack(b);
+			vector_of_bar.pushBack(c);
+			Vector<Bar> another_vector_of_bar(2);
+			another_vector_of_bar.pushBack(a);
+			another_vector_of_bar.pushBack(b);
+			Assert::IsFalse(vector_of_bar == another_vector_of_bar);
+			Vector<Bar> vector_of_bar_two(3);
+			vector_of_bar_two.pushBack(a);
+			vector_of_bar_two.pushBack(b);
+			vector_of_bar_two.pushBack(b);
+			Assert::IsFalse(vector_of_bar == vector_of_bar_two);
+			Vector<Bar> vector_of_bar_three(3);
+			vector_of_bar_three.pushBack(a);
+			vector_of_bar_three.pushBack(b);
+			vector_of_bar_three.pushBack(c);
+			Assert::IsTrue(vector_of_bar == vector_of_bar_three);
+
+			Assert::IsTrue(vector_of_bar != vector_of_bar_two);
+		}
+
 #pragma endregion
 
 	private:

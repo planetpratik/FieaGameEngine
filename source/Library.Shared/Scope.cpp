@@ -20,7 +20,7 @@ namespace FieaGameEngine
 		m_parent(t_rhs.m_parent), m_lookup_table(std::move(t_rhs.m_lookup_table)), m_pointers_list(std::move(t_rhs.m_pointers_list))
 	{
 		fixParentPointer(std::move(t_rhs));
-		//t_rhs.m_parent = nullptr;
+		t_rhs.m_parent = nullptr;
 	}
 
 	Scope& Scope::operator=(const Scope& t_rhs)
@@ -42,7 +42,7 @@ namespace FieaGameEngine
 			m_parent = t_rhs.m_parent;
 			m_lookup_table = std::move(t_rhs.m_lookup_table);
 			m_pointers_list = std::move(t_rhs.m_pointers_list);
-			//fixParentPointer(t_rhs);
+			fixParentPointer(std::move(t_rhs));
 			t_rhs.m_parent = nullptr;
 		}
 		return *this;
@@ -61,7 +61,6 @@ namespace FieaGameEngine
 				}
 			}
 		}
-
 		m_lookup_table.clear();
 		m_pointers_list.clear();
 	}
@@ -368,10 +367,6 @@ namespace FieaGameEngine
 
 	bool Scope::Equals(const RTTI* t_rhs) const
 	{
-		if (t_rhs == nullptr)
-		{
-			return false;
-		}
 		Scope* scope = t_rhs->As<Scope>();
 		if (scope != nullptr)
 		{

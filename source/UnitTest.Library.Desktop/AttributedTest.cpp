@@ -357,6 +357,10 @@ namespace UnitTestLibraryDesktop
 			Assert::AreEqual("MyInteger"s, auxillary_attributes[0]->first);
 			Assert::AreEqual("MyFloat"s, auxillary_attributes[1]->first);
 		}
+		
+		TEST_METHOD(TypeManagerTestRemoveID)
+		{
+		}
 
 	private:
 		static _CrtMemState s_start_mem_state;

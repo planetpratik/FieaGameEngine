@@ -6,6 +6,17 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace FieaGameEngine;
 using namespace std::string_literals;
 
+namespace Microsoft::VisualStudio::CppUnitTestFramework
+{
+	template<>
+	std::wstring ToString<Datum>(const Datum& t_temp)
+	{
+		RETURN_WIDE_STRING(&t_temp);
+	}
+}
+
+
+
 namespace UnitTestLibraryDesktop
 {
 	TEST_CLASS(ScopeTest)
@@ -62,9 +73,6 @@ namespace UnitTestLibraryDesktop
 			Scope& inventory = zork.appendScope("inventory");
 			Datum& key = inventory.append("key");
 			key = 5549;
-			/*Scope& food = inventory.appendScope("food");
-			Datum& almonds = food.append("almonds");
-			almonds = 43;*/
 
 			Scope another_zork;
 			Datum& another_rooms = another_zork.append("rooms");
@@ -96,6 +104,23 @@ namespace UnitTestLibraryDesktop
 			Assert::IsNull(another_zork.getParent());
 		}
 
+		TEST_METHOD(ScopeMoveAssignmentOperator)
+		{
+			Scope zork;
+			Datum& rooms = zork.append("rooms");
+			rooms = 10;
+			Scope& inventory = zork.appendScope("inventory");
+			Datum& key = inventory.append("key");
+			key = 5549;
+			Scope& food = inventory.appendScope("food");
+			Datum& almonds = food.append("almonds");
+			almonds = 43;
+
+			Scope another_zork;
+			another_zork = std::move(zork);
+			Assert::IsNull(another_zork.getParent());
+		}
+
 		TEST_METHOD(ScopeFind)
 		{
 			Scope zork;
@@ -122,12 +147,16 @@ namespace UnitTestLibraryDesktop
 			Datum& rooms = zork.append("rooms");
 			Scope& inventory = zork.appendScope("inventory");
 			Scope& food = inventory.appendScope("food");
+			Scope& drinks = food.appendScope("Scotch");
 
 			Scope* out_param;
 			Assert::IsTrue(&rooms == zork.search("rooms", &out_param));
 			Assert::IsTrue(&zork == out_param);
 			Datum* datum = zork.search("monkey", &out_param);
 			Assert::IsNull(datum);
+
+			drinks.search("food"s, &out_param);
+			Assert::IsTrue(&inventory == out_param);
 		}
 
 		TEST_METHOD(ScopeIndexOperator)
@@ -147,6 +176,26 @@ namespace UnitTestLibraryDesktop
 			Assert::IsTrue(health_datum->get<float_t>() == 17.2f);
 			auto expression = [&] {Datum& temp = zork[3]; };
 			Assert::ExpectException<std::exception>(expression);
+		}
+
+		TEST_METHOD(ScopeAtMethod)
+		{
+			Scope zork;
+			Scope& inventory = zork.appendScope("inventory");
+			inventory.append("medicine");
+			inventory.append("food");
+			Scope& Weapon = inventory.appendScope("weapon");
+			Scope& handgun = Weapon.appendScope("handgun");
+			handgun.append("Glock");
+			Datum& shorty = handgun.append("Shorty-12G");
+			Datum& datum = handgun.at("Shorty-12G");
+			auto expression = [&] {Datum& temp = handgun.at("AK47"); };
+			Assert::ExpectException<std::exception>(expression);
+			Assert::AreEqual(shorty, datum);
+
+			const Scope const_handgun = handgun;
+			auto expression_two = [&] {const Datum& const_datum = const_handgun.at("AK47");};
+			Assert::ExpectException<std::exception>(expression_two);
 		}
 
 		TEST_METHOD(ScopeIndexOperatorConst)
@@ -182,6 +231,9 @@ namespace UnitTestLibraryDesktop
 			food = "almonds";
 			Assert::IsTrue(zork.append("rooms") == rooms);
 			Assert::IsTrue(zork.append("food") == food);
+
+			auto expression_two = [&] {zork.append("", Datum()); };
+			Assert::ExpectException<std::exception>(expression_two);
 		}
 
 		TEST_METHOD(ScopeAppendScope)
@@ -274,7 +326,23 @@ namespace UnitTestLibraryDesktop
 			Assert::ExpectException<std::exception>(expression);
 			auto expression_two = [&] {zork.adopt("inventory", inventory); };
 			Assert::ExpectException<std::exception>(expression_two);
+			Scope tools;
+			Datum& hammer_datum = tools.append("hammer");
+			Scope& nails = tools.appendScope("nails");
+			tools.adopt("inventory", inventory);
+			Assert::IsTrue(&tools == inventory.getParent());
 		}
+
+		TEST_METHOD(ScopeIsAncestorOf)
+		{
+			Scope zork;
+			Scope& inventory = zork.appendScope("inventory");
+			Scope& weapon = inventory.appendScope("weapon");
+			Scope& glock = weapon.appendScope("glock");
+			Assert::IsFalse(glock.isAncestorOf(inventory));
+			Assert::IsTrue(glock.isDescendentOf(inventory));
+		}
+
 
 	private:
 		static _CrtMemState s_start_mem_state;

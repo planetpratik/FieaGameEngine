@@ -62,9 +62,6 @@ namespace FieaGameEngine
 					case DatumType::POINTER:
 						set(t_rhs.m_data.d_RTTI_ptr[i], i);
 						break;
-					case DatumType::TABLE:
-						set(t_rhs.m_data.d_scope_ptr[i], i);
-						break;
 					default:
 						break;
 					}
@@ -137,7 +134,7 @@ namespace FieaGameEngine
 		return *this;
 	}
 
-	Datum & Datum::operator=(Scope * t_rhs)
+	Datum& Datum::operator=(Scope * t_rhs)
 	{
 		set(t_rhs);
 		return *this;
@@ -323,11 +320,6 @@ namespace FieaGameEngine
 			clear();
 		}
 		m_type = t_type;
-		if (m_type == DatumType::TABLE)
-		{
-			m_storage_type = DatumStorageType::INTERNAL;
-			m_is_external = false;
-		}
 		if (m_type != DatumType::TABLE)
 		{
 			m_storage_type = DatumStorageType::EXTERNAL;
@@ -376,8 +368,8 @@ namespace FieaGameEngine
 
 	void Datum::setStorage(void* t_storage, uint32_t t_size)
 	{
-		//setStorage(DatumType::TABLE, t_size);
 		m_storage_type = DatumStorageType::EXTERNAL;
+		m_is_external = true;
 		m_size = t_size;
 		m_capacity = t_size;
 		m_data.d_void_ptr = t_storage;
@@ -463,12 +455,6 @@ namespace FieaGameEngine
 		return ((m_type == DatumType::POINTER) && (m_size > 0) && ((**m_data.d_RTTI_ptr).Equals(t_rhs)));
 	}
 
-	bool Datum::operator==(const Scope* /*t_rhs*/) const
-	{
-		/*return ((m_type == DatumType::TABLE) && (m_size > 0) && ((**m_data.d_scope_ptr).Equals(t_rhs)));*/
-		return true;
-	}
-
 	bool Datum::operator!=(const Datum& t_rhs) const
 	{
 		return !(operator==(t_rhs));
@@ -500,11 +486,6 @@ namespace FieaGameEngine
 	}
 
 	bool Datum::operator!=(const RTTI* t_rhs) const
-	{
-		return !(operator==(t_rhs));
-	}
-
-	bool Datum::operator!=(const Scope* t_rhs) const
 	{
 		return !(operator==(t_rhs));
 	}
@@ -1529,7 +1510,7 @@ namespace FieaGameEngine
 		{
 			for (; index < m_size - 1; ++index)
 			{
-				m_data.d_RTTI_ptr[index] = m_data.d_RTTI_ptr[index + 1];
+				m_data.d_scope_ptr[index] = m_data.d_scope_ptr[index + 1];
 			}
 			--m_size;
 			success = true;

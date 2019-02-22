@@ -93,6 +93,11 @@ namespace UnitTestLibraryDesktop
 			Assert::AreEqual(Datum::DatumType::INTEGER, another_datum.type());
 			Assert::AreEqual(Datum::DatumStorageType::INTERNAL, another_datum.storageType());
 			Assert::IsFalse(another_datum.isExternal());
+
+			Datum scope_datum;
+			Scope* scope = new Scope();
+			scope_datum.set(scope);
+			delete scope;
 		}
 
 		TEST_METHOD(DatumTestMoveConstrutor)
@@ -922,7 +927,6 @@ namespace UnitTestLibraryDesktop
 				Assert::ExpectException<std::exception>(expression);
 				Foo a(10);
 				rtti_datum = &a;
-				//Assert::IsTrue(rtti_datum.get<RTTI*>()->Equals(reinterpret_cast<RTTI*>(&a)));
 				Assert::IsTrue(rtti_datum.front<RTTI*>()->Equals(reinterpret_cast<RTTI*>(&a)));
 			}
 		}
@@ -982,7 +986,6 @@ namespace UnitTestLibraryDesktop
 				Foo a(10);
 				temp_datum = &a;
 				const Datum another_rtti_datum = temp_datum;
-				//Assert::IsTrue(another_rtti_datum.get<RTTI*>()->Equals(reinterpret_cast<RTTI*>(&a)));
 				Assert::IsTrue(another_rtti_datum.front<RTTI*>()->Equals(reinterpret_cast<RTTI*>(&a)));
 			}
 		}
@@ -1264,6 +1267,29 @@ namespace UnitTestLibraryDesktop
 			Assert::IsTrue(&z == rtti_datum.get<RTTI*>(1));
 			Assert::AreEqual(2U, rtti_datum.size());
 			Assert::AreEqual(3U, rtti_datum.capacity());
+
+			Datum scope_datum;
+			scope_datum.setType(Datum::DatumType::TABLE);
+			Scope scope;
+			Datum temp_scope_datum;
+			auto expression_thirteen = [&] { temp_scope_datum.remove(scope); };
+			Assert::ExpectException<std::exception>(expression_thirteen);
+			Scope* scope2 = new Scope();
+			temp_scope_datum.setStorage(scope2, 1);
+			try
+			{
+				temp_scope_datum.remove(*scope2);
+			}
+			catch (std::exception e)
+			{
+				delete scope2;
+			}
+			Datum another_scope;
+			another_scope.setType(Datum::DatumType::TABLE);
+			Scope scope3;
+			scope3.append("Pratik"s);
+			Assert::AreEqual(1U, static_cast<uint32_t>(scope3.size()));
+			another_scope.remove(scope3);
 		}
 
 		TEST_METHOD(DatumTestRemoveAt)
