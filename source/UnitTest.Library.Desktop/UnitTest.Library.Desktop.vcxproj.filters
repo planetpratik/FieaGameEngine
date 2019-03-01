@@ -13,11 +13,17 @@
     <ClCompile Include="AttributedFoo.cpp" />
     <ClCompile Include="TestModuleInitialize.cpp" />
     <ClCompile Include="AttributedTest.cpp" />
+    <ClCompile Include="JsonCppTest.cpp" />
+    <ClCompile Include="JsonParseMasterTest.cpp" />
+    <ClCompile Include="JsonTestParseHelper.cpp" />
+    <ClCompile Include="JsonIntegerParseHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
     <ClInclude Include="Foo.h" />
     <ClInclude Include="Bar.h" />
     <ClInclude Include="AttributedFoo.h" />
+    <ClInclude Include="JsonTestParseHelper.h" />
+    <ClInclude Include="JsonIntegerParseHelper.h" />
   </ItemGroup>
 </Project>
