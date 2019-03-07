@@ -35,22 +35,31 @@ namespace UnitTestLibraryDesktop
 		is_initialized_called = true;
 		start_handler_count = 0;
 		end_handler_count = 0;
+		array_element_count = 0;
 	}
 
-	bool JsonTestParseHelper::startHandler(JsonParseMaster::SharedData& t_shared_data, const std::string& t_key, Json::Value& t_values)
+	bool JsonTestParseHelper::startHandler(JsonParseMaster::SharedData& t_shared_data, const std::string& t_key, const Json::Value& t_values, bool t_is_array_element, size_t t_index)
 	{
 		t_key;
 		t_values;
+		t_index;
 		JsonTestParseHelper::SharedData* shared_data = t_shared_data.As<JsonTestParseHelper::SharedData>();
 		if (shared_data == nullptr)
 		{
 			return false;
 		}
 		++start_handler_count;
+
+		if (t_is_array_element)
+		{
+			++array_element_count;
+		}
+
 		if (shared_data->depth() > shared_data->max_depth)
 		{
 			shared_data->max_depth = shared_data->depth();
 		}
+
 		return true;
 	}
 

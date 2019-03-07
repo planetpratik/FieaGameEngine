@@ -11,9 +11,9 @@ namespace FieaGameEngine
 
 #pragma region SharedData
 
-	void JsonParseMaster::SharedData::setJsonParseMaster(const JsonParseMaster& t_parse_master)
+	void JsonParseMaster::SharedData::setJsonParseMaster(JsonParseMaster& t_parse_master)
 	{
-		json_parse_master = const_cast<JsonParseMaster*>(&t_parse_master);
+		json_parse_master = &t_parse_master;
 	}
 
 	JsonParseMaster* JsonParseMaster::SharedData::getJsonParseMaster()
@@ -28,10 +28,13 @@ namespace FieaGameEngine
 
 	void FieaGameEngine::JsonParseMaster::SharedData::decrementDepth()
 	{
-		--depth_counter;
+		if (depth_counter > 0)
+		{
+			--depth_counter;
+		}
 	}
 
-	uint32_t FieaGameEngine::JsonParseMaster::SharedData::depth()
+	uint32_t FieaGameEngine::JsonParseMaster::SharedData::depth() const
 	{
 		return depth_counter;
 	}
@@ -44,6 +47,30 @@ namespace FieaGameEngine
 		m_shared_data(&t_data)
 	{
 		t_data.setJsonParseMaster(*this);
+	}
+
+	JsonParseMaster::JsonParseMaster(JsonParseMaster&& t_rhs) :
+		m_parse_helpers(std::move(t_rhs.m_parse_helpers)), m_shared_data(t_rhs.m_shared_data),
+		m_is_clone(t_rhs.m_is_clone), m_file_name(t_rhs.m_file_name)
+	{
+		m_shared_data->setJsonParseMaster(*this);
+		t_rhs.m_shared_data = nullptr;
+		t_rhs.m_is_clone = false;
+	}
+
+	JsonParseMaster& JsonParseMaster::operator=(JsonParseMaster&& t_rhs)
+	{
+		if (this != &t_rhs)
+		{
+			m_parse_helpers = std::move(t_rhs.m_parse_helpers);
+			m_shared_data = t_rhs.m_shared_data;
+			m_is_clone = t_rhs.m_is_clone;
+			m_file_name = std::move(t_rhs.m_file_name);
+			m_shared_data->setJsonParseMaster(*this);
+			t_rhs.m_shared_data = nullptr;
+			t_rhs.m_is_clone = false;
+		}
+		return *this;
 	}
 
 	JsonParseMaster::~JsonParseMaster()
@@ -60,12 +87,7 @@ namespace FieaGameEngine
 
 	gsl::owner<JsonParseMaster*> JsonParseMaster::clone()
 	{
-		gsl::owner<JsonParseMaster*> clone = new JsonParseMaster();
-		if (m_shared_data)
-		{
-			const auto& shared_data = m_shared_data->create();
-			clone->m_shared_data = shared_data;
-		}
+		gsl::owner<JsonParseMaster*> clone = new JsonParseMaster(*m_shared_data->create());
 		for (auto& helper : m_parse_helpers)
 		{
 			clone->m_parse_helpers.pushBack(helper->create());
@@ -80,45 +102,53 @@ namespace FieaGameEngine
 		{
 			throw std::exception("Invalid Operation! Cannot add helper to clone");
 		}
+		auto it = std::find_if(m_parse_helpers.begin(), m_parse_helpers.end(), [&t_parse_helper](const IJsonParseHelper* h)
+		{
+			return (&t_parse_helper == h) || (t_parse_helper.TypeIdInstance() == h->TypeIdInstance());
+		});
+		if (it != m_parse_helpers.end())
+		{
+			throw std::exception("Invalid Operation! This helper or one of the same type has already been added to JsonParseMaster");
+		}
 		m_parse_helpers.pushBack(&t_parse_helper);
 	}
 
-	bool JsonParseMaster::removeHelper(IJsonParseHelper & t_helper_to_remove)
+	bool JsonParseMaster::removeHelper(IJsonParseHelper& t_helper_to_remove)
 	{
-		auto itr = m_parse_helpers.find(&t_helper_to_remove);
-		return m_parse_helpers.remove(itr);
+		bool result = false;
+		result = m_parse_helpers.remove(&t_helper_to_remove);
+		if (m_is_clone)
+		{
+			delete &t_helper_to_remove;
+		}
+		return result;
 	}
 
 	void JsonParseMaster::parse(const std::string& t_json_string)
 	{
-		Json::Value root;
 		std::stringstream string_stream;
 		string_stream << t_json_string;
-		string_stream >> root;
-
-		parseMembers("", root);
+		parse(string_stream);
 	}
 
-	void JsonParseMaster::parse(std::stringstream& t_json_input_stream)
+	void JsonParseMaster::parse(std::istream& t_json_input_stream)
 	{
 		Json::Value root;
 		t_json_input_stream >> root;
-
-		parseMembers("", root);
+		m_shared_data->incrementDepth();
+		parseValue(root);
+		m_shared_data->decrementDepth();
 	}
 
 	void JsonParseMaster::parseFromFile(const std::string& t_file_name)
 	{
-		std::ifstream json_file("Content/" + t_file_name);
-		
+		std::ifstream json_file(t_file_name);
 		if (json_file.bad())
 		{
 			throw std::exception("Invalid Operation! Unable to open file.");
 		}
-		std::stringstream stream;
-		stream << json_file.rdbuf();
 		m_file_name = t_file_name;
-		parse(stream);
+		parse(json_file);
 	}
 
 	const std::string& JsonParseMaster::getFileName() const
@@ -129,6 +159,16 @@ namespace FieaGameEngine
 	JsonParseMaster::SharedData* JsonParseMaster::getSharedData() const
 	{
 		return m_shared_data;
+	}
+
+	void JsonParseMaster::setSharedData(SharedData& t_shared_data)
+	{
+		if (m_is_clone)
+		{
+			throw std::exception("Invalid Operation! Cannot change Shared Data on Cloned JsonParseMaster.");
+		}
+		m_shared_data = &t_shared_data;
+		m_shared_data->setJsonParseMaster(*this);
 	}
 
 	void JsonParseMaster::initialize()
@@ -151,45 +191,51 @@ namespace FieaGameEngine
 		return m_parse_helpers;
 	}
 
-	IJsonParseHelper* JsonParseMaster::parseMembers(const std::string& t_key, Json::Value& t_json_value)
+	void JsonParseMaster::parseValue(const Json::Value& t_value)
 	{
-		if (t_json_value.isObject() || t_json_value.isArray())
+		const std::vector<std::string> keys = t_value.getMemberNames();
+		for (const std::string& key : keys)
 		{
-			IJsonParseHelper* temp = nullptr;
-			if (t_key != "")
+			parseKeyValuePair(key, t_value[key]);
+		}
+	}
+
+	void JsonParseMaster::parseKeyValuePair(const std::string& t_key, const Json::Value& t_value, bool t_is_array_element, std::size_t t_index)
+	{
+		if (t_value.isObject())
+		{
+			m_shared_data->incrementDepth();
+			for (IJsonParseHelper* helper : m_parse_helpers)
 			{
-				m_shared_data->incrementDepth();
-				for (auto& helper : m_parse_helpers)
+				if (helper->startHandler(*m_shared_data, t_key, t_value, t_is_array_element, t_index))
 				{
-					if (helper->startHandler(*m_shared_data, t_key, t_json_value))
-					{
-						temp = helper;
-						break;
-					}
+					parseValue(t_value);
+					helper->endHandler(*m_shared_data, t_key);
+					break;
 				}
 			}
-			for (auto& member_name : t_json_value.getMemberNames())
+			m_shared_data->decrementDepth();
+		}
+		else if (t_value.isArray())
+		{
+			size_t i = 0;
+			for (const auto& element : t_value)
 			{
-				temp = parseMembers(member_name, t_json_value[member_name]);
-			}
-			if (temp != nullptr)
-			{
-				temp->endHandler(*m_shared_data, t_key);
-				m_shared_data->decrementDepth();
+				parseKeyValuePair(t_key, element, true, i);
+				++i;
 			}
 		}
 		else
 		{
-			for (auto& helper : m_parse_helpers)
+			for (IJsonParseHelper* helper : m_parse_helpers)
 			{
-				if (helper->startHandler(*m_shared_data, t_key, t_json_value))
+				if (helper->startHandler(*m_shared_data, t_key, t_value, t_is_array_element, t_index))
 				{
 					helper->endHandler(*m_shared_data, t_key);
-					return helper;
+					break;
 				}
 			}
 		}
-		return nullptr;
 	}
 #pragma endregion	
 }

@@ -41,8 +41,10 @@ namespace FieaGameEngine
 		/// <param name="t_shared_data">Passed Shared Data Reference</param>
 		/// <param name="t_key">Const reference to key of type STL std::string.</param>
 		/// <param name="t_values">Json Value associated with the given key.</param>
+		/// <param name="t_is_array_element">Boolean value indicating whether given value is an array element or not.</param>
+		/// <param name="t_index">Index of an array</param>
 		/// <returns>Returns boolean value indicating whether given helper can handle the request or not.</returns>
-		virtual bool startHandler(JsonParseMaster::SharedData& t_shared_data, const std::string& t_key, Json::Value& t_values) = 0;
+		virtual bool startHandler(JsonParseMaster::SharedData& t_shared_data, const std::string& t_key, const Json::Value& t_values, bool t_is_array_element, size_t t_index) = 0;
 		
 		/// <summary>Attempts to complete handling of given key-value pair.</summary>
 		/// <param name="t_shared_data">Passed Shared Data Reference</param>

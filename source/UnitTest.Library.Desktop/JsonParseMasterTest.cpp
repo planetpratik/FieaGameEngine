@@ -79,6 +79,36 @@ namespace UnitTestLibraryDesktop
 			Assert::AreEqual(&shared_data, parse_master.getSharedData()->As<JsonTestParseHelper::SharedData>());
 		}
 
+		TEST_METHOD(JsonParseMasterTestMoveSemantics)
+		{
+			JsonTestParseHelper::SharedData shared_data;
+			JsonTestParseHelper parse_helper;
+			{
+				JsonParseMaster parse_master(shared_data);
+				parse_master.addHelper(parse_helper);
+				// Move Constructor Test
+				JsonParseMaster another_parse_master(std::move(parse_master));
+				Assert::IsFalse(another_parse_master.isClone());
+				Assert::AreEqual(1U, another_parse_master.getHelpers().size());
+				Assert::AreEqual(&shared_data, another_parse_master.getSharedData()->As<JsonTestParseHelper::SharedData>());
+				Assert::AreEqual(&another_parse_master, shared_data.getJsonParseMaster());
+			}
+			{
+				JsonParseMaster parse_master(shared_data);
+				parse_master.addHelper(parse_helper);
+				parse_master.initialize();
+				// Move Assignment operator Test
+				JsonTestParseHelper::SharedData another_shared_data;
+				JsonParseMaster another_parse_master(another_shared_data);
+				another_parse_master = std::move(parse_master);
+				Assert::IsFalse(another_parse_master.isClone());
+				Assert::AreEqual(1U, another_parse_master.getHelpers().size());
+				Assert::AreEqual(&shared_data, another_parse_master.getSharedData()->As<JsonTestParseHelper::SharedData>());
+				Assert::AreEqual(&another_parse_master, shared_data.getJsonParseMaster());
+
+			}
+		}
+
 		TEST_METHOD(JsonParseMasterTestClone)
 		{
 			JsonTestParseHelper::SharedData shared_data;
@@ -150,7 +180,7 @@ namespace UnitTestLibraryDesktop
 			Assert::AreEqual(3U, parse_helper.start_handler_count);
 			Assert::AreEqual(3U, parse_helper.end_handler_count);
 			Assert::AreEqual(0U, shared_data.depth());
-			Assert::AreEqual(1U, shared_data.max_depth);
+			Assert::AreEqual(2U, shared_data.max_depth);
 		}
 
 		TEST_METHOD(JsonParseMasterTestParseStream)
@@ -169,12 +199,12 @@ namespace UnitTestLibraryDesktop
 			Assert::AreEqual(3U, parse_helper.start_handler_count);
 			Assert::AreEqual(3U, parse_helper.end_handler_count);
 			Assert::AreEqual(0U, shared_data.depth());
-			Assert::AreEqual(1U, shared_data.max_depth);
+			Assert::AreEqual(2U, shared_data.max_depth);
 		}
 
 		TEST_METHOD(JsonParseMasterTestParseFile)
 		{
-			const std::string file_name = "TestData.json";
+			const std::string file_name = "Content\\TestData.json";
 			const std::string input_string = R"({ "integer": { "name": "Health", "value": 100 } })";
 			std::ifstream json_file(file_name);
 			Assert::IsFalse(json_file.bad());
@@ -185,11 +215,11 @@ namespace UnitTestLibraryDesktop
 			parse_master.addHelper(parse_helper);
 			parse_master.initialize();
 			parse_master.parseFromFile(file_name);
-			Assert::AreEqual("TestData.json"s, parse_master.getFileName());
+			Assert::AreEqual("Content\\TestData.json"s, parse_master.getFileName());
 			Assert::AreEqual(3U, parse_helper.start_handler_count);
 			Assert::AreEqual(3U, parse_helper.end_handler_count);
 			Assert::AreEqual(0U, shared_data.depth());
-			Assert::AreEqual(1U, shared_data.max_depth);
+			Assert::AreEqual(2U, shared_data.max_depth);
 		}
 
 		TEST_METHOD(JsonParseMasterTestSimpleIntegerParsing)
@@ -201,7 +231,23 @@ namespace UnitTestLibraryDesktop
 			parse_master.addHelper(parse_helper);
 			parse_master.initialize();
 			parse_master.parse(input);
-			Assert::AreEqual(100, shared_data.int_value);
+			Assert::AreEqual(100, shared_data.data[0]);
+		}
+
+		TEST_METHOD(JsonParseMasterTestIntegerArrayParsing)
+		{
+			std::string input = R"({ "integer": [ 10, 20, 30, 40 ] })";
+			JsonIntegerParseHelper::SharedData shared_data;
+			JsonIntegerParseHelper parse_helper;
+			JsonParseMaster parse_master(shared_data);
+			parse_master.addHelper(parse_helper);
+			parse_master.initialize();
+			parse_master.parse(input);
+			Assert::AreEqual(4U, shared_data.data.size());
+			Assert::AreEqual(10, shared_data.data[0]);
+			Assert::AreEqual(20, shared_data.data[1]);
+			Assert::AreEqual(30, shared_data.data[2]);
+			Assert::AreEqual(40, shared_data.data[3]);
 		}
 
 		TEST_METHOD(JsonParseMasterTestAddHelper)

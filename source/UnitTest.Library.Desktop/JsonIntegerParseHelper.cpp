@@ -12,6 +12,7 @@ namespace UnitTestLibraryDesktop
 	void JsonIntegerParseHelper::SharedData::initialize()
 	{
 		max_depth = 0;
+		data.clear();
 	}
 
 	gsl::owner<JsonIntegerParseHelper::SharedData*> JsonIntegerParseHelper::SharedData::create() const
@@ -35,40 +36,45 @@ namespace UnitTestLibraryDesktop
 		is_initialized_called = true;
 		start_handler_count = 0;
 		end_handler_count = 0;
+		array_element_count = 0;
 	}
 
-	bool JsonIntegerParseHelper::startHandler(JsonParseMaster::SharedData& t_shared_data, const std::string& t_key, Json::Value& t_values)
+	bool JsonIntegerParseHelper::startHandler(JsonParseMaster::SharedData& t_shared_data, const std::string& t_key, const Json::Value& t_values, bool t_is_array_element, size_t t_index)
 	{
+		t_is_array_element;
+		t_index;
 		JsonIntegerParseHelper::SharedData* shared_data = t_shared_data.As<JsonIntegerParseHelper::SharedData>();
+		
 		if (shared_data == nullptr)
 		{
 			return false;
 		}
-		if (t_key == "integer")
+
+		if (t_key != integerElementName)
 		{
-			++start_handler_count;
-			Json::Value value = t_values;
-			Json::ValueType value_type = value.type();
-			if (value_type == Json::ValueType::intValue)
-			{
-				shared_data->int_value = value.asInt();
-				return true;
-			}
 			return false;
 		}
-		return false;
+
+		if (m_parsing_data)
+		{
+			throw std::exception("Invalid Operation! Received another start element while parsing an integer.");
+		}
+		
+		m_parsing_data = true;
+		shared_data->data.pushBack(t_values.asInt());
+		return true;
 	}
 
 
 	bool JsonIntegerParseHelper::endHandler(JsonParseMaster::SharedData& t_shared_data, const std::string& t_key)
 	{
-		t_key;
 		JsonIntegerParseHelper::SharedData* shared_data = t_shared_data.As<JsonIntegerParseHelper::SharedData>();
-		if (shared_data == nullptr)
+		if (nullptr == shared_data || t_key != integerElementName || false == m_parsing_data)
 		{
 			return false;
 		}
 		++end_handler_count;
+		m_parsing_data = false;
 		return true;
 	}
 

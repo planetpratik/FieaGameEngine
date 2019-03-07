@@ -42,7 +42,7 @@ namespace FieaGameEngine
 
 			/// <summary>To get current nesting depth.</summary>
 			/// <returns>Returns current nesting depth in Unsigned Integer (32-bit)</returns>
-			uint32_t depth();
+			uint32_t depth() const;
 
 			/// <summary>Initialize SharedData ( Pure Virtual Function ).</summary>
 			virtual void initialize() = 0;
@@ -51,36 +51,34 @@ namespace FieaGameEngine
 			/// <returns>Returns Non-Null pointer to SharedData ( new instance ).</returns>
 			virtual gsl::owner<SharedData*> create() const = 0;
 			
+		protected:
+			uint32_t depth_counter = 0;
 		private:
 			JsonParseMaster* json_parse_master = nullptr;
-			uint32_t depth_counter = 0;
-			void setJsonParseMaster(const JsonParseMaster& t_parse_master);
+			void setJsonParseMaster(JsonParseMaster& t_parse_master);
 		};
-
-		/// <summary>Constructor for JsonParseMaster (Default).</summary>
-		JsonParseMaster() = default;
 
 		/// <summary>Given a reference to SharedData object, Initialize JsonParseMaster.</summary>
 		/// <param name="t_data">Reference to passed SharedData.</param>
-		JsonParseMaster(SharedData& t_data);
+		explicit JsonParseMaster(SharedData& t_data);
 
-		/// <summary>Copy Constructor for JsonParseMaster (Default).</summary>
+		/// <summary>Copy Constructor for JsonParseMaster (Deleted).</summary>
 		/// <param name="t_rhs">Const reference to passed JsonParseMaster.</param>
-		JsonParseMaster(const JsonParseMaster& t_rhs) = default;
+		JsonParseMaster(const JsonParseMaster& t_rhs) = delete;
 
-		/// <summary>Move constructor for JsonParseMaster (Default).</summary>
+		/// <summary>Move constructor for JsonParseMaster.</summary>
 		/// <param name="t_rhs">R-Value reference to a passed JsonParseMaster which is to be moved.</param>
-		JsonParseMaster(JsonParseMaster&& t_rhs) = default;
+		JsonParseMaster(JsonParseMaster&& t_rhs);
 
-		/// <summary>Copy Assignment operator for JsonParseMaster (Default).</summary>
+		/// <summary>Copy Assignment operator for JsonParseMaster (Deleted).</summary>
 		/// <param name="t_rhs">Const reference to passed JsonParseMaster.</param>
 		/// <returns>Reference to current JsonParseMaster.</returns>
-		JsonParseMaster& operator=(const JsonParseMaster& t_rhs) = default;
+		JsonParseMaster& operator=(const JsonParseMaster& t_rhs) = delete;
 
-		/// <summary>Move Assignmenht operator for JsonParseMaster (Default).</summary>
+		/// <summary>Move Assignmenht operator for JsonParseMaster.</summary>
 		/// <param name="t_rhs">R-Value reference to a passed JsonParseMaster which is to be moved.</param>
 		/// <returns>Reference to current JsonParseMaster.</returns>
-		JsonParseMaster& operator=(JsonParseMaster&& t_rhs) = default;
+		JsonParseMaster& operator=(JsonParseMaster&& t_rhs);
 
 		/// <summary>Destructor for JsonParseMaster.</summary>
 		~JsonParseMaster();
@@ -103,8 +101,8 @@ namespace FieaGameEngine
 		void parse(const std::string& t_json_string);
 
 		/// <summary>Parse a given input-stream of JSON data.</summary>
-		/// <param name="t_json_input_stream">StringStream reference representing JSON data.</param>
-		void parse(std::stringstream& t_json_input_stream);
+		/// <param name="t_json_input_stream">istream reference representing JSON data.</param>
+		void parse(std::istream& t_json_input_stream);
 
 		/// <summary>Given a filename, Read the file and parse JSON data.</summary>
 		/// <param name="t_file_name">Const reference to a STL std::string indicating a name of file from which JSON data is to be parsed.</param>
@@ -117,6 +115,10 @@ namespace FieaGameEngine
 		/// <summary>Gets SharedData associated with this object.</summary>
 		/// <returns>Returns address of a SharedData associated with this object.<returns>
 		SharedData* getSharedData() const;
+
+		/// <summary>Sets SharedData associated to this object.</summary>
+		/// <param name="t_shared_data">Passed Shared Data reference.</param>
+		void setSharedData(SharedData& t_shared_data);
 
 		/// <summary>Initialize JsonParseMaster. Initializes SharedData as well as helpers.</summary>
 		void initialize();
@@ -134,7 +136,8 @@ namespace FieaGameEngine
 		Vector<IJsonParseHelper*> m_parse_helpers;
 		std::string m_file_name;
 
-		IJsonParseHelper* parseMembers(const std::string& t_key, Json::Value& t_json_value);
+		void parseValue(const Json::Value& t_value);
+		void parseKeyValuePair(const std::string& t_key, const Json::Value& t_value, bool t_is_array_element = false, std::size_t t_index = 0);
 	};
 
 }
