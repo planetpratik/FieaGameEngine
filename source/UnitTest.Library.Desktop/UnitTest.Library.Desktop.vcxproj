@@ -199,6 +199,7 @@ xcopy /E /Y "$(ProjectDir)Content" "$(OutDir)Content"</Command>
     <ClCompile Include="JsonCppTest.cpp" />
     <ClCompile Include="JsonIntegerParseHelper.cpp" />
     <ClCompile Include="JsonParseMasterTest.cpp" />
+    <ClCompile Include="JsonTableParseHelperTest.cpp" />
     <ClCompile Include="JsonTestParseHelper.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

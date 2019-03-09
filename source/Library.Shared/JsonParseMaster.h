@@ -137,7 +137,7 @@ namespace FieaGameEngine
 		std::string m_file_name;
 
 		void parseValue(const Json::Value& t_value);
-		void parseKeyValuePair(const std::string& t_key, const Json::Value& t_value, bool t_is_array_element = false, std::size_t t_index = 0);
+		void parseKeyValuePair(const std::string& t_key, const Json::Value& t_value, bool t_is_array_element = false, uint32_t t_index = 0, uint32_t t_array_size = 0);
 	};
 
 }

@@ -7,20 +7,30 @@ namespace FieaGameEngine
 	RTTI_DEFINITIONS(JsonTableParseHelper::SharedData)
 
 #pragma region SharedData
-	
-	JsonTableParseHelper::SharedData::SharedData(Scope& t_scope) :
-		shared_data(&t_scope)
+
+		JsonTableParseHelper::SharedData::SharedData(Scope& t_scope) :
+		shared_scope(&t_scope)
 	{
+	}
+
+	void JsonTableParseHelper::SharedData::initialize()
+	{
+	}
+
+	gsl::owner<JsonTableParseHelper::SharedData*> JsonTableParseHelper::SharedData::create() const
+	{
+		Scope* scope = new Scope();
+		return new SharedData(*scope);
 	}
 
 	Scope* JsonTableParseHelper::SharedData::getSharedData()
 	{
-		return shared_data;
+		return shared_scope;
 	}
 
 	void JsonTableParseHelper::SharedData::setSharedData(Scope& t_rhs)
 	{
-		shared_data = &t_rhs;
+		shared_scope = &t_rhs;
 	}
 
 #pragma endregion
@@ -29,28 +39,122 @@ namespace FieaGameEngine
 
 	void JsonTableParseHelper::initialize()
 	{
+		IJsonParseHelper::initialize();
+		while (key_stack.size() > 0)
+		{
+			key_stack.pop();
+		}
 	}
 
-	bool JsonTableParseHelper::startHandler(JsonParseMaster::SharedData & t_shared_data, const std::string & t_key, Json::Value & t_values)
+	bool JsonTableParseHelper::startHandler(JsonParseMaster::SharedData& t_shared_data, const std::string& t_key, const Json::Value& t_values, bool t_is_array_element, uint32_t t_index, uint32_t t_array_size)
 	{
-		t_shared_data;
-		t_key;
-		t_values;
-		return false;
+		t_array_size;
+		JsonTableParseHelper::SharedData* shared_data = t_shared_data.As<JsonTableParseHelper::SharedData>();
+		if (shared_data == nullptr)
+		{
+			return false;
+		}
+
+		if (t_values.isObject())
+		{
+			element.key = t_key;
+			key_stack.push(t_key);
+			return true;
+		}
+
+		if (t_key == "Type")
+		{
+			element.type = t_values.asString();
+			if (element.type == "table")
+			{
+				shared_data->shared_scope = &shared_data->shared_scope->appendScope(element.key);
+				return true;
+			}
+			Datum& datum = shared_data->shared_scope->append(element.key);
+			if (element.type == "integer")
+			{
+				datum.setType(Datum::DatumType::INTEGER);
+			}
+			else if (element.type == "float")
+			{
+				datum.setType(Datum::DatumType::FLOAT);
+			}
+			else if (element.type == "Vector4")
+			{
+				datum.setType(Datum::DatumType::VECTOR4);
+			}
+			else if (element.type == "Matrix4x4")
+			{
+				datum.setType(Datum::DatumType::MATRIX4X4);
+			}
+			else if (element.type == "string")
+			{
+				datum.setType(Datum::DatumType::STRING);
+			}
+
+			if (!datum.isExternal())
+			{
+				datum.setSize(datum.size() + 1);
+			}
+		}
+
+		if (t_key == "Value")
+		{
+			element.value = t_values;
+			Datum& datum = shared_data->shared_scope->append(element.key);
+
+			if (t_is_array_element)
+			{
+				if (!datum.isExternal() && (0 == t_index))
+				{
+					datum.setSize(element.value.size());
+				}
+				if (datum.type() == Datum::DatumType::INTEGER)
+				{
+					datum.set(t_values.asInt(), t_index);
+				}
+				else if (datum.type() == Datum::DatumType::FLOAT)
+				{
+					datum.set(t_values.asFloat(), t_index);
+				}
+				else
+				{
+					datum.setFromString(t_values.asString(), t_index);
+				}
+			}
+			else
+			{
+				datum.setFromString(t_values.asString(), (datum.size() - 1));
+			}
+		}
+
+		return true;
 	}
 
-	bool JsonTableParseHelper::endHandler(JsonParseMaster::SharedData & t_shared_data, const std::string & t_key)
+	bool JsonTableParseHelper::endHandler(JsonParseMaster::SharedData& t_shared_data, const std::string& t_key)
 	{
-		t_shared_data;
-		t_key;
-		return false;
+		JsonTableParseHelper::SharedData* shared_data = t_shared_data.As<JsonTableParseHelper::SharedData>();
+		if (shared_data == nullptr)
+		{
+			return false;
+		}
+
+		if (!key_stack.isEmpty() && (key_stack.top() == t_key))
+		{
+			key_stack.pop();
+
+			if (nullptr != shared_data->shared_scope->getParent())
+			{
+				shared_data->shared_scope = shared_data->shared_scope->getParent();
+			}
+		}
+		return true;
 	}
 
-	gsl::owner<IJsonParseHelper*> JsonTableParseHelper::create()
+	gsl::owner<IJsonParseHelper*> JsonTableParseHelper::create() const
 	{
-		return gsl::owner<IJsonParseHelper*>();
+		return new JsonTableParseHelper();
 	}
 
 #pragma endregion
-
 }

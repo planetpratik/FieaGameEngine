@@ -39,10 +39,11 @@ namespace UnitTestLibraryDesktop
 		array_element_count = 0;
 	}
 
-	bool JsonIntegerParseHelper::startHandler(JsonParseMaster::SharedData& t_shared_data, const std::string& t_key, const Json::Value& t_values, bool t_is_array_element, size_t t_index)
+	bool JsonIntegerParseHelper::startHandler(JsonParseMaster::SharedData& t_shared_data, const std::string& t_key, const Json::Value& t_values, bool t_is_array_element, uint32_t t_index, uint32_t t_array_size)
 	{
 		t_is_array_element;
 		t_index;
+		t_array_size;
 		JsonIntegerParseHelper::SharedData* shared_data = t_shared_data.As<JsonIntegerParseHelper::SharedData>();
 		
 		if (shared_data == nullptr)

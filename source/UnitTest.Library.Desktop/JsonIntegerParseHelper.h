@@ -23,7 +23,7 @@ namespace UnitTestLibraryDesktop
 
 		virtual gsl::owner<IJsonParseHelper*> JsonIntegerParseHelper::create() const override;
 		virtual void JsonIntegerParseHelper::initialize() override;
-		virtual bool JsonIntegerParseHelper::startHandler(FieaGameEngine::JsonParseMaster::SharedData& t_shared_data, const std::string& t_key, const Json::Value& t_values, bool t_is_array_element, size_t t_index) override;
+		virtual bool JsonIntegerParseHelper::startHandler(FieaGameEngine::JsonParseMaster::SharedData& t_shared_data, const std::string& t_key, const Json::Value& t_values, bool t_is_array_element, uint32_t t_index, uint32_t t_array_size) override;
 		virtual bool JsonIntegerParseHelper::endHandler(FieaGameEngine::JsonParseMaster::SharedData& t_shared_data, const std::string& t_key) override;
 
 		bool is_initialized_called = false;

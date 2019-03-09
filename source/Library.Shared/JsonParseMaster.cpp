@@ -200,14 +200,14 @@ namespace FieaGameEngine
 		}
 	}
 
-	void JsonParseMaster::parseKeyValuePair(const std::string& t_key, const Json::Value& t_value, bool t_is_array_element, std::size_t t_index)
+	void JsonParseMaster::parseKeyValuePair(const std::string& t_key, const Json::Value& t_value, bool t_is_array_element, uint32_t t_index, uint32_t t_array_size)
 	{
 		if (t_value.isObject())
 		{
 			m_shared_data->incrementDepth();
 			for (IJsonParseHelper* helper : m_parse_helpers)
 			{
-				if (helper->startHandler(*m_shared_data, t_key, t_value, t_is_array_element, t_index))
+				if (helper->startHandler(*m_shared_data, t_key, t_value, t_is_array_element, t_index, t_array_size))
 				{
 					parseValue(t_value);
 					helper->endHandler(*m_shared_data, t_key);
@@ -218,7 +218,7 @@ namespace FieaGameEngine
 		}
 		else if (t_value.isArray())
 		{
-			size_t i = 0;
+			uint32_t i = 0;
 			for (const auto& element : t_value)
 			{
 				parseKeyValuePair(t_key, element, true, i);
@@ -229,7 +229,7 @@ namespace FieaGameEngine
 		{
 			for (IJsonParseHelper* helper : m_parse_helpers)
 			{
-				if (helper->startHandler(*m_shared_data, t_key, t_value, t_is_array_element, t_index))
+				if (helper->startHandler(*m_shared_data, t_key, t_value, t_is_array_element, t_index, t_array_size))
 				{
 					helper->endHandler(*m_shared_data, t_key);
 					break;
