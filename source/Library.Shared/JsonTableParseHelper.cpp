@@ -180,5 +180,10 @@ namespace FieaGameEngine
 		return new JsonTableParseHelper();
 	}
 
+	size_t JsonTableParseHelper::stackSize() const
+	{
+		return key_stack.size();
+	}
+
 #pragma endregion
 }

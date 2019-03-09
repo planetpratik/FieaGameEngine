@@ -77,6 +77,17 @@ namespace UnitTestLibraryDesktop
 			JsonParseMaster parse_master(shared_data);
 			parse_master.addHelper(parse_helper);
 			Assert::AreEqual(&shared_data, parse_master.getSharedData()->As<JsonTestParseHelper::SharedData>());
+			auto expression = [&parse_master, &parse_helper] { parse_master.addHelper(parse_helper); };
+			Assert::ExpectException<std::exception>(expression);
+
+			JsonTestParseHelper::SharedData another_shared_data;
+			parse_master.initialize();
+			parse_master.setSharedData(another_shared_data);
+			Assert::AreEqual(&another_shared_data, parse_master.getSharedData()->As<JsonTestParseHelper::SharedData>());
+			auto clone = parse_master.clone();
+			auto expression_two = [&parse_master, &shared_data, &clone] { clone->setSharedData(shared_data); };
+			Assert::ExpectException<std::exception>(expression_two);
+			delete clone;
 		}
 
 		TEST_METHOD(JsonParseMasterTestMoveSemantics)
@@ -220,6 +231,11 @@ namespace UnitTestLibraryDesktop
 			Assert::AreEqual(3U, parse_helper.end_handler_count);
 			Assert::AreEqual(0U, shared_data.depth());
 			Assert::AreEqual(2U, shared_data.max_depth);
+
+			const std::string bad_file_name = "Content\\SecretSauce.json";
+			parse_master.initialize();
+			auto expression = [&parse_master, &bad_file_name] { parse_master.parseFromFile(bad_file_name); };
+			Assert::ExpectException<std::exception>(expression);
 		}
 
 		TEST_METHOD(JsonParseMasterTestSimpleIntegerParsing)
@@ -280,6 +296,7 @@ namespace UnitTestLibraryDesktop
 			Assert::AreEqual(1U, parse_master.getHelpers().size());
 			parse_master.removeHelper(parse_helper);
 			Assert::AreEqual(0U, parse_master.getHelpers().size());
+
 		}
 
 	private:

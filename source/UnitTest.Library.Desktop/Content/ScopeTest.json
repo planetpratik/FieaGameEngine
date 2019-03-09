@@ -59,5 +59,13 @@
       "StarBurst",
       "Reeses"
     ]
+  },
+  "power": {
+    "Type": "float",
+    "Value": [
+      74.2,
+      51.5,
+      92.0
+    ]
   }
 }

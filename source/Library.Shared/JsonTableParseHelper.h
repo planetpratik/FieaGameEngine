@@ -96,6 +96,10 @@ namespace FieaGameEngine
 		/// <returns>Returns IJsonParseHelper pointer.</returns>
 		virtual gsl::owner<IJsonParseHelper*> create() const override;
 
+		/// <summary>Gets size of a Key Stack.</summary>
+		/// <returns>Returns Size of a Stack as a std::size_t</returns>
+		size_t stackSize() const;
+
 	private:
 
 		struct Data
