@@ -1,0 +1,63 @@
+{
+  "health": {
+    "Type": "integer",
+    "Value": 100
+  },
+  "speed": {
+    "Type": "float",
+    "Value": 24.3
+  },
+  "directions": {
+    "Type": "vector4",
+    "Value": "vec4(1, 0, 0, 1)"
+  },
+  "transform": {
+    "Type": "matrix4x4",
+    "Value": "mat4x4((1, 0, 0, 0), (1, 0, 0, 0), (1, 1, 0, 0), (0, 0, 1, 1))"
+  },
+  "inventory": {
+    "Type": "table",
+    "Value": {
+      "food": {
+        "Type": "table",
+        "Value": {
+          "protein": {
+            "Type": "string",
+            "Value": "Almond"
+          }
+        }
+      }
+    }
+  },
+  "maxspeed": {
+    "Type": "table",
+    "Value": [
+      {
+        "Ferrari": {
+          "Type": "integer",
+          "Value": 100
+        }
+      },
+      {
+        "Porsche": {
+          "Type": "integer",
+          "Value": 150
+        }
+      },
+      {
+        "Lamborghini": {
+          "Type": "integer",
+          "Value": 200
+        }
+      }
+    ]
+  },
+  "food": {
+    "Type": "string",
+    "Value": [
+      "kitkat",
+      "StarBurst",
+      "Reeses"
+    ]
+  }
+}

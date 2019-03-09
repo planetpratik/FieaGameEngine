@@ -1,6 +1,5 @@
 #include "pch.h"
 #include <string>
-#include <json/json.h>
 #include "JsonTableParseHelper.h"
 #include "CppUnitTest.h"
 #include <fstream>
@@ -9,39 +8,6 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace FieaGameEngine;
 using namespace std;
 using namespace std::string_literals;
-
-namespace Microsoft::VisualStudio::CppUnitTestFramework
-{
-	/*template<>
-	std::wstring ToString<UnitTestLibraryDesktop::JsonTestParseHelper::SharedData>(UnitTestLibraryDesktop::JsonTestParseHelper::SharedData* t_temp)
-	{
-		RETURN_WIDE_STRING(t_temp);
-	}*/
-
-	/*template<>
-	std::wstring ToString<UnitTestLibraryDesktop::JsonTestParseHelper>(UnitTestLibraryDesktop::JsonTestParseHelper* t_temp)
-	{
-		RETURN_WIDE_STRING(t_temp);
-	}*/
-
-	/*template<>
-	std::wstring ToString<FieaGameEngine::IJsonParseHelper>(FieaGameEngine::IJsonParseHelper* t_temp)
-	{
-		RETURN_WIDE_STRING(t_temp);
-	}*/
-
-	/*template<>
-	std::wstring ToString<FieaGameEngine::JsonParseMaster>(FieaGameEngine::JsonParseMaster* t_temp)
-	{
-		RETURN_WIDE_STRING(t_temp);
-	}*/
-
-	/*template<>
-	std::wstring ToString<FieaGameEngine::JsonParseMaster::SharedData>(FieaGameEngine::JsonParseMaster::SharedData* t_temp)
-	{
-		RETURN_WIDE_STRING(t_temp);
-	}*/
-}
 
 namespace UnitTestLibraryDesktop
 {
@@ -78,7 +44,7 @@ namespace UnitTestLibraryDesktop
 			JsonParseMaster parse_master(shared_data);
 			parse_master.addHelper(parse_helper);
 			parse_master.initialize();
-			
+
 			parse_master.parse(input);
 
 			Assert::AreEqual(100, scope["health"].get<int32_t>(0));
@@ -129,7 +95,7 @@ namespace UnitTestLibraryDesktop
 		TEST_METHOD(ParseArrayofObjectsFromStringTest)
 		{
 			Scope scope;
-			const string input = R"({ "speed": { "Type": "table", "Value": [ { "Ferrari": { "Type": "integer", "Value": 100 } }, { "Porsche": { "Type": "integer", "Value": 150 } }, { "Lamborghini": { "Type": "integer", "Value": 200 } } ] } })";
+			const string input = R"({ "speed": { "Type": "table", "Value": [ { "Ferrari": { "Type": "integer", "Value": 100 } }, { "Porsche": { "Type": "integer", "Value": 150 } }, { "Lamborghini": { "Type": "integer", "Value": 200 } } ] }, "food": { "Type": "string", "Value": [ "kitkat", "StarBurst", "Reeses" ] } })";
 			JsonTableParseHelper::SharedData shared_data(scope);
 			JsonTableParseHelper parse_helper;
 			JsonParseMaster parse_master(shared_data);
@@ -140,9 +106,62 @@ namespace UnitTestLibraryDesktop
 			Scope* new_scope = scope["speed"].get<Scope*>(0);
 			Scope temp = *new_scope;
 			Assert::AreEqual(100, temp["Ferrari"].get<int32_t>(0));
-			// Wrongly getting placed. 
-			Assert::AreEqual(150, scope["Porsche"].get<int32_t>(0));
-			Assert::AreEqual(200, scope["Lamborghini"].get<int32_t>(0));
+			Assert::AreEqual(150, temp["Porsche"].get<int32_t>(0));
+			Assert::AreEqual(200, temp["Lamborghini"].get<int32_t>(0));
+
+			Assert::AreEqual("kitkat"s, scope["food"].get<std::string>(0));
+			Assert::AreEqual("StarBurst"s, scope["food"].get<std::string>(1));
+			Assert::AreEqual("Reeses"s, scope["food"].get<std::string>(2));
+		}
+		
+		TEST_METHOD(ParseScopeFromFileTest)
+		{
+			const std::string file_name = "Content\\ScopeTest.json";
+			std::ifstream json_file(file_name);
+			Assert::IsFalse(json_file.bad());
+			json_file.close();
+
+			Scope scope;
+			JsonTableParseHelper::SharedData shared_data(scope);
+			JsonTableParseHelper parse_helper;
+			JsonParseMaster parse_master(shared_data);
+			parse_master.addHelper(parse_helper);
+			parse_master.initialize();
+
+			parse_master.parseFromFile(file_name);
+
+			Assert::IsTrue(glm::vec4(1, 0, 0, 1) == scope["directions"].get<glm::vec4>(0));
+
+			Assert::AreEqual("kitkat"s, scope["food"].get<std::string>(0));
+			Assert::AreEqual("StarBurst"s, scope["food"].get<std::string>(1));
+			Assert::AreEqual("Reeses"s, scope["food"].get<std::string>(2));
+
+			Assert::AreEqual(100, scope["health"].get<int32_t>(0));
+
+			Scope* new_scope = scope["inventory"].get<Scope*>(0);
+			Scope temp = *new_scope;
+			Scope* another_scope = temp["food"].get<Scope*>(0);
+			Scope temp_two = *another_scope;
+			Assert::AreEqual("Almond"s, temp_two["protein"].get<std::string>(0));
+
+			new_scope = scope["maxspeed"].get<Scope*>(0);
+			temp = *new_scope;
+			Assert::AreEqual(100, temp["Ferrari"].get<int32_t>(0));
+			Assert::AreEqual(150, temp["Porsche"].get<int32_t>(0));
+			Assert::AreEqual(200, temp["Lamborghini"].get<int32_t>(0));
+
+
+			std::string temp_string = "mat4x4((1, 0, 0, 0), (1, 0, 0, 0), (1, 1, 0, 0), (0, 0, 1, 1))"s;
+			glm::mat4x4 temp_mat;
+			sscanf_s(temp_string.c_str(), "mat4x4((%f, %f, %f, %f), (%f, %f, %f, %f), (%f, %f, %f, %f), (%f, %f, %f, %f))",
+				&temp_mat[0][0], &temp_mat[0][1], &temp_mat[0][2], &temp_mat[0][3],
+				&temp_mat[1][0], &temp_mat[1][1], &temp_mat[1][2], &temp_mat[1][3],
+				&temp_mat[2][0], &temp_mat[2][1], &temp_mat[2][2], &temp_mat[2][3],
+				&temp_mat[3][0], &temp_mat[3][1], &temp_mat[3][2], &temp_mat[3][3]);
+
+			Assert::IsTrue(temp_mat == scope["transform"].get<glm::mat4x4>(0));
+
+			Assert::AreEqual(24.3f, scope["speed"].get<float_t>(0));
 		}
 
 

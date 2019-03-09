@@ -221,7 +221,7 @@ namespace FieaGameEngine
 			uint32_t i = 0;
 			for (const auto& element : t_value)
 			{
-				parseKeyValuePair(t_key, element, true, i);
+				parseKeyValuePair(t_key, element, true, i, t_value.size());
 				++i;
 			}
 		}
