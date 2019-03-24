@@ -8,36 +8,33 @@ namespace FieaGameEngine
 
 #pragma region Attributed
 
-	Attributed::Attributed(uint64_t t_type_id) :
-		Scope()
+	Attributed::Attributed(uint64_t t_type_id)
 	{
-		Datum& datum = append("this");
-		datum.pushBack(static_cast<RTTI*>(this));
+		(*this)["this"] = this;
 		populate(t_type_id);
 	}
 
 	Attributed::Attributed(const Attributed& t_rhs) :
 		Scope(t_rhs)
 	{
-		(*this)["this"].set(static_cast<RTTI*>(this));
-		populate(t_rhs.TypeIdInstance());
+		(*this)["this"] = this;
+		updateExternalStorage(t_rhs.TypeIdInstance());
 	}
 
 	Attributed::Attributed(Attributed&& t_rhs) :
 		Scope(std::move(t_rhs))
 	{
-		(*this)["this"].set(static_cast<RTTI*>(this));
-		populate(t_rhs.TypeIdInstance());
+		(*this)["this"] = this;
+		updateExternalStorage(t_rhs.TypeIdInstance());
 	}
 
 	Attributed& Attributed::operator=(const Attributed& t_rhs)
 	{
 		if (this != &t_rhs)
 		{
-			clear();
 			Scope::operator=(t_rhs);
-			(*this)["this"].set(static_cast<RTTI*>(this));
-			populate(t_rhs.TypeIdInstance());
+			(*this)["this"] = this;
+			updateExternalStorage(t_rhs.TypeIdInstance());
 		}
 		return *this;
 	}
@@ -46,10 +43,9 @@ namespace FieaGameEngine
 	{
 		if (this != &t_rhs)
 		{
-			clear();
 			Scope::operator=(std::move(t_rhs));
-			(*this)["this"].set(static_cast<RTTI*>(this));
-			populate(t_rhs.TypeIdInstance());
+			(*this)["this"] = this;
+			updateExternalStorage(t_rhs.TypeIdInstance());
 		}
 		return *this;
 	}
@@ -57,6 +53,8 @@ namespace FieaGameEngine
 	void Attributed::clear()
 	{
 		Scope::clear();
+		(*this)["this"] = this;
+		populate(TypeIdInstance());
 	}
 	
 	bool Attributed::isAttribute(const std::string& t_name)
@@ -70,10 +68,7 @@ namespace FieaGameEngine
 		const Vector<std::pair<std::string, Datum>*> attribute_pointers = getTableEntryPointers();
 		if ("this" == t_name)
 		{
-			if (attribute_pointers[0]->first == "this")
-			{
-				return true;
-			}
+			return true;
 		}
 		Vector<Signature> signatures = TypeManager::getSignatures(TypeIdInstance());
 		for (auto& signature : signatures)
@@ -123,10 +118,25 @@ namespace FieaGameEngine
 	}
 
 
+	void Attributed::updateExternalStorage(uint64_t t_type_id)
+	{
+		const Vector<Signature>& signatures = TypeManager::getSignatures(t_type_id);
+		for (auto& signature : signatures)
+		{
+			Datum& datum = at(signature.sig_name);
+			datum.setType(signature.sig_type);
+			if (signature.sig_type != Datum::DatumType::TABLE)
+			{
+				void* offset = reinterpret_cast<uint8_t*>(this) + signature.sig_offset;
+				datum.setStorage(offset, signature.sig_size);
+			}
+		}
+	}
+
 	void Attributed::populate(uint64_t t_type_id)
 	{
-		Vector<Signature> signatures = TypeManager::getSignatures(t_type_id);
-		for (auto& signature : signatures)
+		const Vector<Signature>& signatures = TypeManager::getSignatures(t_type_id);
+		for (const auto& signature : signatures)
 		{
 			Datum& datum = append(signature.sig_name);
 			datum.setType(signature.sig_type);
@@ -135,6 +145,13 @@ namespace FieaGameEngine
 				void* offset = reinterpret_cast<uint8_t*>(this) + signature.sig_offset;
 				datum.setStorage(offset, signature.sig_size);
 			}
+			/*else
+			{
+				for (uint32_t i = 0; i < signature.sig_size; ++i)
+				{
+					appendScope(signature.sig_name);
+				}
+			}*/
 		}
 	}
 
@@ -175,7 +192,11 @@ namespace FieaGameEngine
 		return auxillary_attributes;
 	}
 
+	gsl::owner<Scope*> Attributed::clone() const
+	{
+		return new Attributed(*this);
+	}
+
 #pragma endregion
 
 }
-

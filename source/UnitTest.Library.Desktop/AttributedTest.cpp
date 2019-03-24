@@ -319,7 +319,7 @@ namespace UnitTestLibraryDesktop
 			foo.appendAuxillaryAttribute("AuxillaryInteger");
 			Assert::AreEqual(size + 1, foo.size());
 			foo.clear();
-			Assert::AreEqual(0, static_cast<int>(foo.size()));
+			Assert::AreEqual(13, static_cast<int>(foo.size()));
 		}
 
 		TEST_METHOD(AccessorMethods)
@@ -356,10 +356,6 @@ namespace UnitTestLibraryDesktop
 			Assert::AreEqual(2U, auxillary_attributes.size());
 			Assert::AreEqual("MyInteger"s, auxillary_attributes[0]->first);
 			Assert::AreEqual("MyFloat"s, auxillary_attributes[1]->first);
-		}
-		
-		TEST_METHOD(TypeManagerTestRemoveID)
-		{
 		}
 
 	private:

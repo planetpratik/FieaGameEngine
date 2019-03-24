@@ -27,7 +27,7 @@ namespace FieaGameEngine
 	{
 		if (this != &t_rhs)
 		{
-			clear();
+			_clear();
 			m_pointers_list.reserve(t_rhs.m_lookup_table.size());
 			doRecursiveChildrenCopy(t_rhs);
 		}
@@ -38,7 +38,7 @@ namespace FieaGameEngine
 	{
 		if (this != &t_rhs)
 		{
-			clear();
+			_clear();
 			m_parent = t_rhs.m_parent;
 			m_lookup_table = std::move(t_rhs.m_lookup_table);
 			m_pointers_list = std::move(t_rhs.m_pointers_list);
@@ -50,19 +50,7 @@ namespace FieaGameEngine
 
 	void Scope::clear()
 	{
-		for (uint32_t i = 0; i < m_pointers_list.size(); ++i)
-		{
-			Datum& datum = m_pointers_list[i]->second;
-			if (datum.type() == Datum::DatumType::TABLE)
-			{
-				for (uint32_t j = 0; j < datum.size(); ++j)
-				{
-					delete datum.get<Scope*>(j);
-				}
-			}
-		}
-		m_lookup_table.clear();
-		m_pointers_list.clear();
+		_clear();
 	}
 
 	Scope::~Scope()
@@ -301,6 +289,23 @@ namespace FieaGameEngine
 		return name;
 	}
 
+	void Scope::_clear()
+	{
+		for (uint32_t i = 0; i < m_pointers_list.size(); ++i)
+		{
+			Datum& datum = m_pointers_list[i]->second;
+			if (datum.type() == Datum::DatumType::TABLE)
+			{
+				for (uint32_t j = 0; j < datum.size(); ++j)
+				{
+					delete datum.get<Scope*>(j);
+				}
+			}
+		}
+		m_lookup_table.clear();
+		m_pointers_list.clear();
+	}
+
 	void Scope::doRecursiveChildrenCopy(const Scope& t_rhs)
 	{
 		for (auto& it : t_rhs.m_pointers_list)
@@ -321,14 +326,12 @@ namespace FieaGameEngine
 		}
 	}
 
-
 	void Scope::fixParentPointer(Scope&& t_rhs)
 	{
 		if (m_parent != nullptr)
 		{
 			// Inform the parent that the child has a new address
 			auto[datum, index] = m_parent->findNestedScope(t_rhs);
-			assert(datum != nullptr);
 			datum->set(this, index);
 		}
 
@@ -404,6 +407,11 @@ namespace FieaGameEngine
 	size_t Scope::size()
 	{
 		return m_pointers_list.size();
+	}
+
+	gsl::owner<Scope*> Scope::clone() const
+	{
+		return new Scope(*this);
 	}
 
 	const Vector<std::pair<std::string, Datum>*> Scope::getTableEntryPointers() const

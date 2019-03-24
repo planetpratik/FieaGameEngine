@@ -80,6 +80,8 @@ namespace FieaGameEngine
 		/// <returns>Returns Const Vector of pointers of auxillary attributes string-datum pairs.</returns>
 		const Vector<std::pair<std::string, Datum>*> getAuxillaryAttributes() const;
 
+		gsl::owner<Scope*> clone() const override;
+
 	protected:
 
 		/// <summary>Explicit Constructor for Attributed Class.</summary>
@@ -89,6 +91,8 @@ namespace FieaGameEngine
 		/// <summary>To Fetch data using TypeManager & populate scope using it.</summary>
 		/// <param name="t_type_id">Runtime TypeID of Type uint64_t</param>
 		void populate(uint64_t t_type_id);
+
+		void updateExternalStorage(uint64_t t_type_id);
 
 	};
 }

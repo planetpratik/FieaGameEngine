@@ -4,6 +4,7 @@
 #include "HashMap.h"
 #include "Datum.h"
 #include "Vector.h"
+#include "gsl/gsl"
 namespace FieaGameEngine
 {
 	/// <summary>Scope - Dynamic Hierarchical Database for Datum. Implements RTTI interface.</summary>
@@ -158,6 +159,8 @@ namespace FieaGameEngine
 		/// <returns>Returns total no. of elements in Lookup Table Pointer List.</returns>
 		size_t size();
 
+		virtual gsl::owner<Scope*> clone() const;
+
 	protected:
 
 		/// <summary>Gets Pointers list from the Lookup Table.</summary>
@@ -165,6 +168,8 @@ namespace FieaGameEngine
 		const Vector<std::pair<std::string, Datum>*> getTableEntryPointers() const;
 
 	private:
+
+		void _clear();
 
 		void doRecursiveChildrenCopy(const Scope& t_rhs);
 		void fixParentPointer(Scope&& t_rhs);

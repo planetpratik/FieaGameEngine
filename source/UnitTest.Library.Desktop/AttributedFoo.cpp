@@ -31,6 +31,11 @@ namespace FieaGameEngine
 		};
 	}
 
+	gsl::owner<Scope*> AttributedFoo::clone() const
+	{
+		return new AttributedFoo(*this);
+	}
+
 	bool AttributedFoo::Equals(const RTTI* t_rhs) const
 	{
 		auto attirbuted_foo = t_rhs->As<AttributedFoo>();

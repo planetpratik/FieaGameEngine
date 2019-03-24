@@ -29,6 +29,7 @@ namespace FieaGameEngine
 		glm::vec4 external_glm_vector_array[ARRAY_SIZE];
 		glm::mat4x4 external_glm_matrix_array[ARRAY_SIZE];
 
+		gsl::owner<Scope*> clone() const override;
 		bool Equals(const RTTI* t_rhs) const override;
 		std::string ToString() const override;
 		static const FieaGameEngine::Vector<FieaGameEngine::Signature> Signatures();
