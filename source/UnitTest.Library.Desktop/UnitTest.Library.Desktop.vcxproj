@@ -194,6 +194,7 @@ xcopy /E /Y "$(ProjectDir)Content" "$(OutDir)Content"</Command>
     <ClCompile Include="AttributedTest.cpp" />
     <ClCompile Include="Bar.cpp" />
     <ClCompile Include="DatumTest.cpp" />
+    <ClCompile Include="FactoryTest.cpp" />
     <ClCompile Include="Foo.cpp" />
     <ClCompile Include="HashMapTest.cpp" />
     <ClCompile Include="JsonCppTest.cpp" />

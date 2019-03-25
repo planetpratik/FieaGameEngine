@@ -18,7 +18,7 @@ namespace FieaGameEngine
 		Attributed(const Attributed& t_rhs);
 
 		/// <summary>Move Constructor for Attributed Class. </summary>
-		/// <param name="t_rhs">R-Value reference to passed scope which is to be moved.</param>
+		/// <param name="t_rhs">R-Value reference to passed Attribute which is to be moved.</param>
 		Attributed(Attributed&& t_rhs);
 
 		/// <summary>Copy Assignment operator for Attributed Class. Makes Deep copy of elements.</summary>

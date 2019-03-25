@@ -1,5 +1,6 @@
 #pragma once
 #include "RTTI.h"
+#include "Factory.h"
 namespace FieaGameEngine
 {
 	class Foo : public RTTI
@@ -15,5 +16,7 @@ namespace FieaGameEngine
 	private:
 		int m_data;
 	};
+
+	ConcreteFactory(Foo, RTTI);
 }
 
