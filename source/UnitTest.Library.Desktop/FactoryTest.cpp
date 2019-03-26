@@ -65,6 +65,20 @@ namespace UnitTestLibraryDesktop
 			Assert::IsFalse(rtti->Equals(&otherBar));
 		}
 
+		TEST_METHOD(FactoryConstructorDestructorTest)
+		{
+			Factory<RTTI>* factory = Factory<RTTI>::find("Foo");
+			Assert::IsNull(factory);
+			{
+				FooFactory foo_factory;
+				Assert::IsNotNull(&foo_factory);
+				RTTI* r = Factory<RTTI>::create("Foo");
+				delete r;
+			}
+			factory = Factory<RTTI>::find("Foo");
+			Assert::IsNull(factory);
+		}
+
 		TEST_METHOD(FactoryAddRemoveTest)
 		{
 			FooFactory foo_factory;
