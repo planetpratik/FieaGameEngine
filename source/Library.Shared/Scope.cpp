@@ -312,15 +312,19 @@ namespace FieaGameEngine
 		{
 			std::string& name = it->first;
 			Datum& datum = it->second;
+			Datum& newDatum = append(name);
+			newDatum.setType(datum.type());
 			if (datum.type() != Datum::DatumType::TABLE)
 			{
-				append(name) = datum;
+				newDatum = datum;
 			}
 			else
 			{
 				for (uint32_t i = 0; i < datum.size(); ++i)
 				{
-					appendScope(name) = datum[i];
+					Scope* scope = new Scope(datum[i]);
+					scope->m_parent = this;
+					newDatum.pushBack(scope);
 				}
 			}
 		}

@@ -91,9 +91,9 @@ namespace FieaGameEngine
 		Datum& operator=(RTTI* t_rhs);
 
 		/// <summary>Datum - Assignment Operator overload for Scope member reference</summary>
-		/// <param name="t_rhs">pointer to a Scope class</param>
+		/// <param name="t_rhs">Reference to a Scope class</param>
 		/// <returns>Returns reference to current Datum.</returns>
-		Datum& operator=(Scope* t_rhs);
+		Datum& operator=(Scope& t_rhs);
 
 		/// <summary>Destructor for Datum. Free any memory owned by this object.</summary>
 		~Datum();

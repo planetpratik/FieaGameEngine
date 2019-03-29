@@ -134,9 +134,9 @@ namespace FieaGameEngine
 		return *this;
 	}
 
-	Datum& Datum::operator=(Scope * t_rhs)
+	Datum& Datum::operator=(Scope& t_rhs)
 	{
-		set(t_rhs);
+		set(&t_rhs);
 		return *this;
 	}
 
