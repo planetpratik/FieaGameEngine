@@ -606,11 +606,6 @@ namespace FieaGameEngine
 		/// <returns>Returns const std::tuple of boolean result & index of an element. Index will be size of an array if element isn't found.</returns>
 		const std::tuple<bool, uint32_t> find(const RTTI& t_item) const;
 
-		/// <summary>Const version of find() - Search Given element in the values array of Datum.</summary>
-		/// <param name="t_item">Const reference to a Scope.</param>
-		/// <returns>Returns const std::tuple of boolean result & index of an element. Index will be size of an array if element isn't found.</returns>
-		const std::tuple<bool, uint32_t> find(const Scope& t_item) const;
-
 		/// <summary>Nested Scope dereference operator for datum.</summary>
 		/// <param name="t_index">index of a Scope to get from.</param>
 		/// <returns>Returns reference to the Scope.</returns>

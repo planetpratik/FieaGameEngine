@@ -30,24 +30,6 @@ namespace Microsoft::VisualStudio::CppUnitTestFramework
 	{
 		RETURN_WIDE_STRING(t_temp.ToString().c_str());
 	}
-
-	//	template<>
-	//	std::wstring ToString<FieaGameEngine::Scope>(FieaGameEngine::Scope* t_temp)
-	//	{
-	//		RETURN_WIDE_STRING(t_temp);
-	//	}
-	//
-	//	template<>
-	//	std::wstring ToString<FieaGameEngine::JsonParseMaster>(FieaGameEngine::JsonParseMaster* t_temp)
-	//	{
-	//		RETURN_WIDE_STRING(t_temp);
-	//	}
-	//
-	//	template<>
-	//	std::wstring ToString<FieaGameEngine::JsonTableParseHelper::SharedData>(FieaGameEngine::JsonTableParseHelper::SharedData* t_temp)
-	//	{
-	//		RETURN_WIDE_STRING(t_temp);
-	//	}
 }
 
 
@@ -161,6 +143,22 @@ namespace UnitTestLibraryDesktop
 				world_state.setGameTime(game_time);
 				entity.update(world_state);
 			}
+
+			{
+				Sector sector("TestSector");
+				GameTime game_time;
+				WorldState world_state;
+				world_state.setGameTime(game_time);
+				sector.update(world_state);
+			}
+
+			{
+				World world("World");
+				GameTime game_time;
+				WorldState world_state;
+				world_state.setGameTime(game_time);
+				world.update(world_state);
+			}
 		}
 
 		TEST_METHOD(SectorGetterAndSetterTest)
@@ -183,6 +181,29 @@ namespace UnitTestLibraryDesktop
 			Assert::IsTrue(&world == sector->getWorld());
 			sector->setWorld(&world2);
 			Assert::IsTrue(&world2 == sector->getWorld());
+		}
+
+		TEST_METHOD(ClockTests)
+		{
+			// Temporary Testing. Needs Rework
+			World world("TestWorld");
+			GameTime game_time;
+			WorldState world_state;
+			world_state.setGameTime(game_time);
+			world.update(world_state);
+
+
+			GameTime gameTime = world_state.getGameTime();
+			gameTime.SetElapsedGameTime(std::chrono::milliseconds(100));
+			gameTime.SetTotalGameTime(std::chrono::milliseconds(200));
+			Assert::IsFalse(gameTime.ElapsedGameTime() == gameTime.TotalGameTime());
+			Assert::IsFalse(gameTime.ElapsedGameTimeSeconds() == gameTime.TotalGameTimeSeconds());
+			GameClock gameClock;
+			Assert::IsTrue(gameTime.CurrentTime() != gameClock.CurrentTime());
+			gameTime.SetCurrentTime(std::chrono::steady_clock::time_point());
+			gameClock.StartTime();
+			gameClock.Reset();
+			gameClock.LastTime();
 		}
 
 		TEST_METHOD(SectorsAndEntitiesTest)
@@ -296,6 +317,8 @@ namespace UnitTestLibraryDesktop
 			Scope* sector2 = world["sectors"].get<Scope*>(1);*/
 
 		}
+
+		
 
 	private:
 		static _CrtMemState s_start_mem_state;

@@ -1882,34 +1882,6 @@ namespace FieaGameEngine
 		return std::make_tuple(false, m_size);
 	}
 
-	const std::tuple<bool, uint32_t> Datum::find(const Scope& t_item) const
-	{
-		bool found = false;
-		uint32_t index = 0;
-		if (m_type == DatumType::UNKNOWN)
-		{
-			throw std::exception("Invalid Operation! Datum Type isn't set.");
-		}
-		if (m_type != DatumType::TABLE)
-		{
-			throw std::exception("Invalid Operation! Find operation cannot be performed due to type mismatch.");
-		}
-		for (uint32_t i = 0; i < m_size; ++i)
-		{
-			if (&t_item == m_data.d_scope_ptr[i])
-			{
-				found = true;
-				index = i;
-				break;
-			}
-		}
-		if (found)
-		{
-			return std::make_tuple(true, index);
-		}
-		return std::make_tuple(false, m_size);
-	}
-
 	Scope& Datum::operator[](uint32_t t_index)
 	{
 		return *get<Scope*>(t_index);
