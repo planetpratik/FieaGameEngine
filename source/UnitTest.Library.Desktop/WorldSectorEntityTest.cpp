@@ -188,11 +188,10 @@ namespace UnitTestLibraryDesktop
 			// Temporary Testing. Needs Rework
 			World world("TestWorld");
 			GameTime game_time;
+			GameTime another_game_time;
 			WorldState world_state;
 			world_state.setGameTime(game_time);
 			world.update(world_state);
-
-
 			GameTime gameTime = world_state.getGameTime();
 			gameTime.SetElapsedGameTime(std::chrono::milliseconds(100));
 			gameTime.SetTotalGameTime(std::chrono::milliseconds(200));
@@ -204,6 +203,7 @@ namespace UnitTestLibraryDesktop
 			gameClock.StartTime();
 			gameClock.Reset();
 			gameClock.LastTime();
+			gameClock.UpdateGameTime(another_game_time);
 		}
 
 		TEST_METHOD(SectorsAndEntitiesTest)
@@ -247,6 +247,12 @@ namespace UnitTestLibraryDesktop
 			Entity* entity2 = new Entity(*sector1->createEntity("Entity", "Entity2"));
 			*entity2 = *entity1;
 			Assert::AreEqual(entity2->name(), entity1->name());
+
+			GameTime game_time;
+			WorldState world_state;
+			world_state.setGameTime(game_time);
+			world.update(world_state);
+			sector1->update(world_state);
 
 			delete sector1;
 			delete sector2;

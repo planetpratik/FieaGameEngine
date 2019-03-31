@@ -76,7 +76,7 @@ namespace FieaGameEngine
 		m_sectors_table = find("sectors");
 		for (uint32_t i = 0; i < m_sectors_table->size(); ++i)
 		{
-			assert((*m_sectors_table)[i].Is(Sector::TypeIdClass()));
+			//assert((*m_sectors_table)[i].Is(Sector::TypeIdClass()));
 			(*m_sectors_table)[i].As<Sector>()->update(t_world_state);
 		}
 	}
