@@ -19,6 +19,7 @@
     <ClCompile Include="JsonIntegerParseHelper.cpp" />
     <ClCompile Include="JsonTableParseHelperTest.cpp" />
     <ClCompile Include="FactoryTest.cpp" />
+    <ClCompile Include="WorldSectorEntityTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />

@@ -7,6 +7,10 @@ namespace FieaGameEngine
 {
 	RTTI_DEFINITIONS(Sector)
 
+	Sector::Sector() : Attributed(TypeIdInstance())
+	{
+	}
+
 	Sector::Sector(const std::string& t_name) : Attributed(TypeIdInstance()), m_entities_table(nullptr),  m_sector_name(t_name)
 	{
 		populate();
@@ -58,10 +62,11 @@ namespace FieaGameEngine
 
 	Datum& Sector::entities()
 	{
+		assert(m_entities_table != nullptr);
 		return *m_entities_table;
 	}
 
-	Entity* Sector::createEntity(const std::string & t_class_name, const std::string & t_instance_name)
+	Entity* Sector::createEntity(const std::string& t_class_name, const std::string& t_instance_name)
 	{
 		Entity* entity = Factory<Entity>::create(t_class_name)->As<Entity>();
 		if (entity == nullptr)
@@ -101,18 +106,25 @@ namespace FieaGameEngine
 	void Sector::populate()
 	{
 		m_entities_table = &append("entities");
-		appendAuxillaryAttribute("entities");
 		(*this)["name"].setStorage(&m_sector_name, 1);
 	}
 
 	void Sector::updateExternalStorage()
 	{
 		(*this)["name"].setStorage(&m_sector_name, 1);
-		*find("entities") = *m_entities_table;
 	}
 
 	gsl::owner<Scope*> Sector::clone() const
 	{
 		return new Sector(*this);
+	}
+
+	Vector<Signature> Sector::Signatures()
+	{
+		return Vector<Signature>
+		{
+			{ "name", Datum::DatumType::STRING, 1, offsetof(Sector, m_sector_name) },
+			{ "entities", Datum::DatumType::TABLE, 1, offsetof(Sector, m_entities_table) }
+		};
 	}
 }

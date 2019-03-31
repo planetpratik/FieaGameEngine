@@ -6,6 +6,10 @@ namespace FieaGameEngine
 {
 	RTTI_DEFINITIONS(Entity)
 
+	Entity::Entity() : Attributed(TypeIdClass())
+	{
+	}
+
 	Entity::Entity(const std::string& t_name) : Attributed(TypeIdClass()), m_entity_name(t_name)
 	{
 		populate();
@@ -43,7 +47,7 @@ namespace FieaGameEngine
 		return *this;
 	}
 
-	const std::string & Entity::name() const
+	const std::string& Entity::name() const
 	{
 		return m_entity_name;
 	}
@@ -86,6 +90,14 @@ namespace FieaGameEngine
 	gsl::owner<Scope*> Entity::clone() const
 	{
 		return new Entity(*this);
+	}
+
+	Vector<Signature> Entity::Signatures()
+	{
+		return Vector<Signature>
+		{
+			{"name", Datum::DatumType::STRING, 1, offsetof(Entity, m_entity_name)}
+		};
 	}
 
 }

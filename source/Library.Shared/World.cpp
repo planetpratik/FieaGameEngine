@@ -1,10 +1,13 @@
 #include "pch.h"
-#include "World.h"
 #include "Sector.h"
 
 namespace FieaGameEngine
 {
 	RTTI_DEFINITIONS(World)
+
+	World::World() : Attributed(TypeIdInstance())
+	{
+	}
 
 	World::World(const std::string& t_name) : Attributed(TypeIdInstance()), m_sectors_table(nullptr), m_world_name(t_name)
 	{
@@ -57,14 +60,14 @@ namespace FieaGameEngine
 
 	Datum& World::sectors()
 	{
-		return *find("Sectors");
+		return *find("sectors");
 	}
 
-	Sector& World::createSector(const std::string& t_sector_name)
+	Sector* World::createSector(const std::string& t_sector_name)
 	{
 		Sector* sector = new Sector(t_sector_name);
 		sector->setWorld(this);
-		return *sector;
+		return sector;
 	}
 
 	void World::update(WorldState& t_world_state)
@@ -81,18 +84,25 @@ namespace FieaGameEngine
 	void World::populate()
 	{
 		m_sectors_table = &append("sectors");
-		appendAuxillaryAttribute("sectors");
 		(*this)["name"].setStorage(&m_world_name, 1);
 	}
 
 	void World::updateExternalStorage()
 	{
 		(*this)["name"].setStorage(&m_world_name, 1);
-		*find("sectors") = *m_sectors_table;
 	}
 
 	gsl::owner<Scope*> World::clone() const
 	{
 		return new World(*this);
+	}
+
+	Vector<Signature> World::Signatures()
+	{
+		return Vector<Signature>
+		{
+			{ "name", Datum::DatumType::STRING, 1, offsetof(World, m_world_name) },
+			{ "sectors", Datum::DatumType::TABLE, 1, offsetof(World, m_sectors_table) }
+		};
 	}
 }

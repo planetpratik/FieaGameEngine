@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "TypeManager.h"
 #include "AttributedFoo.h"
+#include "Entity.h"
+#include "Sector.h"
+#include "World.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace FieaGameEngine;
@@ -10,6 +13,9 @@ namespace UnitTestLibraryDesktop
 	TEST_MODULE_INITIALIZE(TestModuleInitialize)
 	{
 		TypeManager::registerType(AttributedFoo::TypeIdClass(), AttributedFoo::Signatures());
+		TypeManager::registerType(Entity::TypeIdClass(), Entity::Signatures());
+		TypeManager::registerType(Sector::TypeIdClass(), Sector::Signatures());
+		TypeManager::registerType(World::TypeIdClass(), World::Signatures());
 	}
 
 	TEST_MODULE_CLEANUP(TestModuleCleanup)

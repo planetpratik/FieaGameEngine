@@ -16,7 +16,7 @@ namespace FieaGameEngine
 		Factory() = default;
 
 		/// <summary>Destructor for Factory class. (Defaulted)</summary>
-		~Factory() = default;
+		virtual ~Factory() = default;
 
 		/// <summary>Copy Constructor for Factory class. (Deleted)</summary>
 		/// <param name="t_rhs">Const reference to passed Factory.</param>

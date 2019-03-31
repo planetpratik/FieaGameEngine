@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "JsonTableParseHelper.h"
+#include "Sector.h"
 
 
 namespace FieaGameEngine
@@ -8,8 +9,7 @@ namespace FieaGameEngine
 
 #pragma region SharedData
 
-	JsonTableParseHelper::SharedData::SharedData(Scope& t_scope) :
-		shared_scope(&t_scope)
+	JsonTableParseHelper::SharedData::SharedData(Scope& t_scope) : shared_scope(&t_scope)
 	{
 	}
 
@@ -48,7 +48,6 @@ namespace FieaGameEngine
 
 	bool JsonTableParseHelper::startHandler(JsonParseMaster::SharedData& t_shared_data, const std::string& t_key, const Json::Value& t_values, bool t_is_array_element, uint32_t t_index, uint32_t t_array_size)
 	{
-		t_array_size;
 		JsonTableParseHelper::SharedData* shared_data = t_shared_data.As<JsonTableParseHelper::SharedData>();
 		if (shared_data == nullptr)
 		{
@@ -70,11 +69,31 @@ namespace FieaGameEngine
 			return true;
 		}
 
+		if (t_key == "Class")
+		{
+			element.class_name = t_values.asString();
+			if (element.class_name == "Sector")
+			{
+				shared_data->shared_scope = shared_data->shared_scope->getParent()->As<World>()->createSector(element.class_name);
+				element.class_name = "";
+				element.attribute_name = "";
+			}
+		}
+
 		if (t_key == "Type")
 		{
 			element.type = t_values.asString();
+			
 			if (element.type == "table")
 			{
+				if (m_array_elements_to_parse != 0)
+				{
+					auto stack_top = key_stack.top();
+					if (stack_top == "Value" && element.key == "Value")
+					{
+						shared_data->shared_scope = shared_data->shared_scope->getParent();
+					}
+				}
 				shared_data->shared_scope = &shared_data->shared_scope->appendScope(element.key);
 				return true;
 			}
@@ -109,6 +128,17 @@ namespace FieaGameEngine
 		if (t_key == "Value")
 		{
 			element.value = t_values;
+			std::string stack_top = key_stack.top();
+			if (!element.class_name.empty() && stack_top == "name")
+			{
+				if(!element.attribute_name.empty())
+				{
+					shared_data->shared_scope = shared_data->shared_scope->As<Sector>()->createEntity(element.class_name, element.attribute_name);
+					element.attribute_name = "";
+					element.class_name = "";
+				}
+			}
+
 			Datum& datum = shared_data->shared_scope->append(element.key);
 			if (m_is_array_size_already_assigned)
 			{
@@ -121,18 +151,7 @@ namespace FieaGameEngine
 					datum.setSize(element.value.size());
 					m_array_elements_to_parse = t_array_size;
 				}
-				if (datum.type() == Datum::DatumType::INTEGER)
-				{
-					datum.set(t_values.asInt(), t_index);
-				}
-				else if (datum.type() == Datum::DatumType::FLOAT)
-				{
-					datum.set(t_values.asFloat(), t_index);
-				}
-				else
-				{
-					datum.setFromString(t_values.asString(), t_index);
-				}
+				datum.setFromString(t_values.asString(), t_index);
 				--m_array_elements_to_parse;
 			}
 			else
@@ -159,7 +178,7 @@ namespace FieaGameEngine
 			{
 				return true;
 			}
-			else 
+			else
 			{
 				if (m_array_elements_to_parse == 0)
 				{

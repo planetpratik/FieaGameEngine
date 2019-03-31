@@ -106,11 +106,14 @@ namespace FieaGameEngine
 		{
 			std::string key;
 			std::string type;
+			std::string class_name = "";
+			std::string attribute_name = "";
 			Json::Value value;
 		};
 
 		Data element;
 		Stack<std::string> key_stack;
+		Stack<std::string> type_stack;
 		bool m_parsing_data = false;
 		bool m_is_array_size_already_assigned = false;
 		int32_t m_array_elements_to_parse = 0;
