@@ -68,7 +68,7 @@ namespace FieaGameEngine
 
 	Entity* Sector::createEntity(const std::string& t_class_name, const std::string& t_instance_name)
 	{
-		Entity* entity = Factory<Entity>::create(t_class_name)->As<Entity>();
+		Entity* entity = Factory<Scope>::create(t_class_name)->As<Entity>();
 		if (entity == nullptr)
 		{
 			return nullptr;

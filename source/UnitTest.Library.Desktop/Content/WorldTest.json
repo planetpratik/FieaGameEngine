@@ -7,8 +7,8 @@
     "Type": "table",
     "Value": [
       {
-        "Type": "table",
         "Class": "Sector",
+        "Type": "table",
         "Value": {
           "name": {
             "Type": "string",
@@ -17,8 +17,8 @@
         }
       },
       {
-        "Type": "table",
         "Class": "Sector",
+        "Type": "table",
         "Value": {
           "name": {
             "Type": "string",

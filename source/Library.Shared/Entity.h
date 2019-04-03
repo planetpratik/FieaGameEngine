@@ -83,6 +83,6 @@ namespace FieaGameEngine
 		std::string m_entity_name;
 	};
 
-	ConcreteFactory(Entity, Entity);
+	ConcreteFactory(Entity, Scope);
 }
 

@@ -99,4 +99,6 @@ namespace FieaGameEngine
 		Datum* m_entities_table;
 	};
 
+	ConcreteFactory(Sector, Scope);
+
 }

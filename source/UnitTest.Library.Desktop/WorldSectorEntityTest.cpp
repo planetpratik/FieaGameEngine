@@ -298,6 +298,7 @@ namespace UnitTestLibraryDesktop
 
 		TEST_METHOD(ParsingFromFileTest)
 		{
+			SectorFactory sectorFactory;
 			EntityFactory factory;
 
 			const std::string file_name = "Content\\WorldTest.json";
@@ -314,13 +315,16 @@ namespace UnitTestLibraryDesktop
 
 			parse_master.parseFromFile(file_name);
 
-			/*Assert::IsTrue("World" == world["name"].get<std::string>(0));
+			Assert::IsTrue("World" == world["name"].get<std::string>(0));
 
-			Scope* sector1 = world["sectors"].get<Scope*>(0);
-			Scope temp = *sector1;
-			Assert::IsTrue("Sector1" == temp["name"].get<std::string>(0));
-			Assert::IsTrue("Sector1" == temp["name"].get<Scope*>(0));
-			Scope* sector2 = world["sectors"].get<Scope*>(1);*/
+			Scope* sectors = world["sectors"].get<Scope*>(0);
+			Assert::IsTrue("Sector1" == (*sectors)["name"].get<std::string>(0));
+			Assert::IsTrue("Sector2" == (*sectors)["name"].get<std::string>(1));
+
+			/*Scope* sector2 = temp["sectors"].get<Scope*>(0);
+			Scope temp2 = *sector2;
+			Assert::IsTrue("Sector2" == temp2["name"].get<std::string>(0));*/
+
 
 		}
 
