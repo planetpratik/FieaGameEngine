@@ -147,6 +147,7 @@ namespace UnitTestLibraryDesktop
 			// ActionListIf Update Test
 			{
 				EntityFactory entity_factory;
+				SectorFactory sector_factory;
 				ActionListFactory action_list_factory;
 				ActionListIfFactory action_list_if_factory;
 				World world("TestWorld");
@@ -163,6 +164,14 @@ namespace UnitTestLibraryDesktop
 				Assert::AreEqual(20, (*inc)["TestInteger"].get<int32_t>());
 				TestEntity->update(world_state);
 				Assert::AreEqual(21, (*inc)["TestInteger"].get<int32_t>());
+				ActionIncrement* inc2 = new ActionIncrement();
+				(*inc2)["TestInteger"] = 30;
+				(*inc2)["Target"] = "TestInteger";
+				TestActionListIf->setIfBlock(*inc2);
+				Assert::AreEqual(30, (*inc2)["TestInteger"].get<int32_t>());
+				TestEntity->update(world_state);
+				Assert::AreEqual(31, (*inc2)["TestInteger"].get<int32_t>());
+				delete inc;
 			}
 			{
 				EntityFactory entity_factory;
@@ -182,6 +191,14 @@ namespace UnitTestLibraryDesktop
 				Assert::AreEqual(20, (*inc)["TestInteger"].get<int32_t>());
 				TestEntity->update(world_state);
 				Assert::AreEqual(21, (*inc)["TestInteger"].get<int32_t>());
+				ActionIncrement* inc2 = new ActionIncrement();
+				(*inc2)["TestInteger"] = 30;
+				(*inc2)["Target"] = "TestInteger";
+				TestActionListIf->setElseBlock(*inc2);
+				Assert::AreEqual(30, (*inc2)["TestInteger"].get<int32_t>());
+				TestEntity->update(world_state);
+				Assert::AreEqual(31, (*inc2)["TestInteger"].get<int32_t>());
+				delete inc;
 			}
 
 			// ActionCreateAction Update Test
@@ -203,10 +220,17 @@ namespace UnitTestLibraryDesktop
 				Assert::AreEqual(TestActionList->actions().size(), 1U);
 				TestEntity->update(world_state);
 				Assert::AreEqual(TestActionList->actions().size(), 2U);
+				Entity* TestEntityTwo = world.createSector("TestSectorTwo")->createEntity("Entity", "TestEntityTwo");
+				ActionCreateAction* TestActionCreateAction2 = TestEntityTwo->createAction("ActionCreateAction", "TestActionCreateAction2")->As<ActionCreateAction>();
+				TestActionCreateAction2->setClassName("ActionCreateAction");
+				TestActionCreateAction2->setInstanceName("TestActionCreateAction2");
+				Assert::AreEqual(TestEntityTwo->actions().size(), 1U);
+				//TestEntityTwo->update(world_state);
+				//Assert::AreEqual(TestEntityTwo->actions().size(), 2U);
 			}
 
 			// ActionDestroyAction Update Test
-			// Not fully tested due to absence of Graveyard implementation
+			// Destroy part Not fully tested due to absence of Graveyard implementation
 			{
 				EntityFactory entity_factory;
 				ActionListFactory action_list_factory;

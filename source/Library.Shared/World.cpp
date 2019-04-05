@@ -39,7 +39,7 @@ namespace FieaGameEngine
 	void World::update(WorldState& t_world_state)
 	{
 		t_world_state.world = this;
-		Datum t_sectors = sectors();
+		Datum& t_sectors = sectors();
 		for (uint32_t i = 0; i < t_sectors.size(); ++i)
 		{
 			Scope& t_sector_scope = t_sectors[i];

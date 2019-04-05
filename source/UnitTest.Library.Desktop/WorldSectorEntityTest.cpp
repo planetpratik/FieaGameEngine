@@ -157,6 +157,7 @@ namespace UnitTestLibraryDesktop
 				GameTime game_time;
 				WorldState world_state;
 				world_state.setGameTime(game_time);
+				Sector* sector = world.createSector("Sector1");
 				world.update(world_state);
 			}
 		}

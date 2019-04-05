@@ -15,11 +15,11 @@ namespace FieaGameEngine
 
 	public:
 		/// <summary>Default Constructor for Action Class.</summary>
-		Action();
+		//Action();
 
 		/// <summary>Parameterised Constructor for Action ( Explicit )</summary>
 		/// <param name="t_name">Const reference to string name with which Action is to be initialized.</param>
-		explicit Action(const std::string& t_name);
+		//explicit Action(const std::string& t_name);
 
 		/// <summary>Defaulted Destructor for Action ( Virtual )</summary>
 		virtual ~Action() = default;
