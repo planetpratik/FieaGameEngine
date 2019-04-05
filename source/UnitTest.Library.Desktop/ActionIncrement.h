@@ -20,5 +20,5 @@ namespace FieaGameEngine
 		std::string m_target;
 	};
 
-	ConcreteFactory(ActionIncrement, Action)
+	ConcreteFactory(ActionIncrement, Scope)
 }

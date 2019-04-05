@@ -66,5 +66,5 @@ namespace FieaGameEngine
 		ActionList(const uint64_t& t_type_id, const std::string& t_name);
 	};
 
-	ConcreteFactory(ActionList, Action)
+	ConcreteFactory(ActionList, Scope)
 }

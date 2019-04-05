@@ -14,12 +14,6 @@ namespace FieaGameEngine
 		RTTI_DECLARATIONS(Action, Attributed)
 
 	public:
-		/// <summary>Default Constructor for Action Class.</summary>
-		//Action();
-
-		/// <summary>Parameterised Constructor for Action ( Explicit )</summary>
-		/// <param name="t_name">Const reference to string name with which Action is to be initialized.</param>
-		//explicit Action(const std::string& t_name);
 
 		/// <summary>Defaulted Destructor for Action ( Virtual )</summary>
 		virtual ~Action() = default;
@@ -71,6 +65,7 @@ namespace FieaGameEngine
 		virtual gsl::owner<Scope*> clone() const = 0;
 
 	protected:
+
 		Action(const uint64_t& t_type_id, const std::string& t_name);
 
 	private:

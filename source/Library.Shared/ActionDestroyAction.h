@@ -56,5 +56,5 @@ namespace FieaGameEngine
 		std::string m_action_instance_name;
 	};
 
-	ConcreteFactory(ActionDestroyAction, Action)
+	ConcreteFactory(ActionDestroyAction, Scope)
 }

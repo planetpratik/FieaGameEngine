@@ -46,7 +46,7 @@ namespace FieaGameEngine
 
 	Action* Entity::createAction(const std::string& t_class_name, const std::string& t_instance_name)
 	{
-		Action* t_action = Factory<Action>::create(t_class_name)->As<Action>();
+		Action* t_action = Factory<Scope>::create(t_class_name)->As<Action>();
 		if (t_action == nullptr)
 		{
 			return nullptr;

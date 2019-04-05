@@ -6,14 +6,6 @@ namespace FieaGameEngine
 {
 	RTTI_DEFINITIONS(Action)
 
-	/*Action::Action() : Action(std::string())
-	{
-	}
-
-	Action::Action(const std::string& t_name) : Attributed(TypeIdClass()), m_action_name(t_name)
-	{
-	}*/
-
 	const std::string & Action::name() const
 	{
 		return m_action_name;

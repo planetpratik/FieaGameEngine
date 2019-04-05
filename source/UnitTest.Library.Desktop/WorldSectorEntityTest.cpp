@@ -7,6 +7,7 @@
 #include "CppUnitTest.h"
 #include <fstream>
 #include <string>
+#include "ActionIncrement.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace FieaGameEngine;
@@ -251,7 +252,6 @@ namespace UnitTestLibraryDesktop
 			GameTime game_time;
 			WorldState world_state;
 			world_state.setGameTime(game_time);
-			//world.update(world_state);
 			sector1->update(world_state);
 		}
 
@@ -295,6 +295,7 @@ namespace UnitTestLibraryDesktop
 		{
 			SectorFactory sectorFactory;
 			EntityFactory factory;
+			ActionIncrementFactory action_increment_factory;
 
 			const std::string file_name = "Content\\WorldTest.json";
 			std::ifstream json_file(file_name);
@@ -310,21 +311,22 @@ namespace UnitTestLibraryDesktop
 
 			parse_master.parseFromFile(file_name);
 
-			Assert::IsTrue("World" == world["name"].get<std::string>(0));
+			Assert::AreEqual("World"s, world.name());
 
-			Scope* sectors = world["sectors"].get<Scope*>(0);
-			Assert::IsTrue("Sector1" == (*sectors)["name"].get<std::string>(0));
-			Assert::IsTrue("Sector2" == (*sectors)["name"].get<std::string>(1));
+			Sector* sector1 = world["Sectors"].get<Scope*>(0)->As<Sector>();
+			Assert::AreEqual("Sector1"s, sector1->name());
 
-			/*Scope* sector2 = temp["sectors"].get<Scope*>(0);
-			Scope temp2 = *sector2;
-			Assert::IsTrue("Sector2" == temp2["name"].get<std::string>(0));*/
+			Sector* sector2 = world["Sectors"].get<Scope*>(1)->As<Sector>();
+			Assert::AreEqual("Sector2"s, sector2->name());
 
+			Entity* entity1 = (*sector1)["Entities"].get<Scope*>(0)->As<Entity>();
+			Assert::AreEqual("Entity1"s, entity1->name());
+			Entity* entity2 = (*sector1)["Entities"].get<Scope*>(1)->As<Entity>();
+			Assert::AreEqual("Entity2"s, entity2->name());
+			Entity* entity3 = (*sector2)["Entities"].get<Scope*>(0)->As<Entity>();
+			Assert::AreEqual("Entity3"s, entity3->name());
 
 		}
-
-		
-
 	private:
 		static _CrtMemState s_start_mem_state;
 	};

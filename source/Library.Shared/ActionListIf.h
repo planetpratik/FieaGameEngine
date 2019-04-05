@@ -63,5 +63,5 @@ namespace FieaGameEngine
 		int32_t m_condition_value;
 	};
 
-	ConcreteFactory(ActionListIf, Action)
+	ConcreteFactory(ActionListIf, Scope)
 }

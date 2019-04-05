@@ -103,6 +103,7 @@ namespace UnitTestLibraryDesktop
 			parse_master.initialize();
 
 			parse_master.parse(input);
+
 			Assert::AreEqual(100, scope["speed"].get<int32_t>(0));
 			Assert::AreEqual(200, scope["speed"].get<int32_t>(1));
 			Assert::AreEqual(300, scope["speed"].get<int32_t>(2));
@@ -112,28 +113,6 @@ namespace UnitTestLibraryDesktop
 			Assert::AreEqual("kitkat"s, temp["food"].get<std::string>(0));
 			Assert::AreEqual("StarBurst"s, temp["food"].get<std::string>(1));
 			Assert::AreEqual("Reeses"s, temp["food"].get<std::string>(2));
-		}
-
-		TEST_METHOD(ParseArrayofObjectsFromStringTest)
-		{
-			Scope scope;
-			const string input = R"({ "speed": { "Type": "table", "Value": [ { "Ferrari": { "Type": "integer", "Value": 100 } }, { "Porsche": { "Type": "integer", "Value": 150 } }, { "Lamborghini": { "Type": "integer", "Value": 200 } } ] }, "food": { "Type": "string", "Value": [ "kitkat", "StarBurst", "Reeses" ] } })";
-			JsonTableParseHelper::SharedData shared_data(scope);
-			JsonTableParseHelper parse_helper;
-			JsonParseMaster parse_master(shared_data);
-			parse_master.addHelper(parse_helper);
-			parse_master.initialize();
-
-			parse_master.parse(input);
-			Scope* new_scope = scope["speed"].get<Scope*>(0);
-			Scope temp = *new_scope;
-			Assert::AreEqual(100, temp["Ferrari"].get<int32_t>(0));
-			Assert::AreEqual(150, temp["Porsche"].get<int32_t>(0));
-			Assert::AreEqual(200, temp["Lamborghini"].get<int32_t>(0));
-
-			Assert::AreEqual("kitkat"s, scope["food"].get<std::string>(0));
-			Assert::AreEqual("StarBurst"s, scope["food"].get<std::string>(1));
-			Assert::AreEqual("Reeses"s, scope["food"].get<std::string>(2));
 		}
 		
 		TEST_METHOD(ParseScopeFromFileTest)
@@ -165,16 +144,6 @@ namespace UnitTestLibraryDesktop
 			Scope* another_scope = temp["food"].get<Scope*>(0);
 			Scope temp_two = *another_scope;
 			Assert::AreEqual("Almond"s, temp_two["protein"].get<std::string>(0));
-
-			new_scope = scope["maxspeed"].get<Scope*>(0);
-			temp = *new_scope;
-			Assert::AreEqual(100, temp["Ferrari"].get<int32_t>(0));
-			Assert::AreEqual(150, temp["Porsche"].get<int32_t>(0));
-			Assert::AreEqual(200, temp["Lamborghini"].get<int32_t>(0));
-			
-			Assert::AreEqual(74.2f, scope["power"].get<float_t>(0));
-			Assert::AreEqual(51.5f, scope["power"].get<float_t>(1));
-			Assert::AreEqual(92.0f, scope["power"].get<float_t>(2));
 
 			std::string temp_string = "mat4x4((1, 0, 0, 0), (1, 0, 0, 0), (1, 1, 0, 0), (0, 0, 1, 1))"s;
 			glm::mat4x4 temp_mat;

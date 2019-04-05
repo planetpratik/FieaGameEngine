@@ -1,31 +1,104 @@
 {
-  "name": {
-    "Type": "string",
-    "Value": "World"
+  "Name":{
+     "Type":"string",
+     "Value":"World"
   },
-  "sectors": {
-    "Type": "table",
-    "Value": [
-      {
-        "Class": "Sector",
-        "Type": "table",
-        "Value": {
-          "name": {
-            "Type": "string",
-            "Value": "Sector1"
-          }
+  "Sectors":{
+     "Type":"table",
+     "Value":[
+        {
+           "Class":"Sector",
+           "Type":"table",
+           "Value":{
+              "Name":{
+                 "Type":"string",
+                 "Value":"Sector1"
+              },
+              "Entities":{
+                 "Type":"table",
+                 "Value":[
+                    {
+                       "Type":"table",
+                       "Class":"Entity",
+                       "Value":{
+                          "Name":{
+                             "Type":"string",
+                             "Value":"Entity1"
+                          }
+                       }
+                    },
+                    {
+                       "Type":"table",
+                       "Class":"Entity",
+                       "Value":{
+                          "Name":{
+                             "Type":"string",
+                             "Value":"Entity2"
+                          },
+                          "Actions":{
+                             "Type":"table",
+                             "Value":[
+                                {
+                                   "Type":"table",
+                                   "Class":"ActionIncrement",
+                                   "Value":{
+                                      "Target":{
+                                         "Type":"string",
+                                         "Value":"Number"
+                                      },
+                                      "Number":{
+                                         "Type":"integer",
+                                         "Value":100
+                                      }
+                                   }
+                                }
+                             ]
+                          }
+                       }
+                    }
+                 ]
+              }
+           }
+        },
+        {
+           "Class":"Sector",
+           "Type":"table",
+           "Value":{
+              "Name":{
+                 "Type":"string",
+                 "Value":"Sector2"
+              },
+              "Entities":{
+                 "Type":"table",
+                 "Class":"Entity",
+                 "Value":{
+                    "Name":{
+                       "Type":"string",
+                       "Value":"Entity3"
+                    },
+                    "Actions":{
+                      "Type":"table",
+                      "Value":[
+                         {
+                            "Type":"table",
+                            "Class":"ActionIncrement",
+                            "Value":{
+                               "Target":{
+                                  "Type":"string",
+                                  "Value":"Number"
+                               },
+                               "Number":{
+                                  "Type":"integer",
+                                  "Value":200
+                               }
+                            }
+                         }
+                      ]
+                   }
+                 }
+              }
+           }
         }
-      },
-      {
-        "Class": "Sector",
-        "Type": "table",
-        "Value": {
-          "name": {
-            "Type": "string",
-            "Value": "Sector2"
-          }
-        }
-      }
-    ]
+     ]
   }
 }

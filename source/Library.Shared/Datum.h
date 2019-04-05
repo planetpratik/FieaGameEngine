@@ -9,6 +9,7 @@
 #include <sstream>
 #include <tuple>
 #include <glm/gtx/string_cast.hpp>
+#include "HashMap.h"
 
 namespace FieaGameEngine
 {
@@ -615,6 +616,9 @@ namespace FieaGameEngine
 		/// <param name="t_index">index of a Scope to get from.</param>
 		/// <returns>Returns const reference to the Scope.</returns>
 		const Scope& operator[](uint32_t t_index) const;
+
+		const static HashMap<std::string, Datum::DatumType> StringDatumTypeMap;
+
 	private:
 		/// <summary>Discriminated Union for storing Data pointer.</summary>
 		union Data
@@ -635,7 +639,6 @@ namespace FieaGameEngine
 		uint32_t m_size = 0;
 		uint32_t m_capacity = 0;
 		bool m_is_external = false;
-		//static uint32_t typeSizeMap[];
 		const static inline size_t typeSizeMap[8]{ 0, sizeof(int32_t), sizeof(float_t), sizeof(glm::vec4), sizeof(glm::mat4x4), sizeof(Scope*), sizeof(std::string), sizeof(RTTI*) };
 	};
 }

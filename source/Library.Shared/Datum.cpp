@@ -4,6 +4,18 @@
 
 namespace FieaGameEngine
 {
+
+	const HashMap<std::string, Datum::DatumType> Datum::StringDatumTypeMap
+	{
+		{ "unknown", Datum::DatumType::UNKNOWN },
+		{ "integer", Datum::DatumType::INTEGER },
+		{ "float", Datum::DatumType::FLOAT },
+		{ "string", Datum::DatumType::STRING },
+		{ "matrix4x4", Datum::DatumType::MATRIX4X4 },
+		{ "vector4", Datum::DatumType::VECTOR4 },
+		{ "table", Datum::DatumType::TABLE }
+	};
+
 	Datum::Datum(DatumType t_type) :
 		m_type(t_type)
 	{

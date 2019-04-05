@@ -191,12 +191,12 @@ namespace FieaGameEngine
 		return m_parse_helpers;
 	}
 
-	void JsonParseMaster::parseValue(const Json::Value& t_value)
+	void JsonParseMaster::parseValue(const Json::Value& t_value, bool t_is_array_element, uint32_t t_index)
 	{
 		const std::vector<std::string> keys = t_value.getMemberNames();
 		for (const std::string& key : keys)
 		{
-			parseKeyValuePair(key, t_value[key]);
+			parseKeyValuePair(key, t_value[key], t_is_array_element, t_index);
 		}
 	}
 
@@ -221,7 +221,16 @@ namespace FieaGameEngine
 			uint32_t i = 0;
 			for (const auto& element : t_value)
 			{
-				parseKeyValuePair(t_key, element, true, i, t_value.size());
+				if (element.isObject())
+				{
+					m_shared_data->incrementDepth();
+					parseValue(element, true, i);
+					m_shared_data->decrementDepth();
+				}
+				else
+				{
+					parseKeyValuePair(t_key, element, true, i, t_value.size());
+				}
 				++i;
 			}
 		}

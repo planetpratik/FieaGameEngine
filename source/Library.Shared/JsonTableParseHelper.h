@@ -102,22 +102,15 @@ namespace FieaGameEngine
 
 	private:
 
-		struct Data
+		struct StackFrame
 		{
 			std::string key;
-			std::string type;
-			std::string class_name = "";
-			std::string attribute_name = "";
-			Json::Value value;
+			Datum::DatumType type = Datum::DatumType::UNKNOWN;
+			std::string class_name;
+			Scope* scope = nullptr;
 		};
 
-		Data element;
-		Stack<std::string> key_stack;
-		Stack<std::string> type_stack;
-		bool m_parsing_data = false;
-		bool m_is_array_size_already_assigned = false;
-		int32_t m_array_elements_to_parse = 0;
-
+		Stack<StackFrame> call_stack;
 	};
 
 }
