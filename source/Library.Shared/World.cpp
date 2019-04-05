@@ -1,51 +1,17 @@
 #include "pch.h"
+#include "World.h"
 #include "Sector.h"
 
 namespace FieaGameEngine
 {
 	RTTI_DEFINITIONS(World)
 
-	World::World() : Attributed(TypeIdInstance())
+	World::World() : Attributed(TypeIdClass())
 	{
 	}
 
-	World::World(const std::string& t_name) : Attributed(TypeIdInstance()), m_sectors_table(nullptr), m_world_name(t_name)
+	World::World(const std::string& t_name) : Attributed(TypeIdClass()), m_world_name(t_name)
 	{
-		populate();
-	}
-
-	World::World(const World& t_rhs) : Attributed(t_rhs), m_world_name(t_rhs.m_world_name), m_sectors_table(t_rhs.m_sectors_table)
-	{
-		updateExternalStorage();
-	}
-
-	World::World(World&& t_rhs) : Attributed(std::move(t_rhs)), m_world_name(std::move(t_rhs.m_world_name)), m_sectors_table(std::move(t_rhs.m_sectors_table))
-	{
-		updateExternalStorage();
-	}
-
-	World& World::operator=(const World& t_rhs)
-	{
-		if (this != &t_rhs)
-		{
-			Attributed::operator=(t_rhs);
-			m_world_name = t_rhs.m_world_name;
-			m_sectors_table = t_rhs.m_sectors_table;
-			updateExternalStorage();
-		}
-		return *this;
-	}
-
-	World& World::operator=(World&& t_rhs)
-	{
-		if (this != &t_rhs)
-		{
-			Attributed::operator=(std::move(t_rhs));
-			m_world_name = std::move(t_rhs.m_world_name);
-			m_sectors_table = std::move(t_rhs.m_sectors_table);
-			updateExternalStorage();
-		}
-		return *this;
 	}
 
 	const std::string& World::name() const
@@ -60,7 +26,7 @@ namespace FieaGameEngine
 
 	Datum& World::sectors()
 	{
-		return *find("sectors");
+		return (*this)[sectors_index];
 	}
 
 	Sector* World::createSector(const std::string& t_sector_name)
@@ -73,23 +39,17 @@ namespace FieaGameEngine
 	void World::update(WorldState& t_world_state)
 	{
 		t_world_state.world = this;
-		m_sectors_table = find("sectors");
-		for (uint32_t i = 0; i < m_sectors_table->size(); ++i)
+		Datum t_sectors = sectors();
+		for (uint32_t i = 0; i < t_sectors.size(); ++i)
 		{
-			//assert((*m_sectors_table)[i].Is(Sector::TypeIdClass()));
-			(*m_sectors_table)[i].As<Sector>()->update(t_world_state);
+			Scope& t_sector_scope = t_sectors[i];
+			assert(t_sector_scope.Is(Sector::TypeIdClass()));
+			Sector& t_sector = static_cast<Sector&>(t_sector_scope);
+			t_world_state.sector = &t_sector;
+			t_sector.update(t_world_state);
 		}
-	}
 
-	void World::populate()
-	{
-		m_sectors_table = &append("sectors");
-		(*this)["name"].setStorage(&m_world_name, 1);
-	}
-
-	void World::updateExternalStorage()
-	{
-		(*this)["name"].setStorage(&m_world_name, 1);
+		t_world_state.sector = nullptr;
 	}
 
 	gsl::owner<Scope*> World::clone() const
@@ -101,8 +61,8 @@ namespace FieaGameEngine
 	{
 		return Vector<Signature>
 		{
-			{ "name", Datum::DatumType::STRING, 1, offsetof(World, m_world_name) },
-			{ "sectors", Datum::DatumType::TABLE, 1, offsetof(World, m_sectors_table) }
+			{ "Name", Datum::DatumType::STRING, 1, offsetof(World, m_world_name) },
+			{ "Sectors", Datum::DatumType::TABLE, 0, 0 }
 		};
 	}
 }

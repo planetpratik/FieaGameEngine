@@ -1,10 +1,10 @@
 #pragma once
 #include "Attributed.h"
 #include "Entity.h"
-#include "World.h"
-
 namespace FieaGameEngine
 {
+	class World;
+
 	/// <summary>
 	/// Sector is purely an artifact of finite resources.
 	/// Sector is loosely comparable to the idea of a package or library, and exists to partition
@@ -28,21 +28,21 @@ namespace FieaGameEngine
 
 		/// <summary>Copy Constructor for Sector.</summary>
 		/// <param name="t_rhs">Const reference to passed Sector.</param>
-		Sector(const Sector& t_rhs);
+		Sector(const Sector& t_rhs) = default;
 
 		/// <summary>Move Constructor for Sector.</summary>
 		/// <param name="t_rhs">R-Value reference to passed Sector which is to be moved.</param>
-		Sector(Sector&& t_rhs);
+		Sector(Sector&& t_rhs) = default;
 
 		/// <summary>Copy Assignment operator overload for Sector.</summary>
 		/// <param name="t_rhs">Const reference to passed Sector.</param>
 		/// <returns>Returns reference to current Sector.</returns>
-		Sector& operator=(const Sector& t_rhs);
+		Sector& operator=(const Sector& t_rhs) = default;
 
 		/// <summary>Move Assignment operator overload for Sector.</summary>
 		/// <param name="t_rhs">R-Value reference to passed Sector which is to be moved.</param>
 		/// <returns>Returns reference to current Sector.</returns>
-		Sector& operator=(Sector&& t_rhs);
+		Sector& operator=(Sector&& t_rhs) = default;
 
 		/// <summary>Defaulted Destructor for Sector ( Virtual )</summary>
 		virtual ~Sector() = default;
@@ -81,12 +81,6 @@ namespace FieaGameEngine
 		/// <param name="t_world_state">Passed WorldState reference parameter.</param>
 		void update(WorldState& t_world_state);
 
-		/// <summary>To Populate Sector during construction with default values.</summary>
-		void populate();
-
-		/// <summary>To update Storage of name parameter to External.</summary>
-		void updateExternalStorage();
-
 		/// <summary>Create clone of a Sector (Overriden)</summary>
 		/// <returns>Returns new Sector clone.</returns>
 		virtual gsl::owner<Scope*> clone() const override;
@@ -96,7 +90,7 @@ namespace FieaGameEngine
 		static Vector<Signature> Signatures();
 	private:
 		std::string m_sector_name;
-		Datum* m_entities_table;
+		const static inline uint32_t entities_index = 2;
 	};
 
 	ConcreteFactory(Sector, Scope);

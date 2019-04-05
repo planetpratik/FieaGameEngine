@@ -1,50 +1,18 @@
 #include "pch.h"
 #include "Entity.h"
 #include "Sector.h"
+#include "Action.h"
 
 namespace FieaGameEngine
 {
 	RTTI_DEFINITIONS(Entity)
 
-	Entity::Entity() : Attributed(TypeIdClass())
+	Entity::Entity() : Entity(std::string())
 	{
 	}
 
 	Entity::Entity(const std::string& t_name) : Attributed(TypeIdClass()), m_entity_name(t_name)
 	{
-		populate();
-	}
-
-	Entity::Entity(const Entity& t_rhs) : Attributed(t_rhs), m_entity_name(t_rhs.m_entity_name)
-	{
-		updateExternalStorage();
-	}
-
-	Entity::Entity(Entity&& t_rhs) : Attributed(std::move(t_rhs)), m_entity_name(std::move(t_rhs.m_entity_name))
-	{
-		updateExternalStorage();
-	}
-
-	Entity& Entity::operator=(const Entity& t_rhs)
-	{
-		if (this != &t_rhs)
-		{
-			Attributed::operator=(t_rhs);
-			m_entity_name = t_rhs.m_entity_name;
-			updateExternalStorage();
-		}
-		return *this;
-	}
-
-	Entity& Entity::operator=(Entity&& t_rhs) 
-	{
-		if (this != &t_rhs)
-		{
-			Attributed::operator=(std::move(t_rhs));
-			m_entity_name = std::move(t_rhs.m_entity_name);
-			updateExternalStorage();
-		}
-		return *this;
 	}
 
 	const std::string& Entity::name() const
@@ -67,24 +35,40 @@ namespace FieaGameEngine
 	{
 		if (t_sector != nullptr)
 		{
-			t_sector->adopt("entities", *this);
+			t_sector->adopt("Entities", *this);
 		}
+	}
+
+	Datum& Entity::actions()
+	{
+		return (*this)["Actions"];
+	}
+
+	Action* Entity::createAction(const std::string& t_class_name, const std::string& t_instance_name)
+	{
+		Action* t_action = Factory<Action>::create(t_class_name)->As<Action>();
+		if (t_action == nullptr)
+		{
+			return nullptr;
+		}
+		t_action->setName(t_instance_name);
+		t_action->setEntity(this);
+		return t_action;
 	}
 
 	void Entity::update(WorldState& t_world_state)
 	{
-		t_world_state;
-		// Does nothing for now.
-	}
-
-	void Entity::populate()
-	{
-		(*this)["name"].setStorage(&m_entity_name, 1);
-	}
-
-	void Entity::updateExternalStorage()
-	{
-		(*this)["name"].setStorage(&m_entity_name, 1);
+		t_world_state.entity = this;
+		Datum& t_actions = actions();
+		for (uint32_t i = 0; i < t_actions.size(); ++i)
+		{
+			Scope& t_action_scope = t_actions[i];
+			assert(t_action_scope.Is(Action::TypeIdClass()));
+			Action& t_action = static_cast<Action&>(t_action_scope);
+			t_world_state.action = &t_action;
+			t_action.update(t_world_state);
+		}
+		t_world_state.action = nullptr;
 	}
 
 	gsl::owner<Scope*> Entity::clone() const
@@ -96,7 +80,8 @@ namespace FieaGameEngine
 	{
 		return Vector<Signature>
 		{
-			{"name", Datum::DatumType::STRING, 1, offsetof(Entity, m_entity_name)}
+			{"Name", Datum::DatumType::STRING, 1, offsetof(Entity, m_entity_name)},
+			{"Actions", Datum::DatumType::TABLE, 0, 0}
 		};
 	}
 

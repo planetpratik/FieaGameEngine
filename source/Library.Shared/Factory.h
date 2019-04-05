@@ -44,7 +44,7 @@ namespace FieaGameEngine
 		/// <summary>Create Concrete Product associated with Concrete factory class. (Static)</summary>
 		/// <param name="t_concrete_factory_name">Const std::string reference to name of associated factory.</param>
 		/// <returns>Returns pointer to Abstract Product type.</returns>
-		static gsl::owner<RTTI*> create(const std::string& t_concrete_factory_name);
+		static gsl::owner<AbstractProductT*> create(const std::string& t_concrete_factory_name);
 
 		/// <summary>Get count of no. of elements present in Factory Table. (Static)</summary>
 		/// <returns>Returns Factory table's count of elements in Unsigned Integer (32-Bit).</returns>
@@ -52,7 +52,7 @@ namespace FieaGameEngine
 
 		/// <summary>Create Concrete Product associated with Concrete factory class. (Pure Virtual Function)</summary>
 		/// <returns>Returns pointer to Abstract Product type.</returns>
-		virtual gsl::owner<RTTI*> create() = 0;
+		virtual gsl::owner<AbstractProductT*> create() = 0;
 
 		/// <summary>Gets name of the product class instantiated by Concrete Factory. (Pure Virtual Function)</summary>
 		/// <returns>Returns std::string indicating name of the Product class.</returns>
@@ -92,7 +92,7 @@ namespace FieaGameEngine
 		{																			\
 			return (#ConcreteProductT);												\
 		}																			\
-		virtual gsl::owner<RTTI*> create() override									\
+		virtual gsl::owner<AbstractProductT*> create() override									\
 		{																			\
 			return new ConcreteProductT();											\
 		}																			\

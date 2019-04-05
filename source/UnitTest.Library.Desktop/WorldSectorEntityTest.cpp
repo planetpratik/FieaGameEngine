@@ -64,19 +64,19 @@ namespace UnitTestLibraryDesktop
 			{
 				string name = "TestEntity";
 				Entity entity(name);
-				Assert::IsTrue(entity.isPrescribedAttribute("name"s));
+				Assert::IsTrue(entity.isPrescribedAttribute("Name"s));
 				Assert::AreEqual(name, entity.name());
 			}
 			{
 				string name = "TestSector";
 				Sector sector(name);
-				Assert::IsTrue(sector.isPrescribedAttribute("name"s));
+				Assert::IsTrue(sector.isPrescribedAttribute("Name"s));
 				Assert::AreEqual(name, sector.name());
 			}
 			{
 				string name = "TestWorld";
 				World world(name);
-				Assert::IsTrue(world.isPrescribedAttribute("name"s));
+				Assert::IsTrue(world.isPrescribedAttribute("Name"s));
 				Assert::AreEqual(name, world.name());
 			}
 		}
@@ -236,28 +236,22 @@ namespace UnitTestLibraryDesktop
 			world3.createSector("TestSector2"s);
 			Datum& sectors2 = world3.sectors();
 			Assert::AreEqual(sectors2.size(), 2U);
-			//Assert::IsTrue(world3.sectors().get<Scope*>(0)->Is(Sector::TypeIdClass()));
 
-			Sector* sector1 = new Sector(*world.createSector("Sector1"s));
-			Sector* sector2 = new Sector(*world.createSector("Sector2"s));
+			Sector* sector1 = world.createSector("Sector1"s);
+			Sector* sector2 = world.createSector("Sector2"s);
 			*sector2 = *sector1;
 			Assert::AreEqual(sector2->name(), sector1->name());
 
-			Entity* entity1 = new Entity(*sector1->createEntity("Entity", "Entity1"));
-			Entity* entity2 = new Entity(*sector1->createEntity("Entity", "Entity2"));
+			Entity* entity1 = sector1->createEntity("Entity", "Entity1");
+			Entity* entity2 = sector1->createEntity("Entity", "Entity2");
 			*entity2 = *entity1;
 			Assert::AreEqual(entity2->name(), entity1->name());
 
 			GameTime game_time;
 			WorldState world_state;
 			world_state.setGameTime(game_time);
-			world.update(world_state);
+			//world.update(world_state);
 			sector1->update(world_state);
-
-			delete sector1;
-			delete sector2;
-			delete entity1;
-			delete entity2;
 		}
 
 		TEST_METHOD(MoveSemanticsTest)

@@ -20,6 +20,8 @@
     <ClCompile Include="JsonTableParseHelperTest.cpp" />
     <ClCompile Include="FactoryTest.cpp" />
     <ClCompile Include="WorldSectorEntityTest.cpp" />
+    <ClCompile Include="ActionIncrement.cpp" />
+    <ClCompile Include="ActionTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -28,5 +30,6 @@
     <ClInclude Include="AttributedFoo.h" />
     <ClInclude Include="JsonTestParseHelper.h" />
     <ClInclude Include="JsonIntegerParseHelper.h" />
+    <ClInclude Include="ActionIncrement.h" />
   </ItemGroup>
 </Project>

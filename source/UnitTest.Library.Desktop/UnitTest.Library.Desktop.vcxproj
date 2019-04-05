@@ -182,6 +182,7 @@ xcopy /E /Y "$(ProjectDir)Content" "$(OutDir)Content"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ActionIncrement.h" />
     <ClInclude Include="AttributedFoo.h" />
     <ClInclude Include="Bar.h" />
     <ClInclude Include="Foo.h" />
@@ -190,6 +191,8 @@ xcopy /E /Y "$(ProjectDir)Content" "$(OutDir)Content"</Command>
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ActionIncrement.cpp" />
+    <ClCompile Include="ActionTest.cpp" />
     <ClCompile Include="AttributedFoo.cpp" />
     <ClCompile Include="AttributedTest.cpp" />
     <ClCompile Include="Bar.cpp" />

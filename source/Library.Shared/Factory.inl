@@ -18,7 +18,7 @@ namespace FieaGameEngine
 	}
 
 	template<typename AbstractProductT>
-	inline gsl::owner<RTTI*> Factory<AbstractProductT>::create(const std::string& t_concrete_factory_name)
+	inline gsl::owner<AbstractProductT*> Factory<AbstractProductT>::create(const std::string& t_concrete_factory_name)
 	{
 		return m_concrete_factories_table.at(t_concrete_factory_name)->create();
 	}

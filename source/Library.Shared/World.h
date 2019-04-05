@@ -4,8 +4,8 @@
 namespace FieaGameEngine
 {
 	/// <summary>Forward Declaration of WorldState Class</summary>
+	class Sector;
 	class WorldState;
-
 	/// <summary>
 	/// World class is Yet Another Container – a container of Sectors.
 	/// A World defines a global Scope – the Scope that all other objects in the simulation share.
@@ -23,23 +23,23 @@ namespace FieaGameEngine
 		/// <param name="t_name">Const reference to string name with which World is to be initialized.</param>
 		explicit World(const std::string& t_name);
 
-		/// <summary>Copy Constructor for World.</summary>
+		/// <summary>Copy Constructor for World (Defaulted).</summary>
 		/// <param name="t_rhs">Const reference to passed World.</param>
-		World(const World& t_rhs);
+		World(const World& t_rhs) = default;
 
-		/// <summary>Move Constructor for World.</summary>
+		/// <summary>Move Constructor for World (Defaulted).</summary>
 		/// <param name="t_rhs">R-Value reference to passed World which is to be moved.</param>
-		World(World&& t_rhs);
+		World(World&& t_rhs) = default;
 
-		/// <summary>Copy Assignment operator overload for World.</summary>
+		/// <summary>Copy Assignment operator overload for World (Defaulted).</summary>
 		/// <param name="t_rhs">Const reference to passed World.</param>
 		/// <returns>Returns reference to current World.</returns>
-		World& operator=(const World& t_rhs);
+		World& operator=(const World& t_rhs) = default;
 
-		/// <summary>Move Assignment operator overload for World.</summary>
+		/// <summary>Move Assignment operator overload for World (Defaulted).</summary>
 		/// <param name="t_rhs">R-Value reference to passed World which is to be moved.</param>
 		/// <returns>Returns reference to current World.</returns>
-		World& operator=(World&& t_rhs);
+		World& operator=(World&& t_rhs) = default;
 
 		/// <summary>Defaulted Destructor for World ( Virtual )</summary>
 		virtual ~World() = default;
@@ -68,12 +68,6 @@ namespace FieaGameEngine
 		/// <param name="t_world_state">Passed WorldState reference parameter.</param>
 		void update(WorldState& t_world_state);
 
-		/// <summary>To Populate World during construction with default values.</summary>
-		void populate();
-
-		/// <summary>To update Storage of name parameter to External.</summary>
-		void updateExternalStorage();
-
 		/// <summary>Create clone of a World (Overriden)</summary>
 		/// <returns>Returns new World clone.</returns>
 		virtual gsl::owner<Scope*> clone() const override;
@@ -83,6 +77,6 @@ namespace FieaGameEngine
 		static Vector<Signature> Signatures();
 	private:
 		std::string m_world_name;
-		Datum* m_sectors_table;
+		const static inline uint32_t sectors_index = 2;
 	};
 }

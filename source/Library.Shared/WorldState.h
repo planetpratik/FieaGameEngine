@@ -15,9 +15,10 @@ namespace FieaGameEngine
 		const GameTime& getGameTime() const;
 		void setGameTime(const GameTime& t_game_time);
 
-		class World* world;
-		class Sector* sector;
-		class Entity* entity;
+		class World* world = nullptr;
+		class Sector* sector = nullptr;;
+		class Entity* entity = nullptr;;
+		class Action* action = nullptr;
 	private:
 		GameClock m_game_clock;
 		GameTime m_game_time;

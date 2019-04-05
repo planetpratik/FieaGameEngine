@@ -1,53 +1,18 @@
 #include "pch.h"
 #include "Sector.h"
 #include "Factory.h"
-
+#include "World.h"
 
 namespace FieaGameEngine
 {
 	RTTI_DEFINITIONS(Sector)
 
-	Sector::Sector() : Attributed(TypeIdInstance())
+	Sector::Sector() : Sector(std::string())
 	{
 	}
 
-	Sector::Sector(const std::string& t_name) : Attributed(TypeIdInstance()), m_entities_table(nullptr),  m_sector_name(t_name)
+	Sector::Sector(const std::string& t_name) : Attributed(TypeIdClass()), m_sector_name(t_name)
 	{
-		populate();
-	}
-
-	Sector::Sector(const Sector& t_rhs) : Attributed(t_rhs), m_sector_name(t_rhs.m_sector_name), m_entities_table(t_rhs.m_entities_table)
-	{
-		updateExternalStorage();
-	}
-
-	Sector::Sector(Sector&& t_rhs) : Attributed(std::move(t_rhs)), m_sector_name(std::move(t_rhs.m_sector_name)), m_entities_table(std::move(t_rhs.m_entities_table))
-	{
-		updateExternalStorage();
-	}
-
-	Sector& Sector::operator=(const Sector& t_rhs)
-	{
-		if (this != &t_rhs)
-		{
-			Attributed::operator=(t_rhs);
-			m_sector_name = t_rhs.m_sector_name;
-			m_entities_table = t_rhs.m_entities_table;
-			updateExternalStorage();
-		}
-		return *this;
-	}
-
-	Sector& Sector::operator=(Sector&& t_rhs)
-	{
-		if (this != &t_rhs)
-		{
-			Attributed::operator=(std::move(t_rhs));
-			m_sector_name = std::move(t_rhs.m_sector_name);
-			m_entities_table = std::move(t_rhs.m_entities_table);
-			updateExternalStorage();
-		}
-		return *this;
 	}
 
 	const std::string& Sector::name() const
@@ -62,8 +27,7 @@ namespace FieaGameEngine
 
 	Datum& Sector::entities()
 	{
-		assert(m_entities_table != nullptr);
-		return *m_entities_table;
+		return (*this)[entities_index];
 	}
 
 	Entity* Sector::createEntity(const std::string& t_class_name, const std::string& t_instance_name)
@@ -88,30 +52,23 @@ namespace FieaGameEngine
 	{
 		if (t_world != nullptr)
 		{
-			t_world->adopt("sectors", *this);
+			t_world->adopt("Sectors", *this);
 		}
 	}
 
 	void Sector::update(WorldState& t_world_state)
 	{
 		t_world_state.sector = this;
-		m_entities_table = find("entities");
-		for (uint32_t i = 0; i < m_entities_table->size(); ++i)
+		Datum& t_entities = entities();
+		for (uint32_t i = 0; i < t_entities.size(); ++i)
 		{
-			assert((*m_entities_table)[i].Is(Entity::TypeIdClass()));
-			(*m_entities_table)[i].As<Entity>()->update(t_world_state);
+			Scope& t_entity_scope = t_entities[i];
+			assert(t_entity_scope.Is(Entity::TypeIdClass()));
+			Entity& t_entity = static_cast<Entity&>(t_entity_scope);
+			t_world_state.entity = &t_entity;
+			t_entity.update(t_world_state);
 		}
-	}
-
-	void Sector::populate()
-	{
-		m_entities_table = &append("entities");
-		(*this)["name"].setStorage(&m_sector_name, 1);
-	}
-
-	void Sector::updateExternalStorage()
-	{
-		(*this)["name"].setStorage(&m_sector_name, 1);
+		t_world_state.entity = nullptr;
 	}
 
 	gsl::owner<Scope*> Sector::clone() const
@@ -123,8 +80,8 @@ namespace FieaGameEngine
 	{
 		return Vector<Signature>
 		{
-			{ "name", Datum::DatumType::STRING, 1, offsetof(Sector, m_sector_name) },
-			{ "entities", Datum::DatumType::TABLE, 1, offsetof(Sector, m_entities_table) }
+			{ "Name", Datum::DatumType::STRING, 1, offsetof(Sector, m_sector_name) },
+			{ "Entities", Datum::DatumType::TABLE, 0, 0 }
 		};
 	}
 }
