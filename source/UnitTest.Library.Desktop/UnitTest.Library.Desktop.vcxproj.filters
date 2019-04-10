@@ -22,6 +22,8 @@
     <ClCompile Include="WorldSectorEntityTest.cpp" />
     <ClCompile Include="ActionIncrement.cpp" />
     <ClCompile Include="ActionTest.cpp" />
+    <ClCompile Include="SubscriberFoo.cpp" />
+    <ClCompile Include="EventTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -31,5 +33,6 @@
     <ClInclude Include="JsonTestParseHelper.h" />
     <ClInclude Include="JsonIntegerParseHelper.h" />
     <ClInclude Include="ActionIncrement.h" />
+    <ClInclude Include="SubscriberFoo.h" />
   </ItemGroup>
 </Project>

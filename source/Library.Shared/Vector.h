@@ -38,6 +38,13 @@ namespace FieaGameEngine
 			friend class ConstIterator;
 
 		public:
+
+			using size_type = std::size_t;
+			using difference_type = std::ptrdiff_t;
+			using value_type = T;
+			using reference = T;
+			using pointer = T * ;
+			using iterator_category = std::forward_iterator_tag;
 			/// <summary>Default Constructor for Iterator.</summary>
 			Iterator() = default;
 
@@ -90,6 +97,13 @@ namespace FieaGameEngine
 			friend Vector;
 
 		public:
+
+			using size_type = std::size_t;
+			using difference_type = std::ptrdiff_t;
+			using value_type = T;
+			using reference = T;
+			using pointer = T * ;
+			using iterator_category = std::forward_iterator_tag;
 			/// <summary>Default Constructor for ConstIterator.</summary>
 			ConstIterator() = default;
 

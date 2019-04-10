@@ -189,6 +189,7 @@ xcopy /E /Y "$(ProjectDir)Content" "$(OutDir)Content"</Command>
     <ClInclude Include="JsonIntegerParseHelper.h" />
     <ClInclude Include="JsonTestParseHelper.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="SubscriberFoo.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ActionIncrement.cpp" />
@@ -197,6 +198,7 @@ xcopy /E /Y "$(ProjectDir)Content" "$(OutDir)Content"</Command>
     <ClCompile Include="AttributedTest.cpp" />
     <ClCompile Include="Bar.cpp" />
     <ClCompile Include="DatumTest.cpp" />
+    <ClCompile Include="EventTest.cpp" />
     <ClCompile Include="FactoryTest.cpp" />
     <ClCompile Include="Foo.cpp" />
     <ClCompile Include="HashMapTest.cpp" />
@@ -214,6 +216,7 @@ xcopy /E /Y "$(ProjectDir)Content" "$(OutDir)Content"</Command>
     <ClCompile Include="FooTest.cpp" />
     <ClCompile Include="ScopeTest.cpp" />
     <ClCompile Include="SListTest.cpp" />
+    <ClCompile Include="SubscriberFoo.cpp" />
     <ClCompile Include="TestModuleInitialize.cpp" />
     <ClCompile Include="VectorTest.cpp" />
     <ClCompile Include="WorldSectorEntityTest.cpp" />
