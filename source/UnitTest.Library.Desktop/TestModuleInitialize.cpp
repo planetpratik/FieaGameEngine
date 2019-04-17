@@ -10,6 +10,10 @@
 #include "ActionIncrement.h"
 #include "ActionCreateAction.h"
 #include "ActionDestroyAction.h"
+#include "Reaction.h"
+#include "ReactionAttributed.h"
+#include "EventMessageAttributed.h"
+#include "ActionEvent.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace FieaGameEngine;
@@ -28,6 +32,10 @@ namespace UnitTestLibraryDesktop
 		TypeManager::registerType(ActionIncrement::TypeIdClass(), ActionIncrement::Signatures());
 		TypeManager::registerType(ActionCreateAction::TypeIdClass(), ActionCreateAction::Signatures());
 		TypeManager::registerType(ActionDestroyAction::TypeIdClass(), ActionDestroyAction::Signatures());
+		TypeManager::registerType(Reaction::TypeIdClass(), Reaction::Signatures());
+		TypeManager::registerType(EventMessageAttributed::TypeIdClass(), EventMessageAttributed::Signatures());
+		TypeManager::registerType(ReactionAttributed::TypeIdClass(), ReactionAttributed::Signatures());
+		TypeManager::registerType(ActionEvent::TypeIdClass(), ActionEvent::Signatures());
 	}
 
 	TEST_MODULE_CLEANUP(TestModuleCleanup)

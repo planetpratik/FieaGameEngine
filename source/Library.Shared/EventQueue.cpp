@@ -33,13 +33,17 @@ namespace FieaGameEngine
 			auto partition_element = std::partition(m_event_queue.begin(), m_event_queue.end(), expression);
 
 			// Now iterate through expired events and call deliver() on them. Then remove them from queue.
+			
+			auto end = ++partition_element;
 
-			for (auto it = m_event_queue.begin(); it != partition_element; ++it)
+			for (auto it = m_event_queue.begin(); it != end/*partition_element*/; ++it)
 			{
 				(*it)->deliver();
 			}
 
-			m_event_queue.remove(m_event_queue.begin(), partition_element);
+			m_event_queue.remove(m_event_queue.begin());
+
+			//m_event_queue.remove(m_event_queue.begin(), partition_element);
 		}
 		
 	}

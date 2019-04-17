@@ -45,7 +45,7 @@ namespace FieaGameEngine
 		/// <summary>Checks whether Prescribed attribute with given name exists in the Scope or not.</summary>
 		/// <param name="t_name">Const reference to name ( std::string ) to be searched as a Prescribed Attribute.</param>
 		/// <returns>Returns boolean result indicating whether given name exists as a Prescribed attribute or not.</returns>
-		bool isPrescribedAttribute(const std::string& t_name);
+		bool isPrescribedAttribute(const std::string& t_name) const;
 
 		/// <summary>Checks whether Auxillary attribute with given name exists in the Scope or not.</summary>
 		/// <param name="t_name">Const reference to name ( std::string ) to be searched as an Auxillary Attribute.</param>

@@ -7,9 +7,9 @@ namespace FieaGameEngine
 	{
 	public:
 		WorldState();
-		WorldState(const WorldState& t_rhs) = delete;
+		WorldState(const WorldState& t_rhs) = default;
 		WorldState(WorldState&& t_rhs) = default;
-		WorldState& operator=(const WorldState& t_rhs) = delete;
+		WorldState& operator=(const WorldState& t_rhs) = default;
 		WorldState& operator=(WorldState&& t_rhs) = default;
 		~WorldState() = default;
 		const GameTime& getGameTime() const;

@@ -1,6 +1,8 @@
 #pragma once
 #include "Attributed.h"
 #include "TypeManager.h"
+#include "EventQueue.h"
+#include "Reaction.h"
 namespace FieaGameEngine
 {
 	/// <summary>Forward Declaration of WorldState Class</summary>
@@ -75,8 +77,19 @@ namespace FieaGameEngine
 		/// <summary>Static Method to get Signatures which are passed to TypeManager.</summary>
 		/// <returns>Vector of Signatures.</returns>
 		static Vector<Signature> Signatures();
+
+		WorldState& getWorldState();
+
+		EventQueue& getEventQueue();
+
+		Datum& reactions();
+
+		Reaction* createReaction(const std::string& t_class_name);
+
 	private:
 		std::string m_world_name;
+		WorldState* m_world_state;
+		EventQueue m_event_queue;
 		const static inline uint32_t sectors_index = 2;
 	};
 }

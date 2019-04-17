@@ -62,7 +62,7 @@ namespace FieaGameEngine
 		return (find(t_name) != nullptr);
 	}
 
-	bool Attributed::isPrescribedAttribute(const std::string& t_name)
+	bool Attributed::isPrescribedAttribute(const std::string& t_name) const
 	{
 		bool found = false;
 		const Vector<std::pair<std::string, Datum>*> attribute_pointers = getTableEntryPointers();

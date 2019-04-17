@@ -30,14 +30,7 @@ namespace FieaGameEngine
 	template<typename T>
 	inline void Event<T>::unsubscribeAll()
 	{
-		if (!m_subscribers_list.isEmpty())
-		{
-			for (auto it = m_subscribers_list.begin(); it != m_subscribers_list.end(); ++it)
-			{
-				m_subscribers_list.remove(it);
-			}
-			m_subscribers_list.clear();
-		}
+		m_subscribers_list.clear();
 	}
 
 	template<typename T>

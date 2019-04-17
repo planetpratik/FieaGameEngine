@@ -39,6 +39,9 @@ namespace FieaGameEngine
 	void World::update(WorldState& t_world_state)
 	{
 		t_world_state.world = this;
+		m_world_state = &t_world_state;
+		m_event_queue.update(m_world_state->getGameTime());
+
 		Datum& t_sectors = sectors();
 		for (uint32_t i = 0; i < t_sectors.size(); ++i)
 		{
@@ -64,5 +67,30 @@ namespace FieaGameEngine
 			{ "Name", Datum::DatumType::STRING, 1, offsetof(World, m_world_name) },
 			{ "Sectors", Datum::DatumType::TABLE, 0, 0 }
 		};
+	}
+
+	WorldState& World::getWorldState()
+	{
+		return *m_world_state;
+	}
+
+	EventQueue& World::getEventQueue()
+	{
+		return m_event_queue;
+	}
+
+	Datum& World::reactions()
+	{
+		return (*this)["Reactions"];
+	}
+
+	Reaction* World::createReaction(const std::string& t_class_name)
+	{
+		Reaction* reaction = Factory<Scope>::create(t_class_name)->As<Reaction>();
+		if (nullptr != reaction)
+		{
+			adopt("Reactions", *reaction);
+		}
+		return reaction;
 	}
 }
