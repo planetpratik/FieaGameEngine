@@ -11,6 +11,7 @@
 #include "Reaction.h"
 #include "ReactionAttributed.h"
 #include "EventMessageAttributed.h"
+#include "JsonTableParseHelper.h"
 #include "ActionEvent.h"
 #include "ActionIncrement.h"
 #include <fstream>
@@ -158,7 +159,7 @@ namespace UnitTestLibraryDesktop
 				r = rtti->QueryInterface(EventMessageAttributed::TypeIdClass());
 				Assert::IsNotNull(r);
 			}
-			
+
 		}
 
 
@@ -253,41 +254,102 @@ namespace UnitTestLibraryDesktop
 
 		TEST_METHOD(ActionEventUpdateTest)
 		{
-			{
-				GameTime game_time;
-				game_time.SetCurrentTime(std::chrono::steady_clock::now());
-				WorldState world_state;
-				world_state.setGameTime(game_time);
 
-				ReactionAttributedFactory reactions_attributed_factory;
-				EntityFactory entity_factory;
-				ActionEventFactory action_event_factory;
-				ActionIncrementFactory action_increment_factory;
-				World test_world("TestWorld");
-				ReactionAttributed* reaction = test_world.createReaction("ReactionAttributed")->As<ReactionAttributed>();
-				reaction->setSubtype("Integer"s);
-				Assert::AreEqual("Integer"s, reaction->getSubtype());
+			GameTime game_time;
+			game_time.SetCurrentTime(std::chrono::steady_clock::now());
+			WorldState world_state;
+			world_state.setGameTime(game_time);
 
-				ActionIncrement* action_increment = reaction->createAction("ActionIncrement", "action_increment")->As<ActionIncrement>();
-				(*action_increment)["Number"] = 10;
-				(*action_increment)["Target"] = "Number";
+			ReactionAttributedFactory reactions_attributed_factory;
+			EntityFactory entity_factory;
+			ActionEventFactory action_event_factory;
+			ActionIncrementFactory action_increment_factory;
+			World test_world("TestWorld");
+			ReactionAttributed* reaction = test_world.createReaction("ReactionAttributed")->As<ReactionAttributed>();
+			reaction->setSubtype("Integer"s);
+			Assert::AreEqual("Integer"s, reaction->getSubtype());
 
-				Entity* test_entity = test_world.createSector("TestSector"s)->createEntity("Entity"s, "TestEntity"s);
-				ActionEvent* test_action = test_entity->createAction("ActionEvent", "TestAction")->As<ActionEvent>();
-				test_action->appendAuxillaryAttribute("Number") = 5;
+			ActionIncrement* action_increment = reaction->createAction("ActionIncrement", "action_increment")->As<ActionIncrement>();
+			(*action_increment)["Number"] = 10;
+			(*action_increment)["Target"] = "Number";
 
-				Datum& datum = test_action->appendAuxillaryAttribute("TableAttribute");
-				datum.setType(Datum::DatumType::TABLE);
-				test_action->setSubtype("Integer");
-				test_action->setDelay(MilliSeconds(0));
-				Assert::AreEqual("Integer"s, test_action->getSubtype());
-				Assert::IsTrue(MilliSeconds(0) == test_action->getDelay());
+			Entity* test_entity = test_world.createSector("TestSector"s)->createEntity("Entity"s, "TestEntity"s);
+			ActionEvent* test_action = test_entity->createAction("ActionEvent", "TestAction")->As<ActionEvent>();
+			test_action->appendAuxillaryAttribute("Number") = 5;
 
-				test_world.update(world_state);
-				Assert::AreEqual(1U, test_world.getEventQueue().size());
-				test_world.update(world_state);
-				Assert::AreEqual(11, (*action_increment)["Number"].get<int32_t>());
-			}
+			Datum& datum = test_action->appendAuxillaryAttribute("TableAttribute");
+			datum.setType(Datum::DatumType::TABLE);
+			test_action->setSubtype("Integer");
+			test_action->setDelay(MilliSeconds(0));
+			Assert::AreEqual("Integer"s, test_action->getSubtype());
+			Assert::IsTrue(MilliSeconds(0) == test_action->getDelay());
+
+			test_world.update(world_state);
+			Assert::AreEqual(1U, test_world.getEventQueue().size());
+			test_world.update(world_state);
+			Assert::AreEqual(11, (*action_increment)["Number"].get<int32_t>());
+
+		}
+
+		TEST_METHOD(ParsingFromFileTest)
+		{
+			GameTime game_time;
+			game_time.SetCurrentTime(std::chrono::steady_clock::now());
+			WorldState world_state;
+			world_state.setGameTime(game_time);
+
+			SectorFactory sectorFactory;
+			EntityFactory factory;
+			ActionIncrementFactory actionIncrementFactory;
+			ReactionAttributedFactory reaction_attributed_factory;
+
+			const std::string file_name = "Content\\WorldTest.json";
+			std::ifstream json_file(file_name);
+			Assert::IsFalse(json_file.bad());
+			json_file.close();
+
+			World world;
+			JsonTableParseHelper::SharedData shared_data(world);
+			JsonTableParseHelper parse_helper;
+			JsonParseMaster parse_master(shared_data);
+			parse_master.addHelper(parse_helper);
+			parse_master.initialize();
+
+			parse_master.parseFromFile(file_name);
+
+			Assert::AreEqual("World"s, world.name());
+
+			Sector* sector1 = world["Sectors"].get<Scope*>(0)->As<Sector>();
+			Assert::AreEqual("Sector1"s, sector1->name());
+
+			Sector* sector2 = world["Sectors"].get<Scope*>(1)->As<Sector>();
+			Assert::AreEqual("Sector2"s, sector2->name());
+
+			Entity* entity1 = (*sector1)["Entities"].get<Scope*>(0)->As<Entity>();
+			Assert::AreEqual("Entity1"s, entity1->name());
+			Entity* entity2 = (*sector1)["Entities"].get<Scope*>(1)->As<Entity>();
+			Assert::AreEqual("Entity2"s, entity2->name());
+			Entity* entity3 = (*sector2)["Entities"].get<Scope*>(0)->As<Entity>();
+			Assert::AreEqual("Entity3"s, entity3->name());
+
+			ActionIncrement* action_increment_one = (*entity2)["Actions"].get<Scope*>(0)->As<ActionIncrement>();
+			Assert::AreEqual("Number"s, (*action_increment_one)["Target"].get<std::string>(0));
+			Assert::AreEqual(100, (*action_increment_one)["Number"].get<int32_t>(0));
+
+			ReactionAttributed* reaction_attributed = (*entity2)["Actions"].get<Scope*>(1)->As<ReactionAttributed>();
+			Assert::AreEqual("integer"s, (*reaction_attributed)["SubType"].get<std::string>(0));
+			/*ActionIncrement* reaction_action_increment = (*reaction_attributed)["ActionIncrement"].get<Scope*>(0)->As<ActionIncrement>();
+			Assert::AreEqual("Number"s, (*reaction_action_increment)["Target"].get<std::string>(0));
+			Assert::AreEqual(200, (*reaction_action_increment)["Number"].get<int32_t>(0));*/
+			world.update(world_state);
+			/*Assert::AreEqual(201, (*reaction_action_increment)["Number"].get<int32_t>(0));*/
+
+			ActionIncrement* action_increment_two = (*entity3)["Actions"].get<Scope*>(0)->As<ActionIncrement>();
+			Assert::AreEqual("Number"s, (*action_increment_two)["Target"].get<std::string>(0));
+			Assert::AreEqual(201, (*action_increment_two)["Number"].get<int32_t>(0));
+			world.update(world_state);
+			Assert::AreEqual(202, (*action_increment_two)["Number"].get<int32_t>(0));
+
 		}
 
 	private:

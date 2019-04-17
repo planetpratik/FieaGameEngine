@@ -6,14 +6,6 @@ namespace FieaGameEngine
 {
 	RTTI_DEFINITIONS(Reaction)
 
-	Reaction::Reaction() : Reaction(std::string())
-	{
-	}
-
-	Reaction::Reaction(const std::string& t_name) : ActionList(TypeIdClass(), t_name)
-	{
-	}
-
 	Vector<Signature> Reaction::Signatures()
 	{
 		return ActionList::Signatures();

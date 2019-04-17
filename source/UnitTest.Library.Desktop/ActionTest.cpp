@@ -10,6 +10,7 @@
 #include "ActionIncrement.h"
 #include "ActionCreateAction.h"
 #include "ActionDestroyAction.h"
+#include "ReactionAttributed.h"
 #include "CppUnitTest.h"
 #include <fstream>
 #include <string>
@@ -318,6 +319,7 @@ namespace UnitTestLibraryDesktop
 			SectorFactory sectorFactory;
 			EntityFactory factory;
 			ActionIncrementFactory actionIncrementFactory;
+			ReactionAttributedFactory reaction_attributed_factory;
 
 			const std::string file_name = "Content\\WorldTest.json";
 			std::ifstream json_file(file_name);

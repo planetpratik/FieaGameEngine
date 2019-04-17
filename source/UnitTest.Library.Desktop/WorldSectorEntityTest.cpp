@@ -8,6 +8,7 @@
 #include <fstream>
 #include <string>
 #include "ActionIncrement.h"
+#include "ReactionAttributed.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace FieaGameEngine;
@@ -296,6 +297,7 @@ namespace UnitTestLibraryDesktop
 			SectorFactory sectorFactory;
 			EntityFactory factory;
 			ActionIncrementFactory action_increment_factory;
+			ReactionAttributedFactory reaction_attributed_factory;
 
 			const std::string file_name = "Content\\WorldTest.json";
 			std::ifstream json_file(file_name);

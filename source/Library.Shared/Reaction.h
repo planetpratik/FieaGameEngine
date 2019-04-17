@@ -11,12 +11,6 @@ namespace FieaGameEngine
 		RTTI_DECLARATIONS(Reaction, ActionList)
 	public:
 
-		/// <summary>Default constructor for Reaction.</summary>
-		Reaction();
-		/// <summary>Parameterised Constructor for Reaction (Explicit).</summary>
-		/// <param name="t_name">Const reference to std::string name with which action is to be initialised.</param>
-		explicit Reaction(const std::string& t_name);
-
 		/// <summary>Copy Constructor for Reaction. (Defaulted).</summary>
 		/// <param name="t_rhs">Const reference to passed Reaction.</param>
 		Reaction(const Reaction& t_rhs) = default;
@@ -42,6 +36,7 @@ namespace FieaGameEngine
 		/// <returns>Vector of Signatures.</returns>
 		static Vector<Signature> Signatures();
 	protected:
+
 		Reaction(const uint64_t& t_type_id, const std::string& t_name);
 	};
 }

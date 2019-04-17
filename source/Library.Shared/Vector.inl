@@ -291,6 +291,16 @@ namespace FieaGameEngine
 		m_data_array = nullptr;
 	}
 
+	template<typename T>
+	inline void Vector<T>::erase()
+	{
+		for (uint32_t i = 0; i < m_size; ++i)
+		{
+			m_data_array[i].~T();
+		}
+		m_size = 0;
+	}
+
 	template <typename T>
 	inline T& Vector<T>::at(uint32_t t_index)
 	{

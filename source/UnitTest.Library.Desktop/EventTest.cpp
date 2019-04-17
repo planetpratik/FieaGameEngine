@@ -53,6 +53,28 @@ namespace UnitTestLibraryDesktop
 #endif
 		}
 
+		TEST_METHOD(RTTI_TEST)
+		{
+			Foo foo;
+			Event<Foo> event_foo(foo);
+			RTTI* rtti = &event_foo;
+			Assert::IsFalse(rtti->Is("Bar"s));
+			Assert::IsTrue(rtti->Is("IEventPublisher"s));
+			Assert::IsFalse(rtti->Is(Bar::TypeIdClass()));
+			Assert::IsTrue(rtti->Is(IEventPublisher::TypeIdClass()));
+			Assert::IsTrue(rtti->Is(rtti->TypeIdInstance()));
+			Bar* b = rtti->As<Bar>();
+			Assert::IsNull(b);
+
+			IEventPublisher* pra = rtti->As<IEventPublisher>();
+			Assert::IsNotNull(pra);
+			RTTI* r = rtti->QueryInterface(Bar::TypeIdClass());
+			Assert::IsNull(r);
+			r = rtti->QueryInterface(IEventPublisher::TypeIdClass());
+			Assert::IsNotNull(r);
+		}
+
+
 		TEST_METHOD(EventSubscribeUnsubscribeTest)
 		{
 			Foo foo(50);
@@ -87,10 +109,7 @@ namespace UnitTestLibraryDesktop
 			event.deliver();
 			Assert::AreEqual(50, sub_foo_one.data());
 			Assert::AreEqual(50, sub_foo_two.data());
-			Event<Foo>::unsubscribe(sub_foo_one);
-			Event<Foo>::unsubscribe(sub_foo_two);
-			Assert::AreEqual(50, sub_foo_one.data());
-			Assert::AreEqual(50, sub_foo_two.data());
+			Event<Foo>::unsubscribeAll();
 		}
 
 		TEST_METHOD(EventMessageTest)
@@ -177,9 +196,7 @@ namespace UnitTestLibraryDesktop
 			event_queue.send(event);
 			Assert::AreEqual(50, sub_foo_one.data());
 			Assert::AreEqual(50, sub_foo_two.data());
-			Event<Foo>::unsubscribe(sub_foo_two);
-			Event<Foo>::unsubscribe(sub_foo_one);
-			//Event<Foo>::unsubscribeAll();
+			Event<Foo>::unsubscribeAll();
 		}
 
 		TEST_METHOD(EventQueueUpdateTest)
@@ -206,8 +223,7 @@ namespace UnitTestLibraryDesktop
 			Assert::AreEqual(60, sub_foo_one.data());
 			Assert::AreEqual(60, sub_foo_two.data());
 
-			Event<Foo>::unsubscribe(sub_foo_one);
-			Event<Foo>::unsubscribe(sub_foo_two);
+			Event<Foo>::unsubscribeAll();
 
 		}
 

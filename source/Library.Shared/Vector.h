@@ -254,6 +254,9 @@ namespace FieaGameEngine
 		/// <summary>Removes all elements from the Vector</summary>
 		void clear();
 
+		/// <summary>Removes all elements from the Vector, but keeps capacity intact.</summary>
+		void erase();
+
 		/// <summary>
 		/// Non-Const implementation of at() method. Reference of an element at given index.
 		/// Throws exception if the index is invalid.

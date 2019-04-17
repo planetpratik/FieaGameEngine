@@ -30,7 +30,7 @@ namespace FieaGameEngine
 	template<typename T>
 	inline void Event<T>::unsubscribeAll()
 	{
-		m_subscribers_list.clear();
+		m_subscribers_list.erase();
 	}
 
 	template<typename T>
