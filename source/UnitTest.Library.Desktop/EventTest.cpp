@@ -213,15 +213,15 @@ namespace UnitTestLibraryDesktop
 			std::shared_ptr<Event<Foo>> eventOne = std::make_shared<Event<Foo>>(foo);
 			std::shared_ptr<Event<Foo>> eventTwo = std::make_shared<Event<Foo>>(another_foo);
 			event_queue.enqueue(eventOne, game_time, MilliSeconds(500));
-			event_queue.enqueue(eventTwo, game_time, MilliSeconds(1000));
+			event_queue.enqueue(eventTwo, game_time, MilliSeconds(1500));
 			event_queue.update(game_time);
-			Assert::AreEqual(50, sub_foo_one.data());
-			Assert::AreEqual(50, sub_foo_two.data());
+			Assert::AreEqual(100, sub_foo_one.data());
+			Assert::AreEqual(100, sub_foo_two.data());
 			
 			game_time.SetCurrentTime(game_time.CurrentTime() + MilliSeconds(501));
 			event_queue.update(game_time);
-			Assert::AreEqual(60, sub_foo_one.data());
-			Assert::AreEqual(60, sub_foo_two.data());
+			Assert::AreEqual(50, sub_foo_one.data());
+			Assert::AreEqual(50, sub_foo_two.data());
 
 			Event<Foo>::unsubscribeAll();
 

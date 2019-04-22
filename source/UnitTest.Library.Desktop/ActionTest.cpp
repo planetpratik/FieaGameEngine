@@ -325,7 +325,6 @@ namespace UnitTestLibraryDesktop
 			std::ifstream json_file(file_name);
 			Assert::IsFalse(json_file.bad());
 			json_file.close();
-
 			World world;
 			JsonTableParseHelper::SharedData shared_data(world);
 			JsonTableParseHelper parse_helper;

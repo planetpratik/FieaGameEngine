@@ -25,6 +25,8 @@ namespace FieaGameEngine
 		/// <param name="t_name">Const reference to string name with which World is to be initialized.</param>
 		explicit World(const std::string& t_name);
 
+		World(const std::string& t_name, EventQueue& t_event_queue);
+
 		/// <summary>Copy Constructor for World (Defaulted).</summary>
 		/// <param name="t_rhs">Const reference to passed World.</param>
 		World(const World& t_rhs) = default;
@@ -88,8 +90,8 @@ namespace FieaGameEngine
 
 	private:
 		std::string m_world_name;
-		WorldState* m_world_state;
-		EventQueue m_event_queue;
+		WorldState* m_world_state = nullptr;
+		EventQueue* m_event_queue = nullptr;
 		const static inline uint32_t sectors_index = 2;
 	};
 }

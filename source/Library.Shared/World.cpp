@@ -14,6 +14,10 @@ namespace FieaGameEngine
 	{
 	}
 
+	World::World(const std::string& t_name, EventQueue& t_event_queue) : Attributed(TypeIdClass()), m_world_name(t_name), m_event_queue(&t_event_queue)
+	{
+	}
+
 	const std::string& World::name() const
 	{
 		return m_world_name;
@@ -40,7 +44,10 @@ namespace FieaGameEngine
 	{
 		t_world_state.world = this;
 		m_world_state = &t_world_state;
-		m_event_queue.update(m_world_state->getGameTime());
+		if (m_event_queue != nullptr)
+		{
+			m_event_queue->update(m_world_state->getGameTime());
+		}
 
 		Datum& t_sectors = sectors();
 		for (uint32_t i = 0; i < t_sectors.size(); ++i)
@@ -76,7 +83,7 @@ namespace FieaGameEngine
 
 	EventQueue& World::getEventQueue()
 	{
-		return m_event_queue;
+		return *m_event_queue;
 	}
 
 	Datum& World::reactions()

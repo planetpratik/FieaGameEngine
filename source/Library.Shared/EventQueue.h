@@ -1,6 +1,5 @@
 #pragma once
 #include "IEventPublisher.h"
-#include "Vector.h"
 
 using MilliSeconds = std::chrono::milliseconds;
 
@@ -66,7 +65,9 @@ namespace FieaGameEngine
 		/// <returns>Returns Number of events (Size) of the EventQueue.</returns>
 		uint32_t size() const;
 	private:
-		Vector<std::shared_ptr<IEventPublisher>> m_event_queue;
+		mutable std::mutex m_mutex;
+		std::vector<std::shared_ptr<IEventPublisher>> m_event_queue;
+		std::vector<std::shared_ptr<IEventPublisher>> m_expired_event_queue;
 	};
 
 }

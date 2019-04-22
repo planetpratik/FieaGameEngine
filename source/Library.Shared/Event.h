@@ -1,5 +1,6 @@
 #pragma once
 #include "IEventPublisher.h"
+#include "Vector.h"
 
 namespace FieaGameEngine
 {
@@ -49,9 +50,19 @@ namespace FieaGameEngine
 
 		/// <summary>Unsubscribe all subscribers to this event type. (Static).</summary>
 		static void unsubscribeAll();
+
+		/// <summary>Get Payload associated with this event. (Const)</summary>
+		/// <returns>Returns const reference to Payload of type T.</returns>
 		const T& message() const;
+
+		uint32_t& getTotalSubscribers() const;
+
+		T& getMutex() const;
+
+
 	private:
 		T payload;
+		static std::mutex m_mutex;
 		static Vector<IEventSubscriber*> m_subscribers_list;
 	};
 }

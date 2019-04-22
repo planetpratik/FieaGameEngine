@@ -259,12 +259,13 @@ namespace UnitTestLibraryDesktop
 			game_time.SetCurrentTime(std::chrono::steady_clock::now());
 			WorldState world_state;
 			world_state.setGameTime(game_time);
+			EventQueue event_queue;
 
 			ReactionAttributedFactory reactions_attributed_factory;
 			EntityFactory entity_factory;
 			ActionEventFactory action_event_factory;
 			ActionIncrementFactory action_increment_factory;
-			World test_world("TestWorld");
+			World test_world("TestWorld", event_queue);
 			ReactionAttributed* reaction = test_world.createReaction("ReactionAttributed")->As<ReactionAttributed>();
 			reaction->setSubtype("Integer"s);
 			Assert::AreEqual("Integer"s, reaction->getSubtype());
@@ -286,6 +287,8 @@ namespace UnitTestLibraryDesktop
 
 			test_world.update(world_state);
 			Assert::AreEqual(1U, test_world.getEventQueue().size());
+			game_time.SetCurrentTime(game_time.CurrentTime() + MilliSeconds(50));
+			world_state.setGameTime(game_time);
 			test_world.update(world_state);
 			Assert::AreEqual(11, (*action_increment)["Number"].get<int32_t>());
 

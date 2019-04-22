@@ -1,8 +1,12 @@
 #pragma once
 #include "RTTI.h"
-#include "Vector.h"
-#include "IEventSubscriber.h"
+#include <vector>
+#include <mutex>
+#include <thread>
+#include <future>
 #include <chrono>
+#include "IEventSubscriber.h"
+#include "Vector.h"
 
 namespace FieaGameEngine
 {
@@ -19,7 +23,7 @@ namespace FieaGameEngine
 
 		/// <summary>Constructor for IEventPublisher (Explicit)</summary>
 		/// <param name="t_subscribers">Reference to Vector of Event Subscribers.</param>
-		explicit IEventPublisher(Vector<IEventSubscriber*>& t_subscribers);
+		explicit IEventPublisher(Vector<IEventSubscriber*>& t_subscribers, std::mutex& t_mutex);
 
 		/// <summary>Destructor for IEventPublisher (Virtual).</summary>
 		virtual ~IEventPublisher() = default;
@@ -62,9 +66,12 @@ namespace FieaGameEngine
 
 		/// <summary>Delivers the Event to Subscriber ( Notifies all subscribers of this event ). </summary>
 		void deliver() const;
+
+		virtual std::mutex& getMutex();
 	private:
 		TimePoint m_enqueued_time;
 		MilliSeconds m_delay;
+		std::mutex* m_mutex = nullptr;
 		Vector<IEventSubscriber*>* m_subscribers_list = nullptr;
 	};
 }
