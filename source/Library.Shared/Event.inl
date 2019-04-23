@@ -36,24 +36,12 @@ namespace FieaGameEngine
 	inline void Event<T>::unsubscribeAll()
 	{
 		std::lock_guard<std::mutex> lock(m_mutex);
-		m_subscribers_list.erase();
+		m_subscribers_list.clear();
 	}
 
 	template<typename T>
 	inline const T& Event<T>::message() const
 	{
 		return payload;
-	}
-
-	template<typename T>
-	inline uint32_t& Event<T>::getTotalSubscribers() const
-	{
-		return m_subscribers_list.size();
-	}
-
-	template<typename T>
-	inline T& Event<T>::getMutex() const
-	{
-		return m_mutex;
 	}
 }

@@ -24,4 +24,9 @@ namespace FieaGameEngine
 		}
 	}
 
+	void SubscriberFoo::setData(const int& t_value)
+	{
+		m_value = t_value;
+	}
+
 }

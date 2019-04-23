@@ -25,6 +25,8 @@
     <ClCompile Include="SubscriberFoo.cpp" />
     <ClCompile Include="EventTest.cpp" />
     <ClCompile Include="ReactionTest.cpp" />
+    <ClCompile Include="UnsubscriberFoo.cpp" />
+    <ClCompile Include="SubscriberEnqueue.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -35,5 +37,7 @@
     <ClInclude Include="JsonIntegerParseHelper.h" />
     <ClInclude Include="ActionIncrement.h" />
     <ClInclude Include="SubscriberFoo.h" />
+    <ClInclude Include="UnsubscriberFoo.h" />
+    <ClInclude Include="SubscriberEnqueue.h" />
   </ItemGroup>
 </Project>

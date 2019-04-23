@@ -4,12 +4,16 @@
 #include "IEventPublisher.h"
 #include "EventQueue.h"
 #include "SubscriberFoo.h"
+#include "UnsubscriberFoo.h"
+#include "SubscriberEnqueue.h"
 #include "Factory.h"
 #include "Foo.h"
 #include "GameTime.h"
+#include "World.h"
 #include <fstream>
 #include <string>
 #include "CppUnitTest.h"
+#include <vector>
 
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -205,7 +209,7 @@ namespace UnitTestLibraryDesktop
 			Event<Foo>::subscribe(sub_foo_one);
 			Event<Foo>::subscribe(sub_foo_two);
 			Foo foo(50);
-			Foo another_foo(60);
+			Foo another_foo(50);
 			EventQueue event_queue;
 
 			GameTime game_time;
@@ -226,6 +230,87 @@ namespace UnitTestLibraryDesktop
 			Event<Foo>::unsubscribeAll();
 
 		}
+
+		TEST_METHOD(AsyncSubscribeUnsubscribeTest)
+		{
+			SubscriberFoo sub_foos[1000];
+			UnsubscriberFoo unsub_foos[500];
+			for (int i = 0; i < 500; ++i)
+			{
+				sub_foos[i].setData(i);
+				Event<Foo>::subscribe(sub_foos[i]);
+				unsub_foos[i].setData(i);
+				Event<Foo>::subscribe(unsub_foos[i]);
+			}
+			for (int i = 500; i < 1000; ++i)
+			{
+				sub_foos[i].setData(i);
+				Event<Foo>::subscribe(sub_foos[i]);
+			}
+			Foo foo(200);
+			Event<Foo> foo_event(foo);
+			foo_event.deliver();
+			for (int i = 0; i < 500; ++i)
+			{
+				Assert::AreEqual(unsub_foos[i].data(), 200);
+			}
+			for (int i = 0; i < 1000; ++i)
+			{
+				Assert::AreEqual(sub_foos[i].data(), 200);
+			}
+			Event<Foo>::unsubscribeAll();
+		}
+
+		TEST_METHOD(AsyncEnqueueUpdateTest)
+		{
+			EventQueue event_queue;
+			GameTime game_time;
+			SubscriberFoo sub_foos[20];
+			vector<shared_ptr<SubscriberEnqueue>> sub_enqueue;
+			std::shared_ptr<SubscriberEnqueue> sub_enqueue_ptr[20];
+			for (int32_t i = 0; i < 20; ++i)
+			{
+				SubscriberEnqueue subscriber(event_queue, game_time);
+				sub_enqueue_ptr[i] = std::make_shared<SubscriberEnqueue>(subscriber);
+				sub_enqueue_ptr[i]->setData(i);
+				sub_enqueue.push_back(sub_enqueue_ptr[i]);
+			}
+
+			// Subscribe all subscribers
+			for (int32_t i = 0; i < 20; ++i)
+			{
+				sub_foos[i].setData(i);
+				Event<Foo>::subscribe(sub_foos[i]);
+				Event<Foo>::subscribe(*sub_enqueue[i]);
+			}
+
+			// Create and Enqueue Events in Event Queue.
+			for (int32_t i = 0; i < 20; ++i)
+			{
+				Foo temp(2000);
+				std::shared_ptr<Event<Foo>> event = std::make_shared<Event<Foo>>(temp);
+				event_queue.enqueue(event, game_time, std::chrono::milliseconds(0));
+			}
+			game_time.SetCurrentTime(game_time.CurrentTime() + MilliSeconds(500));
+
+			// Call Update to check queued subscribers
+
+			event_queue.update(game_time);
+			for (int32_t i = 0; i < 20; ++i)
+			{
+				Assert::AreEqual(sub_enqueue[i]->data(), 2000);
+			}
+
+			game_time.SetCurrentTime(game_time.CurrentTime() + MilliSeconds(500));
+			event_queue.update(game_time);
+
+			for (int32_t i = 0; i < 20; ++i)
+			{
+				Assert::AreEqual(sub_enqueue[i]->data(), 200);
+			}
+			Event<Foo>::unsubscribeAll();
+		}
+
 
 	private:
 		static _CrtMemState s_start_mem_state;

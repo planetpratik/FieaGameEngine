@@ -57,9 +57,4 @@ namespace FieaGameEngine
 			future.get();
 		}
 	}
-
-	std::mutex& IEventPublisher::getMutex()
-	{
-		return *m_mutex;
-	}
 }

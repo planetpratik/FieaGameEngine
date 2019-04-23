@@ -55,11 +55,6 @@ namespace FieaGameEngine
 		/// <returns>Returns const reference to Payload of type T.</returns>
 		const T& message() const;
 
-		uint32_t& getTotalSubscribers() const;
-
-		T& getMutex() const;
-
-
 	private:
 		T payload;
 		static std::mutex m_mutex;

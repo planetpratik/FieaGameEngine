@@ -294,7 +294,7 @@ namespace FieaGameEngine
 	template<typename T>
 	inline void Vector<T>::erase()
 	{
-		for (uint32_t i = 0; i < m_size; ++i)
+		for (uint32_t i = 0; i <= m_capacity; ++i)
 		{
 			m_data_array[i].~T();
 		}

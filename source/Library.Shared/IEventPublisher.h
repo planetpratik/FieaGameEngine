@@ -66,8 +66,6 @@ namespace FieaGameEngine
 
 		/// <summary>Delivers the Event to Subscriber ( Notifies all subscribers of this event ). </summary>
 		void deliver() const;
-
-		virtual std::mutex& getMutex();
 	private:
 		TimePoint m_enqueued_time;
 		MilliSeconds m_delay;
